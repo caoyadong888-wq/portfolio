@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.github/workflows/cloudops-validate.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>.github/workflows/cloudops-validate.yml</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># File-level workflow. It runs tools, check, and test. It does not deploy.</span>
+<span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>cloudops-validate
+<span style="color: #008000; font-weight: bold">on</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">workflow_dispatch</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">push</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">branches</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">main</span>]
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">pull_request</span>:
+<span style="color: #008000; font-weight: bold">permissions</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">contents</span>:<span style="color: #bbbbbb"> </span>read
+<span style="color: #008000; font-weight: bold">jobs</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">validate</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">runs-on</span>:<span style="color: #bbbbbb"> </span>ubuntu-latest
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">timeout-minutes</span>:<span style="color: #bbbbbb"> </span>40
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">defaults</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">run</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">working-directory</span>:<span style="color: #bbbbbb"> </span>cloudops
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">steps</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>checkout
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">uses</span>:<span style="color: #bbbbbb"> </span>actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic"># v4.2.2</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>tools
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">run</span>:<span style="color: #bbbbbb"> </span>make tools
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>check
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">run</span>:<span style="color: #bbbbbb"> </span>make check
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>test
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">run</span>:<span style="color: #bbbbbb"> </span>make test
+</code></pre></div>
+
+</main>
+</body>
+</html>

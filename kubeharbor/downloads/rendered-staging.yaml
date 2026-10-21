@@ -1,0 +1,638 @@
+---
+# Source: ledgerlite/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: namespace
+    app.kubernetes.io/part-of: ledgerlite
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Source: ledgerlite/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ledgerlite-default-deny
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: network
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress: []
+---
+# Source: ledgerlite/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ledgerlite-allow-ingress-nginx
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: network
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ledgerlite
+      app.kubernetes.io/instance: ledgerlite
+      app.kubernetes.io/component: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - port: 8000
+          protocol: TCP
+---
+# Source: ledgerlite/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ledgerlite-allow-prometheus
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: network
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ledgerlite
+      app.kubernetes.io/instance: ledgerlite
+      app.kubernetes.io/component: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 8000
+          protocol: TCP
+---
+# Source: ledgerlite/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ledgerlite-allow-dns
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: network
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - ledgerlite
+      - key: app.kubernetes.io/component
+        operator: In
+        values:
+          - api
+          - migrate
+          - backup
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+# Source: ledgerlite/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ledgerlite-allow-egress-postgres
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: network
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - ledgerlite
+      - key: app.kubernetes.io/component
+        operator: In
+        values:
+          - api
+          - migrate
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: "10.8.0.0/16"
+      ports:
+        - port: 5432
+          protocol: TCP
+---
+# Source: ledgerlite/templates/resourcequota.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ledgerlite
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: quota
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  hard:
+    pods: "30"
+    requests.cpu: "4"
+    requests.memory: "4Gi"
+    limits.cpu: "8"
+    limits.memory: "8Gi"
+    persistentvolumeclaims: "0"
+    requests.storage: "0"
+---
+# Source: ledgerlite/templates/limitrange.yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: ledgerlite
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: limits
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: "50m"
+        memory: "64Mi"
+      default:
+        cpu: "250m"
+        memory: "256Mi"
+      max:
+        cpu: "2"
+        memory: "2Gi"
+---
+# Source: ledgerlite/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ledgerlite-api
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  minAvailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ledgerlite
+      app.kubernetes.io/instance: ledgerlite
+      app.kubernetes.io/component: api
+---
+# Source: ledgerlite/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ledgerlite
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+automountServiceAccountToken: false
+---
+# Source: ledgerlite/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ledgerlite-api
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+data:
+  LOG_LEVEL: "info"
+  PORT: "8000"
+  ENVIRONMENT: "staging"
+  METRICS_PATH: /metrics
+  WEB_CONCURRENCY: "1"
+---
+# Source: ledgerlite/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ledgerlite-api
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+---
+# Source: ledgerlite/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ledgerlite-api
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ledgerlite
+      app.kubernetes.io/instance: ledgerlite
+      app.kubernetes.io/component: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ledgerlite
+        app.kubernetes.io/instance: ledgerlite
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: ledgerlite
+      annotations:
+        checksum/config: 4b38f7c8ff6fe265927bd659944c6037278ea7a8b836a4f55f987da96cbd20db
+    spec:
+      serviceAccountName: ledgerlite
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: ledgerlite
+                    app.kubernetes.io/instance: ledgerlite
+                    app.kubernetes.io/component: api
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: ledgerlite
+              app.kubernetes.io/instance: ledgerlite
+              app.kubernetes.io/component: api
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: ledgerlite
+              app.kubernetes.io/instance: ledgerlite
+              app.kubernetes.io/component: api
+      containers:
+        - name: api
+          image: "ghcr.io/OWNER/ledgerlite:0.1.0"
+          imagePullPolicy: Always
+          command: ["python", "-m", "app"]
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8000"
+            - name: DATA_DIR
+              value: /tmp
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: ledgerlite-api
+                  key: LOG_LEVEL
+            - name: WEB_CONCURRENCY
+              valueFrom:
+                configMapKeyRef:
+                  name: ledgerlite-api
+                  key: WEB_CONCURRENCY
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: ledgerlite-api
+                  key: ENVIRONMENT
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ledgerlite-staging-db
+                  key: DATABASE_URL
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: ledgerlite/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ledgerlite-api
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ledgerlite-api
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+---
+# Source: ledgerlite/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ledgerlite-api
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "ledgerlite.staging.example.com"
+      secretName: ledgerlite-staging-tls
+  rules:
+    - host: "ledgerlite.staging.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ledgerlite-api
+                port:
+                  number: 8000
+---
+# Source: ledgerlite/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ledgerlite-api
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ledgerlite
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ledgerlite
+      app.kubernetes.io/instance: ledgerlite
+      app.kubernetes.io/component: api
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scheme: http
+---
+# Source: ledgerlite/templates/migrate-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ledgerlite-migrate
+  namespace: ledgerlite-staging
+  labels:
+    app.kubernetes.io/name: ledgerlite
+    app.kubernetes.io/instance: ledgerlite
+    app.kubernetes.io/component: migrate
+    app.kubernetes.io/part-of: ledgerlite
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ledgerlite
+        app.kubernetes.io/instance: ledgerlite
+        app.kubernetes.io/component: migrate
+        app.kubernetes.io/part-of: ledgerlite
+    spec:
+      restartPolicy: Never
+      serviceAccountName: ledgerlite
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: "ghcr.io/OWNER/ledgerlite:0.1.0"
+          imagePullPolicy: Always
+          command: ["alembic", "upgrade", "head"]
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ledgerlite-staging-db
+                  key: DATABASE_URL
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          startupProbe:
+            exec:
+              command: ["alembic", "--help"]
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            exec:
+              command: ["alembic", "--help"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: ["alembic", "--help"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

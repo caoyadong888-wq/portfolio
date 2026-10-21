@@ -1,0 +1,235 @@
+{
+  "name": "SMB inquiry router",
+  "nodes": [
+    {
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "name": "Rules",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        40
+      ],
+      "parameters": {
+        "content": "## Classification rules\nPriority: spam, then sales, then support, else general.\nSpam: casino, crypto, viagra, the phrase \"seo backlinks\", the word \"backlink\", or 3 or more http/https/www links.\nSales: price, quote, or order.\nSupport: error, broken, refund, or help.\nMatching is a case-insensitive substring of the message.\nThe webhook answers with JSON {category, row}.",
+        "height": 260,
+        "width": 560,
+        "color": 4
+      }
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "name": "Production swap",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        40
+      ],
+      "parameters": {
+        "content": "## Production swap\nThis demo stores rows in the built-in Data table node (table name smb_inquiries).\nNo external credential is required.\nIn production, replace Append Inquiry Row with Google Sheets \"Append row\" and map name, email, company, message, category, received_at.\nAdd an email node after that when a person should be notified.\nDEMO DATA only. Addresses use example.com.",
+        "height": 260,
+        "width": 520,
+        "color": 6
+      }
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "name": "Receive Inquiry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        380
+      ],
+      "webhookId": "b2000000-0000-4000-8000-000000000003",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "smb-inquiry",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000004",
+      "name": "Ensure Inquiry Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        380
+      ],
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "smb_inquiries",
+        "columns": {
+          "column": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "type": "string"
+            },
+            {
+              "name": "company",
+              "type": "string"
+            },
+            {
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "name": "category",
+              "type": "string"
+            },
+            {
+              "name": "received_at",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      }
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000005",
+      "name": "Classify Inquiry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        380
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function classifyMessage(message) {\n  const text = String(message || '').toLowerCase();\n  const linkMatches = text.match(/https?:\\/\\/|www\\./g);\n  const linkCount = linkMatches ? linkMatches.length : 0;\n  const spamWord = ['casino', 'crypto', 'viagra'].some((word) => text.includes(word));\n  const spam = spamWord || text.includes('seo backlinks') || text.includes('backlink') || linkCount >= 3;\n  if (spam) return 'spam';\n  if (['price', 'quote', 'order'].some((word) => text.includes(word))) return 'sales';\n  if (['error', 'broken', 'refund', 'help'].some((word) => text.includes(word))) return 'support';\n  return 'general';\n}\n\nconst raw = $('Receive Inquiry').first().json;\nconst body = raw.body && typeof raw.body === 'object' ? raw.body : raw;\nconst name = String(body.name || '').trim();\nconst email = String(body.email || '').trim();\nconst company = String(body.company || '').trim();\nconst message = String(body.message || '').trim();\nreturn [{\n  json: {\n    name: name,\n    email: email,\n    company: company,\n    message: message,\n    category: classifyMessage(message),\n    received_at: new Date().toISOString(),\n  },\n}];"
+      }
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000006",
+      "name": "Append Inquiry Row",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1020,
+        380
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "smb_inquiries"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000007",
+      "name": "Shape Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        380
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const item = $('Classify Inquiry').first().json;\nreturn [{\n  json: {\n    category: item.category,\n    row: {\n      name: item.name,\n      email: item.email,\n      company: item.company,\n      message: item.message,\n      category: item.category,\n      received_at: item.received_at,\n    },\n  },\n}];"
+      }
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000008",
+      "name": "Reply To Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1540,
+        380
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Receive Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Ensure Inquiry Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Inquiry Table": {
+      "main": [
+        [
+          {
+            "node": "Classify Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Append Inquiry Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Inquiry Row": {
+      "main": [
+        [
+          {
+            "node": "Shape Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Reply": {
+      "main": [
+        [
+          {
+            "node": "Reply To Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

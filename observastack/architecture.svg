@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 460" role="img" aria-labelledby="title desc">
+  <title id="title">ObservaStack architecture</title>
+  <desc id="desc">Exporters and services feed Prometheus. Prometheus evaluates recording rules and alerts. Alertmanager routes to PagerDuty, Slack, email, and a deadman webhook. Grafana reads Prometheus.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; fill: #141824; }
+  </style>
+  <rect width="980" height="460" fill="#f7f8fb"/>
+  <g>
+    <rect x="24" y="28" width="150" height="300" rx="12" fill="#ffffff" stroke="#d5d9e6"/>
+    <text x="40" y="54" font-size="13" font-weight="700">sources</text>
+    <text x="40" y="88" font-size="13">storefront</text>
+    <text x="40" y="116" font-size="13">orders-api</text>
+    <text x="40" y="144" font-size="13">payments-worker</text>
+    <text x="40" y="172" font-size="13">postgres exporter</text>
+    <text x="40" y="200" font-size="13">node exporter</text>
+    <text x="40" y="228" font-size="13">blackbox exporter</text>
+    <text x="40" y="270" font-size="12" fill="#5c6578">*.larkspur.example</text>
+  </g>
+  <g>
+    <rect x="250" y="70" width="210" height="220" rx="12" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="266" y="100" font-size="15" font-weight="700">Prometheus</text>
+    <text x="266" y="132" font-size="13">scrape 15s</text>
+    <text x="266" y="160" font-size="13">recording rules</text>
+    <text x="266" y="188" font-size="13">alert rules</text>
+    <text x="266" y="230" font-size="12" fill="#5c6578">promtool check + test</text>
+  </g>
+  <g>
+    <rect x="540" y="70" width="200" height="220" rx="12" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="556" y="100" font-size="15" font-weight="700">Alertmanager</text>
+    <text x="556" y="132" font-size="13">route tree</text>
+    <text x="556" y="160" font-size="13">inhibit</text>
+    <text x="556" y="188" font-size="13">time intervals</text>
+    <text x="556" y="230" font-size="12" fill="#5c6578">amtool check + routes</text>
+  </g>
+  <g>
+    <rect x="790" y="36" width="166" height="36" rx="8" fill="#eef0ff" stroke="#c7c9f5"/>
+    <text x="806" y="59" font-size="13">PagerDuty</text>
+    <rect x="790" y="84" width="166" height="36" rx="8" fill="#eef0ff" stroke="#c7c9f5"/>
+    <text x="806" y="107" font-size="13">Slack</text>
+    <rect x="790" y="132" width="166" height="36" rx="8" fill="#eef0ff" stroke="#c7c9f5"/>
+    <text x="806" y="155" font-size="13">email</text>
+    <rect x="790" y="180" width="166" height="36" rx="8" fill="#eef0ff" stroke="#c7c9f5"/>
+    <text x="806" y="203" font-size="13">deadman webhook</text>
+  </g>
+  <g>
+    <rect x="250" y="340" width="490" height="80" rx="12" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="266" y="372" font-size="15" font-weight="700">Grafana</text>
+    <text x="266" y="398" font-size="13">5 dashboards, imported at build time, then shut down</text>
+  </g>
+  <path d="M174 178 H250" stroke="#4f46e5" stroke-width="2" fill="none"/>
+  <path d="M460 178 H540" stroke="#4f46e5" stroke-width="2" fill="none"/>
+  <path d="M740 150 H790" stroke="#4f46e5" stroke-width="2" fill="none"/>
+  <path d="M355 290 V340" stroke="#4f46e5" stroke-width="2" fill="none"/>
+</svg>

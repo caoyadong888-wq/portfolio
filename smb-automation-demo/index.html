@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Small-business automation demo (n8n)</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <style>
+    body { font-family: "Noto Sans CJK SC", "Noto Sans CJK TC", "WenQuanYi Zen Hei", sans-serif; }
+    .banner { background: #fff6e0; border: 1px solid #ead7a1; border-radius: 12px; padding: 12px 14px; margin: 12px 0; }
+    pre, .flow { white-space: pre-wrap; background: #141824; color: #f4f6fb; padding: 12px; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    figure { margin: 0 0 18px; }
+    figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
+    .table-scroll { max-width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px; vertical-align: top; overflow-wrap: anywhere; }
+    img.shot { width: 100%; border: 1px solid var(--line); border-radius: 12px; }
+    .links a { margin-right: 12px; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Portfolio sample</p>
+      <h1>Small-business automation demo (n8n)</h1>
+      <p class="lead links"><a href="zh.html">中文</a> <a href="workflow.json">workflow.json</a> <a href="results.json">results.json</a></p>
+      <p class="value">A webhook accepts a customer inquiry, classifies it with keyword rules, appends a row to n8n's built-in data table, and answers with JSON. No credential and no external service are used. The eight rows below are DEMO DATA / 演示数据 from a local n8n 2.43.8 community run.</p>
+    </div>
+  </header>
+  <main>
+    <section class="section">
+      <div class="wrap">
+        <h2>What it does</h2>
+        <p>A small team can drop this workflow in front of a contact form. Sales questions, support problems, and obvious spam land in different categories, and every accepted call leaves a row that can later move to a spreadsheet.</p>
+        <h2>Flow</h2>
+        <pre class="flow">POST /webhook/smb-inquiry
+        |
+        v
+Ensure Inquiry Table   Data table create, name smb_inquiries, reuse when present
+        |
+        v
+Classify Inquiry       keyword rules below
+        |
+        v
+Append Inquiry Row     Data table insert
+        |
+        v
+Shape Reply            JSON object category and row
+        |
+        v
+Reply To Webhook</pre>
+        <h2>Classification rules</h2>
+        <p>The message is lower-cased. The first matching group wins.</p>
+        <ul>
+          <li><strong>spam</strong> — casino, crypto, viagra, the phrase "seo backlinks", the word "backlink", or three or more http, https, or www links.</li>
+          <li><strong>sales</strong> — price, quote, or order.</li>
+          <li><strong>support</strong> — error, broken, refund, or help.</li>
+          <li><strong>general</strong> — anything else.</li>
+        </ul>
+        <p>Matching is a substring, so "errors" counts as support and "quotes" counts as sales. Spam is tested before sales and support.</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>Screenshots</h2>
+        <figure>
+          <img class="shot" src="img/01-workflow-editor.png" alt="n8n editor canvas showing the inquiry workflow" width="1280" height="800">
+          <figcaption>Editor canvas of the published workflow, after signing in.</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="img/02-executions.png" alt="n8n executions list and one successful run" width="1280" height="800">
+          <figcaption>Executions list and one successful run. Each node completed.</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="img/03-result-table.png" alt="n8n data table with eight demo inquiry rows" width="1280" height="800">
+          <figcaption>Data table smb_inquiries after the eight demo inquiries. DEMO DATA / 演示数据.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>Results</h2>
+        <p class="banner">DEMO DATA / 演示数据. Names start with DEMO. Mail uses example.com. These are the JSON bodies returned by the webhook.</p>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Message</th><th>Category</th><th>Received</th></tr></thead>
+          <tbody>
+            <tr><td>DEMO Mara Chen</td><td>mara.chen@example.com</td><td>Northwind Outfitters</td><td>Please send a price quote for 20 seats of the annual plan.</td><td>sales</td><td>2026-10-20T02:10:52.563Z</td></tr>
+<tr><td>DEMO Luis Ortega</td><td>luis.ortega@example.com</td><td>Fabrikam Studio</td><td>We want to place an order for the starter package this week.</td><td>sales</td><td>2026-10-20T02:10:52.649Z</td></tr>
+<tr><td>DEMO Priya Shah</td><td>priya.shah@example.com</td><td>Contoso Labs</td><td>The export button is broken and shows an error after login.</td><td>support</td><td>2026-10-20T02:10:52.725Z</td></tr>
+<tr><td>DEMO Owen Blake</td><td>owen.blake@example.com</td><td>Adventure Works</td><td>I need help with a refund for invoice 1042.</td><td>support</td><td>2026-10-20T02:10:52.798Z</td></tr>
+<tr><td>DEMO Casino Promo</td><td>casino.promo@example.com</td><td>Lucky Fields</td><td>Play at our casino tonight and claim a welcome bonus.</td><td>spam</td><td>2026-10-20T02:10:52.853Z</td></tr>
+<tr><td>DEMO Link Farm</td><td>links.farm@example.com</td><td>SEO Partners</td><td>Buy crypto signals and seo backlinks. See https://example.com/a https://example.com/b https://example.com/c</td><td>spam</td><td>2026-10-20T02:10:52.909Z</td></tr>
+<tr><td>DEMO Pill Ads</td><td>pills.ads@example.com</td><td>Health Noise</td><td>Cheap viagra shipped overnight, no questions asked.</td><td>spam</td><td>2026-10-20T02:10:52.968Z</td></tr>
+<tr><td>DEMO Nina Park</td><td>nina.park@example.com</td><td>Alpine Books</td><td>Hello, we read the company page and the catalog looks clear.</td><td>general</td><td>2026-10-20T02:10:53.022Z</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>Import</h2>
+        <ol>
+          <li>Use n8n community 2.43.x. This file was imported on 2.43.8.</li>
+          <li>Download <a href="workflow.json">workflow.json</a>.</li>
+          <li>In the workflow list choose Import from File, or run <code>n8n import:workflow --input=workflow.json</code>.</li>
+          <li>Publish the workflow. On 2.43 the CLI command is <code>n8n publish:workflow --id=WORKFLOW_ID</code>.</li>
+          <li>POST JSON to <code>/webhook/smb-inquiry</code> with name, email, company, and message. The first call creates the data table <code>smb_inquiries</code>.</li>
+        </ol>
+        <h2>Swap in Google Sheets or email</h2>
+        <p>The last storage node is the built-in Data table node so the sample runs with no credential. In production, replace Append Inquiry Row with Google Sheets, operation Append row, and map name, email, company, message, category, and received_at. Add a Gmail or SMTP node on that same success path when someone should be notified. Keep Reply To Webhook last so the caller still receives <code>{category, row}</code>.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

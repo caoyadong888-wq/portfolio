@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlackboxProbeFailed</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../index.html">概览</a>
+<a href="../alerts.html">告警</a>
+<a href="../slo.html">SLO</a>
+<a href="../routing.html">路由</a>
+<a href="../files/index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>BlackboxProbeFailed</h1>
+<pre># BlackboxProbeFailed
+
+Larkspur Grocers is fictional. This note explains the alert. It is not an incident report. It does not record a page, a customer impact, or an MTTR.
+
+## Signal
+
+- Severity: `critical`
+- Team: `platform`
+- Pending duration (`for`): 5m
+
+```promql
+probe_success == 0
+```
+
+## What the condition means
+
+probe_success has been 0 for 5 minutes on a blackbox HTTP or TLS target.
+
+## What an on-call would check
+
+1. Read the expression above and the recording rules it uses.
+2. Compare it with the promtool unit tests in `tests/rules/`. Every alert except Watchdog has a firing case and a non-firing case.
+3. The annotation `runbook_url` is `https://runbooks.larkspur.example/BlackboxProbeFailed`. That host is a placeholder. This file is the copy in the repo.
+4. This stack does not page anyone. Receivers use `*_file` credential paths and `example.invalid`.
+
+</pre>
+<p><a href="../alerts.html">返回告警目录</a></p>
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

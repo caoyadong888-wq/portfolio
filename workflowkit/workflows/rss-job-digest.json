@@ -1,0 +1,292 @@
+{
+  "name": "RSS job digest",
+  "nodes": [
+    {
+      "id": "00000000-0000-4000-8000-000000003001",
+      "name": "How The Job Digest Works",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        40
+      ],
+      "parameters": {
+        "content": "## RSS job digest\nDaily At Seven uses cron 0 7 * * * (07:00 UTC).\nRead Public Job Feed loads the public Jobicy job feed at https://jobicy.com/?feed=job_feed.\nSource: Jobicy (jobicy.com), used with attribution.\nKeep Keyword Matches keeps items whose title, snippet, or link contains engineer, developer, python, or remote.\nDrop Already Sent Items hides ids already stored in workflow static data.\nSend Digest Email sends one plain-text summary. Mark Items Sent runs only after that node, so a failed send can be retried the next day.",
+        "height": 340,
+        "width": 600,
+        "color": 2
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000003002",
+      "name": "Feed And Mail Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        860,
+        40
+      ],
+      "parameters": {
+        "content": "## Setup\nThe RSS URL is a public feed and needs no credential.\nAttach an SMTP credential on Send Digest Email.\nSet WORKFLOWKIT_FROM and WORKFLOWKIT_TO in the n8n environment.\nEdit DEFAULT_KEYWORDS inside Keep Keyword Matches to change the filter.\nThe digest lists at most 20 new items.",
+        "height": 240,
+        "width": 420,
+        "color": 6
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000003003",
+      "name": "Daily At Seven",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        400
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000003004",
+      "name": "Read Public Job Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        540,
+        400
+      ],
+      "parameters": {
+        "url": "https://jobicy.com/?feed=job_feed",
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000003005",
+      "name": "Keep Keyword Matches",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function normalizeItem(raw) {\n  const source = raw && typeof raw === 'object' ? raw : {};\n  const title = String(source.title || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\n  const link = String(source.link || '').trim();\n  const id = String(source.guid || source.link || title).trim();\n  const snippet = String(source.contentSnippet || source.content || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 240);\n  return { id: id, title: title, link: link, snippet: snippet };\n}\n\nfunction keywordHits(item, keywords) {\n  const title = String((item && item.title) || '');\n  const snippet = String((item && item.snippet) || '');\n  const link = String((item && item.link) || '');\n  const hay = (title + '\\n' + snippet + '\\n' + link).toLowerCase();\n  const hits = [];\n  const list = Array.isArray(keywords) ? keywords : [];\n  for (let i = 0; i < list.length; i++) {\n    const needle = String(list[i] || '').toLowerCase();\n    if (needle && hay.indexOf(needle) !== -1) hits.push(needle);\n  }\n  return hits;\n}\n\nconst DEFAULT_KEYWORDS = ['engineer', 'developer', 'python', 'remote'];\n\nif (typeof $input === 'undefined') {\n  return { normalizeItem: normalizeItem, keywordHits: keywordHits, DEFAULT_KEYWORDS: DEFAULT_KEYWORDS };\n}\n\nconst matches = [];\nconst items = $input.all();\nfor (let i = 0; i < items.length; i++) {\n  const normalized = normalizeItem(items[i].json || {});\n  const hits = keywordHits(normalized, DEFAULT_KEYWORDS);\n  if (hits.length && normalized.id) {\n    matches.push({\n      id: normalized.id,\n      title: normalized.title,\n      link: normalized.link,\n      snippet: normalized.snippet,\n      keywords: hits,\n    });\n  }\n}\nreturn [{\n  json: {\n    matches: matches,\n    count: matches.length,\n    hasItems: matches.length ? 'yes' : 'no',\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000003006",
+      "name": "Drop Already Sent Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function selectUnseen(items, seen) {\n  const unseen = [];\n  const map = seen && typeof seen === 'object' ? seen : {};\n  const list = Array.isArray(items) ? items : [];\n  for (let i = 0; i < list.length; i++) {\n    const item = list[i];\n    const id = String((item && item.id) || '');\n    if (!id || Object.prototype.hasOwnProperty.call(map, id)) continue;\n    unseen.push(item);\n  }\n  return unseen;\n}\n\nif (typeof $input === 'undefined') {\n  return { selectUnseen: selectUnseen };\n}\n\nconst incoming = $input.first().json || {};\nconst staticData = $getWorkflowStaticData('global');\nconst unseen = selectUnseen(incoming.matches || [], staticData.sent || {});\nreturn [{\n  json: {\n    matches: unseen,\n    count: unseen.length,\n    hasItems: unseen.length ? 'yes' : 'no',\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000003008",
+      "name": "Digest Has Items",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        400
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000003007",
+              "leftValue": "={{ $json.hasItems }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000003009",
+      "name": "Skip Empty Digest",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        640
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000300a",
+      "name": "Build Digest Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function buildDigest(items, generatedAt) {\n  const list = Array.isArray(items) ? items : [];\n  const lines = ['Job digest', 'Items: ' + list.length, 'Generated: ' + String(generatedAt || ''), ''];\n  const shown = list.slice(0, 20);\n  for (let i = 0; i < shown.length; i++) {\n    const item = shown[i];\n    lines.push('- ' + String(item.title || 'untitled'));\n    if (item.link) lines.push('  ' + String(item.link));\n    if (item.keywords && item.keywords.length) lines.push('  keywords: ' + item.keywords.join(', '));\n  }\n  if (!list.length) lines.push('No new items.');\n  const ids = [];\n  for (let i = 0; i < list.length; i++) {\n    const id = String((list[i] && list[i].id) || '');\n    if (id) ids.push(id);\n  }\n  return {\n    subject: 'Job digest (' + list.length + ')',\n    text: lines.join('\\n'),\n    ids: ids,\n    count: list.length,\n  };\n}\n\nif (typeof $input === 'undefined') {\n  return { buildDigest: buildDigest };\n}\n\nconst incoming = $input.first().json || {};\nconst digest = buildDigest(incoming.matches || [], new Date().toISOString());\nreturn [{ json: digest }];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000300b",
+      "name": "Send Digest Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2040,
+        400
+      ],
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "fromEmail": "={{ $env.WORKFLOWKIT_FROM }}",
+        "toEmail": "={{ $env.WORKFLOWKIT_TO }}",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000300c",
+      "name": "Mark Items Sent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2340,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function markSent(seen, ids) {\n  const next = {};\n  const source = seen && typeof seen === 'object' ? seen : {};\n  const keys = Object.keys(source);\n  for (let i = 0; i < keys.length; i++) next[keys[i]] = true;\n  const list = Array.isArray(ids) ? ids : [];\n  for (let i = 0; i < list.length; i++) {\n    const id = String(list[i] || '');\n    if (id) next[id] = true;\n  }\n  return next;\n}\n\nif (typeof $input === 'undefined') {\n  return { markSent: markSent };\n}\n\nconst built = $('Build Digest Email').first().json || {};\nconst staticData = $getWorkflowStaticData('global');\nconst next = markSent(staticData.sent, built.ids || []);\nstaticData.sent = next;\nreturn [{ json: { marked: (built.ids || []).length, hasItems: 'yes' } }];\n"
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily At Seven": {
+      "main": [
+        [
+          {
+            "node": "Read Public Job Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Public Job Feed": {
+      "main": [
+        [
+          {
+            "node": "Keep Keyword Matches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Keyword Matches": {
+      "main": [
+        [
+          {
+            "node": "Drop Already Sent Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Drop Already Sent Items": {
+      "main": [
+        [
+          {
+            "node": "Digest Has Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Digest Has Items": {
+      "main": [
+        [
+          {
+            "node": "Build Digest Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Empty Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Digest Email": {
+      "main": [
+        [
+          {
+            "node": "Send Digest Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Digest Email": {
+      "main": [
+        [
+          {
+            "node": "Mark Items Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>demo-app/README.md</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>demo-app/README.md</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold"># demo-app</span>
+
+Stdlib Python process that exposes <span style="color: #BA2121">`metrics/catalog.yml`</span> as Prometheus text.
+
+Larkspur Grocers is fictional. The numbers in <span style="color: #BA2121">`--dump`</span> are one legal sample per family so <span style="color: #BA2121">`promtool check metrics`</span> can lint the names. They are not a traffic report.
+
+<span style="color: #BA2121">```bash</span>
+python<span style="color: #bbbbbb"> </span>demo-app/app.py<span style="color: #bbbbbb"> </span>--dump
+python<span style="color: #bbbbbb"> </span>demo-app/app.py<span style="color: #bbbbbb">   </span><span style="color: #3D7B7B; font-style: italic"># /metrics and /healthz on port 8080</span>
+<span style="color: #BA2121">```</span>
+
+The compose file is not executed on this box (no Docker). <span style="color: #BA2121">`CATALOG_PATH`</span> overrides the catalog location inside the image.
+
+Series whose names look like node_exporter, postgres_exporter, blackbox, Prometheus, or Alertmanager are part of the fixture so the rules and the linter share one catalog. <span style="color: #BA2121">`ALERTS`</span> in this output is not the result of evaluating alerting rules.
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

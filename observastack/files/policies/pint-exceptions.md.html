@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>policies/pint-exceptions.md</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>policies/pint-exceptions.md</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold"># pint exceptions</span>
+
+Offline lint is <span style="color: #BA2121">`pint --offline lint rules/`</span> with <span style="color: #BA2121">`policies/.pint.hcl`</span>.
+<span style="color: #BA2121">`--fail-on`</span> stays at the default <span style="color: #BA2121">`bug`</span>. A finding is listed here only when a check is disabled or a bug is accepted.
+
+<span style="color: #800080; font-weight: bold">## alerts/for and alerts/comparison on Watchdog</span>
+
+<span style="color: #BA2121">`rules/alerts/meta.yml`</span> disables <span style="color: #BA2121">`alerts/for`</span> and <span style="color: #BA2121">`alerts/comparison`</span> on the <span style="color: #BA2121">`Watchdog`</span> rule.
+
+Watchdog is a dead-man&#39;s switch (<span style="color: #BA2121">`vector(1)`</span>). It is supposed to be firing whenever rule evaluation works. A <span style="color: #BA2121">`for`</span> duration would delay that signal and could hide a stalled pipeline. <span style="color: #BA2121">`alerts/comparison`</span> warns that the query always returns a sample; that is the point of the alert. Every other alert has <span style="color: #BA2121">`for`</span> of at least 1 minute. That minimum is enforced by <span style="color: #BA2121">`tests/test_rules_policy.py`</span>, not by a pint <span style="color: #BA2121">`alerts { range = &quot;1m&quot; }`</span> block, because that block cannot express a single-rule exception on its own.
+
+<span style="color: #800080; font-weight: bold">## promql/impossible on the latency threshold union</span>
+
+<span style="color: #BA2121">`rules/recording/red.yml`</span> disables <span style="color: #BA2121">`promql/impossible`</span> on <span style="color: #BA2121">`service:http_latency_p95_threshold_seconds:constant`</span>.
+
+The expression is three <span style="color: #BA2121">`label_replace(vector(...))`</span> branches combined with <span style="color: #BA2121">`or`</span>, each with a different <span style="color: #BA2121">`service`</span> label. PromQL <span style="color: #BA2121">`or`</span> keeps every non-matching label set, so all three thresholds are present. <span style="color: #BA2121">`promtool test rules`</span> asserts the three samples. pint treats a non-empty left-hand side as dead code and would drop the other two services.
+
+<span style="color: #800080; font-weight: bold">## amtool and active time intervals</span>
+
+Not a pint exception. Recorded here so the routing notes stay next to the policy files: <span style="color: #BA2121">`amtool config routes test`</span> in Alertmanager v0.34.1 matches the routing tree only. It does not evaluate <span style="color: #BA2121">`active_time_intervals`</span> or <span style="color: #BA2121">`mute_time_intervals`</span>. A warning with <span style="color: #BA2121">`team=platform`</span> therefore resolves to <span style="color: #BA2121">`slack-platform`</span> in <span style="color: #BA2121">`amtool`</span> even outside <span style="color: #BA2121">`business-hours`</span>. <span style="color: #BA2121">`amtool check-config`</span> still parses those intervals.
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

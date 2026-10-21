@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KubeHarbor — case study</title>
+  <meta name="description" content="Helm chart, Kustomize overlays, and Argo CD apps for a FastAPI service, validated offline">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="../kubeharbor/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. Manifests are rendered and validated offline; nothing is deployed to a cluster. Vandelay Industries is fictional, not a client.</p>
+    <article class="readme">
+      <h1>KubeHarbor</h1>
+      <p>KubeHarbor is a static portfolio demo. It packages the fictional Vandelay Industries LedgerLite FastAPI API as a Helm chart, Kustomize overlays, and Argo CD application manifests. The manifests are rendered and validated offline. Nothing in this project is deployed to a cluster. kind was not run. There is no live cluster.</p>
+      <p>Vandelay Industries is fictional. The container image <code>ghcr.io/OWNER/ledgerlite:0.1.0</code> is a placeholder and is not claimed to be published. The prod digest <code>sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef</code> is a placeholder.</p>
+      <p>The chart listens on port 8000. Probes use <code>/healthz</code>, <code>/readyz</code>, and a startup probe. The migrate Job runs <code>alembic upgrade head</code>.</p>
+      <h2>What is rendered</h2>
+      <p>Three environments, <code>ledgerlite-dev</code>, <code>ledgerlite-staging</code>, and <code>ledgerlite-prod</code>:</p>
+      <table><thead><tr><th></th><th>dev</th><th>staging</th><th>prod</th></tr></thead><tbody><tr><td>replicas / HPA</td><td>1 / off</td><td>2 / 2–4</td><td>3 / 3–10</td></tr><tr><td>API resources</td><td>50m/64Mi → 250m/256Mi</td><td>100m/128Mi → 500m/256Mi</td><td>250m/256Mi → 1/512Mi</td></tr><tr><td>PDB</td><td>none</td><td>minAvailable 1</td><td>minAvailable 2</td></tr><tr><td>Postgres</td><td>in-cluster StatefulSet</td><td>external</td><td>external</td></tr><tr><td>ServiceMonitor</td><td>off</td><td>on</td><td>on</td></tr><tr><td>ClusterIssuer</td><td>letsencrypt-staging</td><td>letsencrypt-staging</td><td>letsencrypt-prod</td></tr><tr><td>Image</td><td>tag <code>0.1.0</code></td><td>tag <code>0.1.0</code></td><td>digest pin</td></tr></tbody></table>
+      <p><code>helm template charts/ledgerlite</code> with the default values fails on purpose. The error contains <code>existingSecret</code>. Set <code>existingSecret</code> to a Secret name, or set <code>externalSecrets.enabled=true</code>. The chart does not put a database URL or a password in values.</p>
+      <h2>Extra objects</h2>
+      <p>The minimum file list did not name every object the two renderers have to share. These were added so the Helm and Kustomize output stay in the same set:</p>
+      <ul><li>Helm templates <code>namespace.yaml</code>, <code>resourcequota.yaml</code>, and <code>limitrange.yaml</code> create the namespace (Pod Security <code>restricted</code>), the quota, and the limit range.</li><li>Helm template <code>backup-pvc.yaml</code> is the dev backup volume.</li><li>The dev Kustomize overlay adds the Postgres StatefulSet, the headless Service (<code>clusterIP: None</code>), the backup PVC, the backup CronJob (<code>pg_dump</code>, 7 files), and the in-cluster Postgres NetworkPolicies.</li><li><code>externalsecret.yaml</code> renders an <code>external-secrets.io/v1</code> ExternalSecret when <code>externalSecrets.enabled</code> is true. A separate render, <code>rendered/helm/dev-externalsecret.yaml</code>, exercises that schema. It is not one of the six compared renders.</li></ul>
+      <p>The Kustomize migrate Job is a normal Job with <code>argocd.argoproj.io/hook: PreSync</code>. The Helm Job uses <code>helm.sh/hook: pre-install,pre-upgrade</code>. The consistency test ignores only those hook annotations (and the Helm <code>checksum/config</code> annotation).</p>
+      <h2>Layout</h2>
+      <ul><li><code>charts/ledgerlite/</code> Helm chart, values, schema, and helm-unittest suites.</li><li><code>kustomize/base</code>, <code>kustomize/components/{external-db,monitoring,pdb}</code>, <code>kustomize/overlays/{dev,staging,prod}</code>.</li><li><code>gitops/argocd/</code> AppProject, three Applications, and an app-of-apps. Dev and staging sync from the Helm chart with automation on. Prod syncs from the Kustomize prod overlay with automation off, and with prune and selfHeal on. These files are not applied.</li><li><code>rendered/</code> committed Helm and Kustomize output. <code>make render</code> must not change it.</li><li><code>results/checks.json</code> is written by <code>make check</code> from real tool output.</li><li><code>policies/.kube-linter.yaml</code> and <code>policies/checkov-skips.md</code> hold every exclusion or skip, with a reason.</li><li><code>site/kubeharbor/</code> is the static page, built by <code>make showcase</code>.</li></ul>
+      <h2>Commands</h2>
+      <p>From this directory:</p>
+      <pre><code class="language-bash">make tools
+      make render
+      make check
+      make showcase
+      make test</code></pre>
+      <p><code>make tools</code> downloads pinned linux-amd64 binaries into <code>.tools/</code> (gitignored) and checks the sha256 values hardcoded in <code>scripts/install_tools.sh</code>. Helm cache, config, data, and plugins stay under <code>.tools/helm</code>. checkov is installed into <code>/tmp/kubeharbor-checkov</code>. pytest, PyYAML, and Pygments are installed into <code>.venv</code>.</p>
+      <p>Pinned tools: helm v3.16.4, kustomize v5.4.3, kubeconform v0.6.7, kube-linter v0.7.6, helm-unittest v0.7.2, checkov 3.2.449.</p>
+      <p><code>make check</code> lints the three values files with <code>helm lint --strict</code>, runs helm-unittest, kubeconform, kube-linter, checkov, and pytest, then writes <code>results/checks.json</code>. kubeconform uses <code>-strict</code> and local schemas only. It does not pass <code>-ignore-missing-schemas</code>. kubeconform v0.6.7 rejects the version token <code>1.30.x</code>, so the command passes <code>-kubernetes-version 1.30.14</code>. The schema files are the <code>v1.30.14-standalone-strict</code> set plus the ServiceMonitor, Certificate, ExternalSecret, Application, and AppProject schemas. Every rendered file, the ExternalSecret render, and <code>gitops/argocd/*.yaml</code> are validated. Skipped resources must be 0.</p>
+      <p>Checkov runs the Kubernetes framework on <code>rendered/</code> and <code>gitops/</code>, and the Helm framework on the chart. Skips are listed in <code>policies/checkov-skips.md</code> and <code>policies/checkov.yaml</code>. The page copies the counts from <code>results/checks.json</code>.</p>
+      <h2>Secret names</h2>
+      <p>Create the Secret in the target namespace before install. The value below is a placeholder, not a credential:</p>
+      <pre><code class="language-bash">kubectl -n ledgerlite-dev create secret generic ledgerlite-dev-db \
+        --from-literal=DATABASE_URL=&#x27;REPLACE_ME&#x27; \
+        --from-literal=POSTGRES_USER=&#x27;REPLACE_ME&#x27; \
+        --from-literal=POSTGRES_PASSWORD=&#x27;REPLACE_ME&#x27; \
+        --from-literal=POSTGRES_DB=&#x27;REPLACE_ME&#x27;</code></pre>
+      <p>Staging and prod only need <code>DATABASE_URL</code> in <code>ledgerlite-staging-db</code> and <code>ledgerlite-prod-db</code>. An ExternalSecret can point at the ClusterSecretStore name in values (<code>vandelay-cluster-store</code> in the defaults). That store is not a real cluster.</p>
+      <h2>GitHub workflow</h2>
+      <p><code>.github/workflows/k8s.yml</code> would run <code>make tools</code>, <code>make check</code>, and <code>make showcase</code> on <code>ubuntu-latest</code>. This monorepo does not register that file, because GitHub only loads workflows from the repository root. The workflow is not executed here, and it has no secrets.</p>
+      <h2>Installing on kind when Docker is available</h2>
+      <p>These are instructions for a machine that has Docker and kind. They were not run for this demo. The showcase page does not claim that a kind cluster exists.</p>
+      <pre><code class="language-bash">kind create cluster --name ledgerlite
+      kubectl create secret generic ledgerlite-dev-db -n ledgerlite-dev \
+        --from-literal=DATABASE_URL=&#x27;REPLACE_ME&#x27; \
+        --from-literal=POSTGRES_USER=&#x27;REPLACE_ME&#x27; \
+        --from-literal=POSTGRES_PASSWORD=&#x27;REPLACE_ME&#x27; \
+        --from-literal=POSTGRES_DB=&#x27;REPLACE_ME&#x27; || true
+      helm install ledgerlite charts/ledgerlite \
+        --namespace ledgerlite-dev --create-namespace \
+        -f charts/ledgerlite/values-dev.yaml
+      kubectl apply -k kustomize/overlays/dev
+      kubectl apply -f gitops/argocd/project.yaml
+      kubectl apply -f gitops/argocd/app-dev.yaml
+      kind delete cluster --name ledgerlite</code></pre>
+      <p>The namespace create and the Secret will race if you paste this as one script. Create the namespace, then the Secret, then install. The image pull will fail until a real image replaces the placeholder.</p>
+      <h2>Showcase</h2>
+      <p><code>https://3.1.79.63/portfolio/kubeharbor/</code> is a static page. It has no process and no port. The footer states that the manifests were rendered and validated offline, that nothing was deployed, and that the client is fictional.</p>
+    </article>
+    <p class="case-cta"><a class="btn" href="../kubeharbor/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

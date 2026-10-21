@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2972" height="784" viewBox="216 16 2972 784" role="img">
+<title>Workflow canvas</title>
+<style>text{font-family:system-ui,sans-serif}</style>
+<rect x="240" y="40" width="520" height="280" rx="12" fill="#fef3c7" stroke="#f5d98a"/>
+<text x="254" y="68" font-size="14" font-weight="700" fill="#92400e">How Lead Intake Works</text>
+<rect x="820" y="40" width="460" height="280" rx="12" fill="#fef3c7" stroke="#f5d98a"/>
+<text x="834" y="68" font-size="14" font-weight="700" fill="#92400e">Credentials And Error Branch</text>
+<path d="M 480 440 C 520 440, 480 436.0, 520 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 760 440 C 800 440, 760 436.0, 800 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1040 424 C 1080 424, 1060 436.0, 1100 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1040 452 C 1160.0 452, 680.0 676.0, 800 676.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1040 680 C 1080 680, 1060 676.0, 1100 676.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1340 440 C 1380 440, 1360 436.0, 1400 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1640 424 C 1680 424, 1660 436.0, 1700 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1640 452 C 1760.0 452, 1280.0 676.0, 1400 676.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1640 680 C 1680 680, 1660 676.0, 1700 676.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1940 440 C 1980 440, 1960 436.0, 2000 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 2240 440 C 2280 440, 2260 436.0, 2300 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 2120.0 472 C 2120.0 512, 2260 696, 2300 696" fill="none" stroke="#b91c1c" stroke-width="2" stroke-dasharray="5 4"/>
+<path d="M 2540 440 C 2580 440, 2560 436.0, 2600 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 2420.0 472 C 2420.0 512, 2260 696, 2300 696" fill="none" stroke="#b91c1c" stroke-width="2" stroke-dasharray="5 4"/>
+<path d="M 2840 440 C 2880 440, 2860 436.0, 2900 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 2540 720 C 2580 720, 2560 716.0, 2600 716.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<rect x="240" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="252" y="428" font-size="13" font-weight="700" fill="#141824">Receive Lead</text>
+<text x="252" y="450" font-size="11" fill="#5c6578">webhook</text>
+<rect x="520" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="532" y="428" font-size="13" font-weight="700" fill="#141824">Validate Lead Payload</text>
+<text x="532" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="800" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="812" y="428" font-size="13" font-weight="700" fill="#141824">Lead Is Valid</text>
+<text x="812" y="450" font-size="11" fill="#5c6578">if</text>
+<rect x="800" y="640" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="812" y="668" font-size="13" font-weight="700" fill="#141824">Log Validation Failure</text>
+<text x="812" y="690" font-size="11" fill="#5c6578">code</text>
+<rect x="1100" y="640" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1112" y="668" font-size="13" font-weight="700" fill="#141824">Reply Validation Error</text>
+<text x="1112" y="690" font-size="11" fill="#5c6578">respondToWebhook</text>
+<rect x="1100" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1112" y="428" font-size="13" font-weight="700" fill="#141824">Deduplicate By Email And Day</text>
+<text x="1112" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="1400" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1412" y="428" font-size="13" font-weight="700" fill="#141824">Lead Is New</text>
+<text x="1412" y="450" font-size="11" fill="#5c6578">if</text>
+<rect x="1400" y="640" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1412" y="668" font-size="13" font-weight="700" fill="#141824">Log Duplicate Lead</text>
+<text x="1412" y="690" font-size="11" fill="#5c6578">code</text>
+<rect x="1700" y="640" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1712" y="668" font-size="13" font-weight="700" fill="#141824">Reply Duplicate</text>
+<text x="1712" y="690" font-size="11" fill="#5c6578">respondToWebhook</text>
+<rect x="1700" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1712" y="428" font-size="13" font-weight="700" fill="#141824">Score Lead</text>
+<text x="1712" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="2000" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2012" y="428" font-size="13" font-weight="700" fill="#141824">Append Lead Row</text>
+<text x="2012" y="450" font-size="11" fill="#5c6578">googleSheets</text>
+<rect x="2300" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2312" y="428" font-size="13" font-weight="700" fill="#141824">Post Lead Notification</text>
+<text x="2312" y="450" font-size="11" fill="#5c6578">slack</text>
+<rect x="2600" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2612" y="428" font-size="13" font-weight="700" fill="#141824">Shape Accepted Reply</text>
+<text x="2612" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="2900" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2912" y="428" font-size="13" font-weight="700" fill="#141824">Reply Accepted</text>
+<text x="2912" y="450" font-size="11" fill="#5c6578">respondToWebhook</text>
+<rect x="2300" y="680" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2312" y="708" font-size="13" font-weight="700" fill="#141824">Log Integration Error</text>
+<text x="2312" y="730" font-size="11" fill="#5c6578">code</text>
+<rect x="2600" y="680" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2612" y="708" font-size="13" font-weight="700" fill="#141824">Reply Integration Error</text>
+<text x="2612" y="730" font-size="11" fill="#5c6578">respondToWebhook</text>
+</svg>

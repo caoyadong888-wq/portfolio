@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BMC/IPMI Fault Code Quick Reference &amp; Runbook</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --paper: #fffcf6;
+      --ink: #1c2416;
+      --muted: #5c6556;
+      --line: #ddd6c8;
+      --accent: #0e6b45;
+      --accent-soft: #e5f3eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--accent); }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 64px; }
+    header {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    header .wrap { padding-top: 22px; padding-bottom: 22px; }
+    .back { margin: 0 0 12px; font-size: 14px; }
+    h1 { margin: 0 0 6px; font-size: 32px; letter-spacing: -0.02em; line-height: 1.2; }
+    .zh-title { margin: 0; color: var(--muted); font-size: 18px; }
+    h2 { margin: 0 0 10px; font-size: 22px; }
+    h2 span { color: var(--muted); font-weight: 600; }
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 18px 8px;
+      margin: 16px 0;
+    }
+    p, li { font-size: 16px; }
+    ul { margin-top: 0; padding-left: 1.2em; }
+    .note {
+      background: var(--accent-soft);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    pre {
+      overflow-x: auto;
+      background: #f7f4ec;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: "DejaVu Sans Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #1c2416;
+    }
+    .flow { overflow-x: auto; margin: 0 0 12px; }
+    .flow svg { max-width: 100%; height: auto; display: block; }
+    .links a { display: inline-block; margin: 0 16px 8px 0; }
+    footer { color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="back"><a href="/portfolio/">Back to portfolio / 返回作品集</a></p>
+      <h1>BMC/IPMI Fault Code Quick Reference &amp; Runbook</h1>
+      <p class="zh-title">BMC/IPMI 故障码速查与手册</p>
+    </div>
+  </header>
+  <main class="wrap">
+    <section id="problem">
+      <h2>Problem / <span>问题</span></h2>
+      <p>SEL noise hides the critical events. Presence, boot, and cleared lines bury the one row that should page someone. Triage is tribal knowledge: the same phrase is cooling on a temperature sensor and a rail on a voltage sensor, and the person who knows the difference is not on every shift.</p>
+      <p>系统事件日志的噪声会把严重事件盖住。在位、启动和已经解除的行，把真正该叫醒人的那一行埋掉。分诊是口头经验：同一句短语在温度上是散热，在电压上是电源轨，而知道差别的人并不是每个班次都在。</p>
+    </section>
+    <section id="approach">
+      <h2>Approach / <span>做法</span></h2>
+      <p>A code table maps the sensor type and the event phrase to a severity, a category, and a runbook. A deasserted line drops one severity step. The script groups the capture by host and category, prints the runbook path, and exits 2 while any critical row remains. The flowchart below is the same path on paper. Samples are synthetic hosts only.</p>
+      <p>码表把传感器类型和事件短语对应到严重级别、类别和手册。已解除的行把级别降一档。脚本按主机和类别汇总，打印手册路径，只要还剩严重项就退出码 2。下面的流程图是同一条路径。示例主机都是合成的。</p>
+    </section>
+    <section id="flowchart">
+      <h2>Triage flowchart / <span>分诊流程</span></h2>
+      <p>Collect the SEL and SDR, match the phrase, lower a deasserted line, then open the runbook, schedule a window, or record it. Exit 0 when nothing critical remains. Exit 2 when it does.</p>
+      <p>先收集 SEL 和 SDR，匹配短语，已解除的降一档，然后打开手册、排窗口，或只记录。没有严重项是退出码 0，还有就是 2。</p>
+      <div class="flow">
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1180" viewBox="0 0 1040 1180">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+<polygon points="0 0, 10 4, 0 8" fill="#1f3a5f"/>
+</marker>
+</defs>
+<rect width="1040" height="1180" fill="#f4f7fb"/>
+<text x="520.0" y="32" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="20" font-weight="700" fill="#1f3a5f">IPMI / BMC fault triage</text>
+<line x1="520.0" y1="104.0" x2="520.0" y2="132.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="520.0" y1="188.0" x2="520.0" y2="216.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="520.0" y1="272.0" x2="520.0" y2="300.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="455.2" y1="396.0" x2="170.0" y2="430.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="584.8" y1="396.0" x2="870.0" y2="430.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="170.0" y1="486.0" x2="455.2" y2="524.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="870.0" y1="486.0" x2="584.8" y2="524.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="455.2" y1="620.0" x2="155.0" y2="660.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="520.0" y1="620.0" x2="520.0" y2="660.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="584.8" y1="620.0" x2="885.0" y2="660.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="155.0" y1="720.0" x2="430.0" y2="768.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="520.0" y1="720.0" x2="520.0" y2="768.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="885.0" y1="720.0" x2="610.0" y2="768.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="520.0" y1="824.0" x2="520.0" y2="856.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="520.0" y1="912.0" x2="520.0" y2="944.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="455.2" y1="1040.0" x2="205.0" y2="1088.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="584.8" y1="1040.0" x2="835.0" y2="1088.0" stroke="#1f3a5f" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="270" y="48" width="500" height="56" rx="8" fill="#ffffff" stroke="#1f3a5f" stroke-width="2"/>
+<text x="520.0" y="76.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Collect SEL and SDR</tspan>
+</text>
+<rect x="270" y="132" width="500" height="56" rx="8" fill="#ffffff" stroke="#1f3a5f" stroke-width="2"/>
+<text x="520.0" y="160.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Parse pipe-delimited rows</tspan>
+</text>
+<rect x="270" y="216" width="500" height="56" rx="8" fill="#ffffff" stroke="#1f3a5f" stroke-width="2"/>
+<text x="520.0" y="244.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Match type and event keyword</tspan>
+</text>
+<polygon points="520.0,300.0 700.0,348.0 520.0,396.0 340.0,348.0" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/>
+<text x="520.0" y="348.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Deasserted?</tspan>
+</text>
+<rect x="40" y="430" width="260" height="56" rx="8" fill="#ffffff" stroke="#1f3a5f" stroke-width="2"/>
+<text x="170.0" y="458.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="170.0" dy="4">Lower severity one step</tspan>
+</text>
+<rect x="740" y="430" width="260" height="56" rx="8" fill="#ffffff" stroke="#1f3a5f" stroke-width="2"/>
+<text x="870.0" y="458.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="870.0" dy="4">Keep severity</tspan>
+</text>
+<polygon points="520.0,524.0 700.0,572.0 520.0,620.0 340.0,572.0" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/>
+<text x="520.0" y="572.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Which severity?</tspan>
+</text>
+<rect x="30" y="660" width="250" height="60" rx="8" fill="#fde8e8" stroke="#b42318" stroke-width="2"/>
+<text x="155.0" y="690.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="155.0" dy="4">Critical: open runbook</tspan>
+</text>
+<rect x="395" y="660" width="250" height="60" rx="8" fill="#fef4e6" stroke="#b54708" stroke-width="2"/>
+<text x="520.0" y="690.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Warning: schedule window</tspan>
+</text>
+<rect x="760" y="660" width="250" height="60" rx="8" fill="#e7f6ef" stroke="#067647" stroke-width="2"/>
+<text x="885.0" y="690.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="885.0" dy="4">Info: record only</tspan>
+</text>
+<rect x="270" y="768" width="500" height="56" rx="8" fill="#ffffff" stroke="#1f3a5f" stroke-width="2"/>
+<text x="520.0" y="796.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Group by host and category</tspan>
+</text>
+<rect x="270" y="856" width="500" height="56" rx="8" fill="#ffffff" stroke="#1f3a5f" stroke-width="2"/>
+<text x="520.0" y="884.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Write md, csv, and json reports</tspan>
+</text>
+<polygon points="520.0,944.0 700.0,992.0 520.0,1040.0 340.0,992.0" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/>
+<text x="520.0" y="992.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="520.0" dy="4">Any critical left?</tspan>
+</text>
+<rect x="90" y="1088" width="230" height="52" rx="8" fill="#e7f6ef" stroke="#067647" stroke-width="2"/>
+<text x="205.0" y="1114.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="205.0" dy="4">Exit 0</tspan>
+</text>
+<rect x="720" y="1088" width="230" height="52" rx="8" fill="#fde8e8" stroke="#b42318" stroke-width="2"/>
+<text x="835.0" y="1114.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#1f3a5f">
+<tspan x="835.0" dy="4">Exit 2</tspan>
+</text>
+<text x="230" y="408" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#3d4f63">yes</text>
+<text x="810" y="408" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#3d4f63">no</text>
+<text x="250" y="1064" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#3d4f63">no</text>
+<text x="800" y="1064" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#3d4f63">yes</text>
+</svg>
+      </div>
+    </section>
+    <section id="demo">
+      <h2>Demo output / <span>演示输出</span></h2>
+      <p>Stdout of <code>python3 demo.py</code> on the two synthetic hosts. The parser reports 59 findings, 19 critical, and exits 2. The demo process then exits 0.</p>
+      <p><code>python3 demo.py</code> 对两台合成主机的标准输出。解析结果是 59 条发现、严重 19 条、退出码 2。演示进程随后以 0 结束。</p>
+      <pre>BMC/IPMI fault code kit demo
+
+$ python3 scripts/ipmi_triage.py --sel samples/srv-a01_sel_elist.txt samples/srv-b02_sel_elist.txt --sdr samples/srv-a01_sdr.txt samples/srv-b02_sdr_elist.txt --out out
+findings: 59  critical: 19  warning: 25  info: 15  exit: 2
+Host                Category   Severity  Count  Action        Runbook                 
+------------------  ---------  --------  -----  ------------  ------------------------
+dc1-rack-a01-srv01  battery    warning   2      RB-BATTERY    runbooks/RB-BATTERY.md  
+dc1-rack-a01-srv01  battery    info      1      RB-BATTERY    runbooks/RB-BATTERY.md  
+dc1-rack-a01-srv01  bmc        critical  1      RB-BMC        runbooks/RB-BMC.md      
+dc1-rack-a01-srv01  bmc        info      1      RB-BMC        runbooks/RB-BMC.md      
+dc1-rack-a01-srv01  cpu        critical  1      RB-CPU        runbooks/RB-CPU.md      
+dc1-rack-a01-srv01  cpu        warning   1      RB-CPU        runbooks/RB-CPU.md      
+dc1-rack-a01-srv01  fan        critical  2      RB-FAN        runbooks/RB-FAN.md      
+dc1-rack-a01-srv01  fan        warning   2      RB-FAN        runbooks/RB-FAN.md      
+dc1-rack-a01-srv01  fan        info      1      RB-FAN        runbooks/RB-FAN.md      
+dc1-rack-a01-srv01  intrusion  critical  1      RB-INTRUSION  runbooks/RB-INTRUSION.md
+dc1-rack-a01-srv01  memory     critical  1      RB-MEM-ECC    runbooks/RB-MEM-ECC.md  
+dc1-rack-a01-srv01  memory     warning   1      RB-MEM-ECC    runbooks/RB-MEM-ECC.md  
+dc1-rack-a01-srv01  pcie       critical  1      RB-PCIE       runbooks/RB-PCIE.md     
+dc1-rack-a01-srv01  pcie       warning   1      RB-PCIE       runbooks/RB-PCIE.md     
+dc1-rack-a01-srv01  power      critical  2      RB-PSU        runbooks/RB-PSU.md      
+dc1-rack-a01-srv01  power      warning   3      RB-PSU        runbooks/RB-PSU.md      
+dc1-rack-a01-srv01  power      info      2      RB-PSU        runbooks/RB-PSU.md      
+dc1-rack-a01-srv01  sel        critical  1      RB-SEL-FULL   runbooks/RB-SEL-FULL.md 
+dc1-rack-a01-srv01  sel        warning   1      RB-SEL-FULL   runbooks/RB-SEL-FULL.md 
+dc1-rack-a01-srv01  sel        info      1      RB-SEL-FULL   runbooks/RB-SEL-FULL.md 
+dc1-rack-a01-srv01  thermal    critical  2      RB-THERMAL    runbooks/RB-THERMAL.md  
+dc1-rack-a01-srv01  thermal    warning   4      RB-THERMAL    runbooks/RB-THERMAL.md  
+dc1-rack-a01-srv01  thermal    info      1      RB-THERMAL    runbooks/RB-THERMAL.md  
+dc1-rack-a01-srv01  unknown    info      1                    -                       
+dc1-rack-a01-srv01  watchdog   critical  2      RB-WATCHDOG   runbooks/RB-WATCHDOG.md 
+dc1-rack-a01-srv01  watchdog   info      1      RB-WATCHDOG   runbooks/RB-WATCHDOG.md 
+dc1-rack-b02-srv02  battery    warning   1      RB-BATTERY    runbooks/RB-BATTERY.md  
+dc1-rack-b02-srv02  bmc        warning   1      RB-BMC        runbooks/RB-BMC.md      
+dc1-rack-b02-srv02  bmc        info      1      RB-BMC        runbooks/RB-BMC.md      
+dc1-rack-b02-srv02  cpu        critical  1      RB-CPU        runbooks/RB-CPU.md      
+dc1-rack-b02-srv02  cpu        warning   1      RB-CPU        runbooks/RB-CPU.md      
+dc1-rack-b02-srv02  fan        warning   2      RB-FAN        runbooks/RB-FAN.md      
+dc1-rack-b02-srv02  memory     info      1      RB-MEM-ECC    runbooks/RB-MEM-ECC.md  
+dc1-rack-b02-srv02  pcie       warning   1      RB-PCIE       runbooks/RB-PCIE.md     
+dc1-rack-b02-srv02  power      critical  2      RB-PSU        runbooks/RB-PSU.md      
+dc1-rack-b02-srv02  power      warning   2      RB-PSU        runbooks/RB-PSU.md      
+dc1-rack-b02-srv02  power      info      1      RB-PSU        runbooks/RB-PSU.md      
+dc1-rack-b02-srv02  storage    critical  1      RB-STORAGE    runbooks/RB-STORAGE.md  
+dc1-rack-b02-srv02  storage    warning   1      RB-STORAGE    runbooks/RB-STORAGE.md  
+dc1-rack-b02-srv02  thermal    info      1      RB-THERMAL    runbooks/RB-THERMAL.md  
+dc1-rack-b02-srv02  watchdog   critical  1      RB-WATCHDOG   runbooks/RB-WATCHDOG.md 
+dc1-rack-b02-srv02  watchdog   warning   1      RB-WATCHDOG   runbooks/RB-WATCHDOG.md 
+dc1-rack-b02-srv02  watchdog   info      2      RB-WATCHDOG   runbooks/RB-WATCHDOG.md 
+recommended:
+- dc1-rack-a01-srv01  bmc  critical  x1
+  what: The management controller is off-line
+  action: Save the SEL first. Reset the management controller only after the log is stored.
+  runbook: runbooks/RB-BMC.md
+- dc1-rack-a01-srv01  cpu  critical  x1
+  what: The processor reported an internal error
+  action: Save the SEL. Treat a repeated IERR, thermal trip, or machine check as a board fault.
+  runbook: runbooks/RB-CPU.md
+- dc1-rack-a01-srv01  fan  critical  x2
+  what: Fan speed crossed the lower critical mark
+  action: Confirm the fan is seated and spinning. Swap it if it stays below the low mark.
+  runbook: runbooks/RB-FAN.md
+- dc1-rack-a01-srv01  intrusion  critical  x1
+  what: The chassis was opened
+  action: Confirm someone was in the rack, close the chassis, and clear the latch on purpose.
+  runbook: runbooks/RB-INTRUSION.md
+- dc1-rack-a01-srv01  memory  critical  x1
+  what: Memory logged an uncorrectable ECC error
+  action: Map the DIMM, reseat once, and replace it if uncorrectable errors return.
+  runbook: runbooks/RB-MEM-ECC.md
+- dc1-rack-a01-srv01  pcie  critical  x1
+  what: A PCI system error was signaled
+  action: Note the slot, reseat the card, and move it before calling the board failed.
+  runbook: runbooks/RB-PCIE.md
+- dc1-rack-a01-srv01  power  critical  x2
+  what: A power supply lost AC input
+  action: Check the feed, the supply LED, and redundancy before pulling a supply.
+  runbook: runbooks/RB-PSU.md
+- dc1-rack-a01-srv01  sel  critical  x1
+  what: The system event log is full
+  action: Export the SEL, store the file, and only then clear the log.
+  runbook: runbooks/RB-SEL-FULL.md
+- dc1-rack-a01-srv01  thermal  critical  x2
+  what: Temperature crossed the upper critical mark
+  action: Check inlet temperature, fan speed, and blanking before replacing a heat sink.
+  runbook: runbooks/RB-THERMAL.md
+- dc1-rack-a01-srv01  watchdog  critical  x2
+  what: The watchdog timer expired
+  action: Save the console. Reboot only after deciding the OS hung rather than a firmware loop.
+  runbook: runbooks/RB-WATCHDOG.md
+- dc1-rack-b02-srv02  cpu  critical  x1
+  what: The processor shut down on a thermal trip
+  action: Save the SEL. Treat a repeated IERR, thermal trip, or machine check as a board fault.
+  runbook: runbooks/RB-CPU.md
+- dc1-rack-b02-srv02  power  critical  x2
+  what: Power redundancy is gone
+  action: Check the feed, the supply LED, and redundancy before pulling a supply.
+  runbook: runbooks/RB-PSU.md
+- dc1-rack-b02-srv02  storage  critical  x1
+  what: A drive reported a fault
+  action: Name the bay and replace a faulted drive before a second member fails.
+  runbook: runbooks/RB-STORAGE.md
+- dc1-rack-b02-srv02  watchdog  critical  x1
+  what: The watchdog forced a hard reset
+  action: Save the console. Reboot only after deciding the OS hung rather than a firmware loop.
+  runbook: runbooks/RB-WATCHDOG.md
+wrote out/report.md (17187 bytes)
+wrote out/report.csv (22882 bytes)
+wrote out/report.json (71267 bytes)
+triage exit 2
+demo complete</pre>
+    </section>
+    <section id="deliverables">
+      <h2>Deliverables / <span>交付物</span></h2>
+      <ul>
+        <li>Bilingual SEL quick reference and twelve fault categories. 中英速查和十二类故障。</li>
+        <li>Code table, 81 rows, each with an action id. 81 行码表，每行有手册编号。</li>
+        <li>Twelve bilingual runbooks: symptoms, ipmitool checks, steps, escalation and RMA, ticket note. 十二本中英手册。</li>
+        <li>Triage flowchart (Mermaid, SVG, PNG). 分诊流程图。</li>
+        <li>SEL/SDR parser with markdown, CSV, and JSON reports. SEL/SDR 解析和三份报告。</li>
+        <li>Synthetic two-host sample, <code>demo.py</code>, unit tests, and an acceptance script. 两台合成主机、演示、单元测试和验收脚本。</li>
+      </ul>
+      <p>The free lite repo keeps the parser, a 12-row thermal and power subset, the flowchart, and <code>RB-THERMAL</code> plus <code>RB-PSU</code>. 免费精简仓库保留解析器、十二行温度和电源子集、流程图，以及这两本手册。</p>
+    </section>
+    <section id="delivery">
+      <h2>Delivery time / <span>交付时间</span></h2>
+      <p class="note">Instant download. Setup about 5 minutes. Adapting the code table and runbooks to your fleet about 30 minutes.</p>
+      <p class="note">下载即得。安装并跑通大约 5 分钟。把码表和手册改成你的机器大约 30 分钟。</p>
+      <p>Pay what you want, $1 or more. Suggested price is $5. 愿付多少付多少，1 美元起，建议 5 美元。</p>
+    </section>
+    <section id="gumroad">
+      <h2>Links / <span>链接</span></h2>
+      <p class="links"><a href="https://github.com/caoyadong888-wq/bmc-ipmi-kit-lite">GitHub: bmc-ipmi-kit-lite</a> <a href="https://caoyadong.gumroad.com/l/dzmww" target="_blank" rel="noopener">Gumroad: full kit</a></p>
+      <p>Full n8n DevOps pack, $9 / 完整 n8n DevOps 包 9 美元: <a href="https://caoyadong.gumroad.com/l/yvmcqj">https://caoyadong.gumroad.com/l/yvmcqj</a></p>
+      <p>DC Inspection &amp; Asset Register Kit / 数据中心巡检与资产台账: <a href="https://caoyadong.gumroad.com/l/hxlops">https://caoyadong.gumroad.com/l/hxlops</a></p>
+    </section>
+    <footer>
+      <p><a href="/portfolio/">Back to portfolio / 返回作品集</a></p>
+    </footer>
+  </main>
+</body>
+</html>

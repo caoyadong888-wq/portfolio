@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>app/Dockerfile</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../aws/index.html">AWS 次要</a>
+<a href="../index.html">文件</a>
+<a href="../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>app/Dockerfile</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Insights API image for the fictional Thistle Analytics demo.</span>
+<span style="color: #3D7B7B; font-style: italic"># Multi-stage, digest-pinned, non-root. make check does not build or push this image.</span>
+
+<span style="color: #008000; font-weight: bold">FROM</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">python:3.12-slim@sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">AS</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">build</span>
+<span style="color: #008000; font-weight: bold">WORKDIR</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">/src</span>
+<span style="color: #008000; font-weight: bold">COPY</span><span style="color: #bbbbbb"> </span>pyproject.toml<span style="color: #bbbbbb"> </span>README.md<span style="color: #bbbbbb"> </span>./
+<span style="color: #008000; font-weight: bold">COPY</span><span style="color: #bbbbbb"> </span>insights_api<span style="color: #bbbbbb"> </span>./insights_api
+<span style="color: #008000; font-weight: bold">RUN</span><span style="color: #bbbbbb"> </span>pip<span style="color: #bbbbbb"> </span>install<span style="color: #bbbbbb"> </span>--no-cache-dir<span style="color: #bbbbbb"> </span>--upgrade<span style="color: #bbbbbb"> </span>pip<span style="color: #bbbbbb"> </span><span style="color: #AA5D1F; font-weight: bold">\</span>
+<span style="color: #bbbbbb">    </span><span style="color: #666666">&amp;&amp;</span><span style="color: #bbbbbb"> </span>pip<span style="color: #bbbbbb"> </span>install<span style="color: #bbbbbb"> </span>--no-cache-dir<span style="color: #bbbbbb"> </span>.
+
+<span style="color: #008000; font-weight: bold">FROM</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">python:3.12-slim@sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f</span>
+<span style="color: #008000; font-weight: bold">LABEL</span><span style="color: #bbbbbb"> </span>org.opencontainers.image.source<span style="color: #666666">=</span><span style="color: #BA2121">&quot;https://example.invalid/thistle-analytics/insights-api&quot;</span>
+<span style="color: #008000; font-weight: bold">LABEL</span><span style="color: #bbbbbb"> </span>org.opencontainers.image.title<span style="color: #666666">=</span><span style="color: #BA2121">&quot;insights-api&quot;</span>
+<span style="color: #008000; font-weight: bold">LABEL</span><span style="color: #bbbbbb"> </span>org.opencontainers.image.description<span style="color: #666666">=</span><span style="color: #BA2121">&quot;Fictional Thistle Analytics insights API. Not deployed to any cloud account.&quot;</span>
+<span style="color: #008000; font-weight: bold">RUN</span><span style="color: #bbbbbb"> </span>useradd<span style="color: #bbbbbb"> </span>--uid<span style="color: #bbbbbb"> </span><span style="color: #666666">10001</span><span style="color: #bbbbbb"> </span>--create-home<span style="color: #bbbbbb"> </span>--shell<span style="color: #bbbbbb"> </span>/usr/sbin/nologin<span style="color: #bbbbbb"> </span>appuser
+<span style="color: #008000; font-weight: bold">WORKDIR</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">/app</span>
+<span style="color: #008000; font-weight: bold">COPY</span><span style="color: #bbbbbb"> </span>--from<span style="color: #666666">=</span>build<span style="color: #bbbbbb"> </span>/usr/local/lib/python3.12/site-packages<span style="color: #bbbbbb"> </span>/usr/local/lib/python3.12/site-packages
+<span style="color: #008000; font-weight: bold">COPY</span><span style="color: #bbbbbb"> </span>--from<span style="color: #666666">=</span>build<span style="color: #bbbbbb"> </span>/usr/local/bin/uvicorn<span style="color: #bbbbbb"> </span>/usr/local/bin/uvicorn
+<span style="color: #008000; font-weight: bold">USER</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">10001</span>
+<span style="color: #008000; font-weight: bold">EXPOSE</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">8080</span>
+<span style="color: #008000; font-weight: bold">ENV</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">PORT</span><span style="color: #666666">=8080</span>
+<span style="color: #008000; font-weight: bold">HEALTHCHECK</span><span style="color: #bbbbbb"> </span>--interval<span style="color: #666666">=</span>30s<span style="color: #bbbbbb"> </span>--timeout<span style="color: #666666">=</span>3s<span style="color: #bbbbbb"> </span>--start-period<span style="color: #666666">=</span>10s<span style="color: #bbbbbb"> </span>--retries<span style="color: #666666">=3</span><span style="color: #bbbbbb"> </span><span style="color: #AA5D1F; font-weight: bold">\</span>
+<span style="color: #bbbbbb">  </span>CMD<span style="color: #bbbbbb"> </span><span style="color: #666666">[</span><span style="color: #BA2121">&quot;python&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-c&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;import urllib.request; urllib.request.urlopen(&#39;http://127.0.0.1:8080/healthz&#39;, timeout=2).read()&quot;</span><span style="color: #666666">]</span>
+<span style="color: #008000; font-weight: bold">ENTRYPOINT</span><span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;uvicorn&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;insights_api.main:app&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;--host&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;0.0.0.0&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;--port&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;8080&quot;</span>]
+</code></pre></div>
+
+</main>
+</body>
+</html>

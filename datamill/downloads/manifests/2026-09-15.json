@@ -1,0 +1,254 @@
+{
+  "clean_examples": [
+    {
+      "clean": {
+        "amount_cents": 375,
+        "business_date": "2026-09-15",
+        "is_return": false,
+        "qty": 1,
+        "sku": "ESP-002",
+        "sold_at_utc": "2026-09-15T15:00:00+00:00",
+        "store_id": "01"
+      },
+      "raw": {
+        "amount": "3.75",
+        "business_date": "2026-09-15",
+        "qty": "1",
+        "sku": " esp-002 ",
+        "sold_at": "2026-09-15 08:00:00",
+        "store_id": "01"
+      },
+      "source_file": "pos/01/2026-09-15.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 550,
+        "business_date": "2026-09-15",
+        "is_return": false,
+        "qty": 2,
+        "sku": "DRP-001",
+        "sold_at_utc": "2026-09-15T15:07:00+00:00",
+        "store_id": "01"
+      },
+      "raw": {
+        "amount": "$5.50",
+        "business_date": "09/15/2026",
+        "qty": "2",
+        "sku": "DRP-001",
+        "sold_at": "09/15/2026 08:07:00",
+        "store_id": "01"
+      },
+      "source_file": "pos/01/2026-09-15.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 275,
+        "business_date": "2026-09-15",
+        "is_return": false,
+        "qty": 1,
+        "sku": "DRP-001",
+        "sold_at_utc": "2026-09-15T13:00:00+00:00",
+        "store_id": "02"
+      },
+      "raw": {
+        "amount": "2.75",
+        "business_date": "2026-09-15",
+        "qty": "1",
+        "sku": " drp-001 ",
+        "sold_at": "2026-09-15 08:00:00",
+        "store_id": "02"
+      },
+      "source_file": "pos/02/2026-09-15.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 900,
+        "business_date": "2026-09-15",
+        "is_return": false,
+        "qty": 2,
+        "sku": "DRP-002",
+        "sold_at_utc": "2026-09-15T13:07:00+00:00",
+        "store_id": "02"
+      },
+      "raw": {
+        "amount": "$9.00",
+        "business_date": "09/15/2026",
+        "qty": "2",
+        "sku": "DRP-002",
+        "sold_at": "09/15/2026 08:07:00",
+        "store_id": "02"
+      },
+      "source_file": "pos/02/2026-09-15.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 450,
+        "business_date": "2026-09-15",
+        "is_return": false,
+        "qty": 1,
+        "sku": "DRP-002",
+        "sold_at_utc": "2026-09-15T12:00:00+00:00",
+        "store_id": "03"
+      },
+      "raw": {
+        "amount": "4.50",
+        "business_date": "2026-09-15",
+        "qty": "1",
+        "sku": " drp-002 ",
+        "sold_at": "2026-09-15 08:00:00",
+        "store_id": "03"
+      },
+      "source_file": "pos/03/2026-09-15.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 990,
+        "business_date": "2026-09-15",
+        "is_return": false,
+        "qty": 2,
+        "sku": "LAT-001",
+        "sold_at_utc": "2026-09-15T12:07:00+00:00",
+        "store_id": "03"
+      },
+      "raw": {
+        "amount": "$9.90",
+        "business_date": "09/15/2026",
+        "qty": "2",
+        "sku": "LAT-001",
+        "sold_at": "09/15/2026 08:07:00",
+        "store_id": "03"
+      },
+      "source_file": "pos/03/2026-09-15.csv"
+    }
+  ],
+  "dq": {
+    "blocking_failed": [],
+    "checks": [
+      {
+        "detail": "source=73 loaded=60 quarantined=13 deduped=0",
+        "id": "row_reconciliation",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "dup_sales=0 dup_current=0",
+        "id": "primary_key_unique",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "missing=0",
+        "id": "foreign_keys",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "null_rows=0",
+        "id": "required_not_null",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "bad_enum=0",
+        "id": "value_enums",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "mismatched_store_days=0",
+        "id": "amount_reconciliation",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "max=2026-09-15 as_of=2026-09-15 gap_days=0",
+        "id": "freshness",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "files=0",
+        "id": "no_schema_drift",
+        "level": "warning",
+        "passed": true
+      }
+    ],
+    "status": "PASS",
+    "warnings": []
+  },
+  "elapsed_ms": 1089,
+  "files_skipped": 3,
+  "finished_at": "2026-10-04T08:41:58+00:00",
+  "params": {
+    "as_of": "2026-09-15",
+    "date_from": "2026-09-15",
+    "date_to": "2026-09-15",
+    "dry_run": false,
+    "full_refresh": false
+  },
+  "published": true,
+  "quarantine_counts": {
+    "DUPLICATE_ROW": 12,
+    "ENCODING_FIXED": 1,
+    "MISSING_STORE": 1
+  },
+  "reconciliation": {
+    "deduped_rows": 0,
+    "loaded_rows": 60,
+    "quarantined_rows": 13,
+    "source_rows": 73
+  },
+  "rows_added": 60,
+  "run_id": "2026-09-15",
+  "schema_drift_files": [],
+  "stages": {
+    "dq": {
+      "ms": 6,
+      "rows": 8
+    },
+    "extract": {
+      "ms": 147,
+      "rows": 88
+    },
+    "land": {
+      "ms": 20,
+      "rows": 88
+    },
+    "load": {
+      "ms": 55,
+      "rows": 60
+    },
+    "manifest": {
+      "ms": 1,
+      "rows": 1
+    },
+    "publish": {
+      "ms": 449,
+      "rows": 570
+    },
+    "quarantine": {
+      "ms": 0,
+      "rows": 13
+    },
+    "transform": {
+      "ms": 0,
+      "rows": 60
+    },
+    "validate": {
+      "ms": 371,
+      "rows": 73
+    }
+  },
+  "started_at": "2026-10-04T08:41:57+00:00",
+  "status": "SUCCESS",
+  "versions": {
+    "PyYAML": "6.0.2",
+    "SQLAlchemy": "2.0.36",
+    "httpx": "0.27.2",
+    "openpyxl": "3.1.5",
+    "pandas": "2.2.3",
+    "pandera": "0.20.4",
+    "pyarrow": "17.0.0",
+    "python": "3.9.9"
+  }
+}

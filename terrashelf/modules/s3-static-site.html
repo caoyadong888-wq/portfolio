@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>s3-static-site</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · Web · v1.1.0</p>
+<h1>s3-static-site</h1>
+<p>Private S3 origin, CloudFront origin access control, and optional access logs.</p>
+<p>Tests passed <span data-metric="modules.s3-static-site.passed">6</span> of <span data-metric="modules.s3-static-site.runs">6</span>. Failed <span data-metric="modules.s3-static-site.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>access_log_expiration_days</td><td><code>number</code></td><td>no</td><td>Days to keep objects in the module-managed access log bucket.</td></tr><tr><td>access_logs_bucket_name</td><td><code>string</code></td><td>no</td><td>Existing bucket name that receives CloudFront access logs. Null creates a bucket when enable_access_logs is true.</td></tr><tr><td>aliases</td><td><code>list(string)</code></td><td>no</td><td>Alternate domain names on the distribution. Must be empty unless certificate_arn is set.</td></tr><tr><td>certificate_arn</td><td><code>string</code></td><td>no</td><td>Optional ACM certificate ARN. Required when aliases is not empty. CloudFront accepts that certificate only from its global control-plane region.</td></tr><tr><td>comment</td><td><code>string</code></td><td>no</td><td>Comment stored on the CloudFront distribution.</td></tr><tr><td>default_root_object</td><td><code>string</code></td><td>no</td><td>Object CloudFront returns when a viewer requests the root of the distribution.</td></tr><tr><td>domain_name</td><td><code>string</code></td><td>no</td><td>DNS name for the optional Route 53 alias. Null skips the record. When set, it must also be one of aliases.</td></tr><tr><td>enable_access_logs</td><td><code>bool</code></td><td>no</td><td>Write CloudFront standard access logs. Added in 1.1.0. Off by default.</td></tr><tr><td>geo_restriction_locations</td><td><code>list(string)</code></td><td>no</td><td>Two-letter country codes used when geo_restriction_type is not none.</td></tr><tr><td>geo_restriction_type</td><td><code>string</code></td><td>no</td><td>CloudFront geographic restriction type.</td></tr><tr><td>kms_key_arn</td><td><code>string</code></td><td>no</td><td>Optional customer managed key ARN for site bucket encryption. Null uses SSE-S3.</td></tr><tr><td>name_prefix</td><td><code>string</code></td><td>yes</td><td>Lowercase prefix for the bucket, origin access control, and response headers policy. The module appends a short suffix. Do not encode an environment name here.</td></tr><tr><td>price_class</td><td><code>string</code></td><td>no</td><td>CloudFront price class name. This selects an edge set. It is not a currency amount.</td></tr><tr><td>route53_zone_id</td><td><code>string</code></td><td>no</td><td>Hosted zone id for the optional alias record. Set this together with domain_name. Null skips the record.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr><tr><td>versioning_enabled</td><td><code>bool</code></td><td>no</td><td>Enable versioning on the site bucket.</td></tr><tr><td>web_acl_id</td><td><code>string</code></td><td>no</td><td>Optional WAFv2 web ACL ARN attached to the distribution. Null leaves WAF off.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>access_logs_enabled</td><td>Whether CloudFront standard logging is configured.</td></tr><tr><td>alias_record_count</td><td>Number of Route 53 alias records managed by this module.</td></tr><tr><td>bucket_arn</td><td>ARN of the private site bucket.</td></tr><tr><td>bucket_name</td><td>Name of the private site bucket.</td></tr><tr><td>bucket_policy_actions</td><td>Actions allowed by the site bucket policy. The policy document uses this list and no other actions.</td></tr><tr><td>bucket_policy_condition_keys</td><td>Condition keys on the site bucket policy. AWS:SourceArn is set to this distribution&#x27;s ARN.</td></tr><tr><td>bucket_policy_principal_service</td><td>Service principal allowed by the site bucket policy.</td></tr><tr><td>bucket_policy_statement_count</td><td>Number of statements written into the site bucket policy.</td></tr><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources. Nothing in the module hardcodes them.</td></tr><tr><td>default_root_object</td><td>Default root object configured on the distribution.</td></tr><tr><td>distribution_arn</td><td>CloudFront distribution ARN.</td></tr><tr><td>distribution_domain_name</td><td>Domain name assigned to the CloudFront distribution.</td></tr><tr><td>distribution_id</td><td>CloudFront distribution id.</td></tr><tr><td>log_bucket_created</td><td>True when this module creates the access log bucket.</td></tr><tr><td>oac_origin_type</td><td>Origin type on the CloudFront origin access control. s3 means the distribution is not using a legacy origin access identity.</td></tr><tr><td>oac_signing_behavior</td><td>Signing behavior on the origin access control.</td></tr><tr><td>oac_signing_protocol</td><td>Signing protocol on the origin access control.</td></tr><tr><td>origin_access_control_id</td><td>Origin access control id attached to the S3 origin.</td></tr><tr><td>origin_ids</td><td>Origin ids on the distribution. The S3 origin is s3-site and references the origin access control.</td></tr><tr><td>public_access_block</td><td>Four public access block flags on the site bucket.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr><tr><td>versioning_status</td><td>Versioning status of the site bucket.</td></tr><tr><td>viewer_protocol_policy</td><td>Viewer protocol policy on the default cache behavior.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;site&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">name_prefix</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;demo-site&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>private_oac passed</li><li>versioning_suspended passed</li><li>access_logs_bucket passed</li><li>custom_domain_alias passed</li><li>reject_bad_name_prefix passed</li><li>reject_alias_without_certificate passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\s3-static-site.tftest.hcl... in progress
+  run &quot;private_oac&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_cloudfront_distribution.site will be created
+  + resource &quot;aws_cloudfront_distribution&quot; &quot;site&quot; {
+      + aliases                         = []
+      + arn                             = (known after apply)
+      + caller_reference                = (known after apply)
+      + comment                         = &quot;Private S3 origin behind CloudFront origin access control.&quot;
+      + continuous_deployment_policy_id = (known after apply)
+      + default_root_object             = &quot;index.html&quot;
+      + domain_name                     = (known after apply)
+      + enabled                         = true
+      + etag                            = (known after apply)
+      + hosted_zone_id                  = (known after apply)
+      + id                              = (known after apply)
+      + in_progress_validation_batches  = (known after apply)
+      + is_ipv6_enabled                 = true
+      + last_modified_time              = (known after apply)
+      + price_class                     = &quot;PriceClass_100&quot;
+      + status                          = (known after apply)
+      + tags                            = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;s3-static-site&quot;
+          + &quot;Owner&quot;     = &quot;platform&quot;
+        }
+      + tags_all                        = (known after apply)
+      + trusted_key_groups              = (known after apply)
+      + trusted_signers                 = (known after apply)
+
+      + default_cache_behavior {
+          + allowed_methods            = [</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/s3-static-site.svg" alt="Resource list for s3-static-site">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.1.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Optional CloudFront access log bucket via <code>enable_access_logs</code>. Leaving the flag off does not replace the distribution.</li></ul>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Private S3 bucket, CloudFront origin access control, and a response headers policy.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>Amazon S3</li><li>Amazon CloudFront</li><li>Amazon Route 53</li><li>AWS WAF</li><li>AWS Key Management Service</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

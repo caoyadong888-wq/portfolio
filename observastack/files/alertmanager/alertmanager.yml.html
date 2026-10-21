@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>alertmanager/alertmanager.yml</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>alertmanager/alertmanager.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Credential fields are *_file only. Placeholder files are created under</span>
+<span style="color: #3D7B7B; font-style: italic"># /tmp/observastack-secrets by make check because amtool requires the paths to exist.</span>
+<span style="color: #3D7B7B; font-style: italic"># Those files are not secrets and are not committed.</span>
+<span style="color: #008000; font-weight: bold">global</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">resolve_timeout</span>:<span style="color: #bbbbbb"> </span>5m
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">smtp_from</span>:<span style="color: #bbbbbb"> </span>alertmanager@larkspur.example
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">smtp_smarthost</span>:<span style="color: #bbbbbb"> </span>smtp.larkspur.example:587
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">smtp_auth_username</span>:<span style="color: #bbbbbb"> </span>alertmanager@larkspur.example
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">smtp_auth_password_file</span>:<span style="color: #bbbbbb"> </span>/tmp/observastack-secrets/smtp_password
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">smtp_require_tls</span>:<span style="color: #bbbbbb"> </span>true
+
+<span style="color: #008000; font-weight: bold">templates</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span>alertmanager/templates/*.tmpl
+
+<span style="color: #008000; font-weight: bold">route</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span>default
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">group_by</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">alertname</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">service</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">severity</span>]
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">group_wait</span>:<span style="color: #bbbbbb"> </span>30s
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">group_interval</span>:<span style="color: #bbbbbb"> </span>5m
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">repeat_interval</span>:<span style="color: #bbbbbb"> </span>4h
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">routes</span>:
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">matchers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>alertname = Watchdog
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span>deadman-webhook
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">group_wait</span>:<span style="color: #bbbbbb"> </span>0s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">group_interval</span>:<span style="color: #bbbbbb"> </span>1m
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">repeat_interval</span>:<span style="color: #bbbbbb"> </span>1m
+<span style="color: #bbbbbb">    </span><span style="color: #3D7B7B; font-style: italic"># Sibling routes, not a parent/child pair. Alertmanager notifies the leaf</span>
+<span style="color: #bbbbbb">    </span><span style="color: #3D7B7B; font-style: italic"># receiver only, so a child slack route would drop pagerduty-oncall.</span>
+<span style="color: #bbbbbb">    </span><span style="color: #3D7B7B; font-style: italic"># continue: true on both keeps matching into the team routes below.</span>
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">matchers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>severity = critical
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span>pagerduty-oncall
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">continue</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">matchers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>severity = critical
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span>slack-incidents
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">continue</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">matchers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>team = payments
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span>slack-payments
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">matchers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>team = orders
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span>email-oncall
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">matchers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>severity = warning
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span>slack-platform
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">active_time_intervals</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>business-hours
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">mute_time_intervals</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>maintenance-window
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">matchers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span>severity = info
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">receiver</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;null&quot;</span>
+
+<span style="color: #008000; font-weight: bold">inhibit_rules</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_matchers</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>alertname = InstanceDown
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">target_matchers</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>alertname != InstanceDown
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">equal</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>instance
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_matchers</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>severity = critical
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">target_matchers</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>severity = warning
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">equal</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>alertname
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_matchers</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>alertname = OrdersApiErrorBudgetBurnFast
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">target_matchers</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>alertname = ServiceHighErrorRate
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>service = orders-api
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">equal</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>service
+
+<span style="color: #008000; font-weight: bold">time_intervals</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>business-hours
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">time_intervals</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">times</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">start_time</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;09:00&quot;</span>
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">end_time</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;18:00&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">weekdays</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;monday:friday&quot;</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">location</span>:<span style="color: #bbbbbb"> </span>Asia/Shanghai
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>maintenance-window
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">time_intervals</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">times</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">start_time</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;02:00&quot;</span>
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">end_time</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;04:00&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">weekdays</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;sunday&quot;</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">location</span>:<span style="color: #bbbbbb"> </span>Asia/Shanghai
+
+<span style="color: #008000; font-weight: bold">receivers</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>default
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;null&quot;</span>
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>deadman-webhook
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">webhook_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">url</span>:<span style="color: #bbbbbb"> </span>https://example.invalid/deadman
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">send_resolved</span>:<span style="color: #bbbbbb"> </span>false
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>pagerduty-oncall
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">pagerduty_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">routing_key_file</span>:<span style="color: #bbbbbb"> </span>/tmp/observastack-secrets/pagerduty_routing_key
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">url</span>:<span style="color: #bbbbbb"> </span>https://events.pagerduty.example/v2/enqueue
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">send_resolved</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>slack-incidents
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">slack_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">api_url_file</span>:<span style="color: #bbbbbb"> </span>/tmp/observastack-secrets/slack_incidents_url
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">channel</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;#incidents&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">title</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;{{</span><span style="color: #19177C"> </span><span style="color: #BA2121">template</span><span style="color: #19177C"> </span><span style="color: #BA2121">&quot;slack.larkspur.title&quot;</span><span style="color: #19177C"> </span><span style="color: #BA2121">.</span><span style="color: #19177C"> </span><span style="color: #BA2121">}}&#39;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">text</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;{{</span><span style="color: #19177C"> </span><span style="color: #BA2121">template</span><span style="color: #19177C"> </span><span style="color: #BA2121">&quot;slack.larkspur.text&quot;</span><span style="color: #19177C"> </span><span style="color: #BA2121">.</span><span style="color: #19177C"> </span><span style="color: #BA2121">}}&#39;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">send_resolved</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>slack-payments
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">slack_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">api_url_file</span>:<span style="color: #bbbbbb"> </span>/tmp/observastack-secrets/slack_payments_url
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">channel</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;#payments&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">title</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;{{</span><span style="color: #19177C"> </span><span style="color: #BA2121">template</span><span style="color: #19177C"> </span><span style="color: #BA2121">&quot;slack.larkspur.title&quot;</span><span style="color: #19177C"> </span><span style="color: #BA2121">.</span><span style="color: #19177C"> </span><span style="color: #BA2121">}}&#39;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">text</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;{{</span><span style="color: #19177C"> </span><span style="color: #BA2121">template</span><span style="color: #19177C"> </span><span style="color: #BA2121">&quot;slack.larkspur.text&quot;</span><span style="color: #19177C"> </span><span style="color: #BA2121">.</span><span style="color: #19177C"> </span><span style="color: #BA2121">}}&#39;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">send_resolved</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>slack-platform
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">slack_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">api_url_file</span>:<span style="color: #bbbbbb"> </span>/tmp/observastack-secrets/slack_platform_url
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">channel</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;#platform&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">title</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;{{</span><span style="color: #19177C"> </span><span style="color: #BA2121">template</span><span style="color: #19177C"> </span><span style="color: #BA2121">&quot;slack.larkspur.title&quot;</span><span style="color: #19177C"> </span><span style="color: #BA2121">.</span><span style="color: #19177C"> </span><span style="color: #BA2121">}}&#39;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">text</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;{{</span><span style="color: #19177C"> </span><span style="color: #BA2121">template</span><span style="color: #19177C"> </span><span style="color: #BA2121">&quot;slack.larkspur.text&quot;</span><span style="color: #19177C"> </span><span style="color: #BA2121">.</span><span style="color: #19177C"> </span><span style="color: #BA2121">}}&#39;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">send_resolved</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>email-oncall
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">email_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">to</span>:<span style="color: #bbbbbb"> </span>oncall@larkspur.example
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">from</span>:<span style="color: #bbbbbb"> </span>alertmanager@larkspur.example
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">smarthost</span>:<span style="color: #bbbbbb"> </span>smtp.larkspur.example:587
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">auth_username</span>:<span style="color: #bbbbbb"> </span>alertmanager@larkspur.example
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">auth_password_file</span>:<span style="color: #bbbbbb"> </span>/tmp/observastack-secrets/smtp_password
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">require_tls</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">headers</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">Subject</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;{{</span><span style="color: #19177C"> </span><span style="color: #BA2121">template</span><span style="color: #19177C"> </span><span style="color: #BA2121">&quot;email.larkspur.subject&quot;</span><span style="color: #19177C"> </span><span style="color: #BA2121">.</span><span style="color: #19177C"> </span><span style="color: #BA2121">}}&#39;</span>
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

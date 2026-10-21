@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aws/template.yaml</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../aws/index.html">AWS 次要</a>
+<a href="../index.html">文件</a>
+<a href="../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>aws/template.yaml</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># SECONDARY — AWS parallel; GCP is the primary narrative of this demo.</span>
+<span style="color: #3D7B7B; font-style: italic"># 次要. Not deployed. No VPC, no load balancer, no NAT.</span>
+<span style="color: #008000; font-weight: bold">AWSTemplateFormatVersion</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2010-09-09&quot;</span>
+<span style="color: #008000; font-weight: bold">Transform</span>:<span style="color: #bbbbbb"> </span>AWS::Serverless-2016-10-31
+<span style="color: #008000; font-weight: bold">Description</span>:<span style="color: #bbbbbb"> </span>SECONDARY AWS parallel for insights-api. GCP is the primary narrative. Not deployed.
+
+<span style="color: #008000; font-weight: bold">Parameters</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">SigningSecretArn</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>String
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Default</span>:<span style="color: #bbbbbb"> </span>arn:aws:secretsmanager:us-east-1:000000000000:secret:insights-api-signing-key-placeholder
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">LogGroupName</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>String
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Default</span>:<span style="color: #bbbbbb"> </span>/thistle/insights-api
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">KmsKeyArn</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>String
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Default</span>:<span style="color: #bbbbbb"> </span>arn:aws:kms:us-east-1:000000000000:key/00000000-0000-0000-0000-000000000001
+
+<span style="color: #008000; font-weight: bold">Globals</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">Function</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Timeout</span>:<span style="color: #bbbbbb"> </span>10
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">MemorySize</span>:<span style="color: #bbbbbb"> </span>256
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Runtime</span>:<span style="color: #bbbbbb"> </span>python3.12
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Architectures</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>x86_64
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Tracing</span>:<span style="color: #bbbbbb"> </span>Active
+
+<span style="color: #008000; font-weight: bold">Resources</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">InsightsFunction</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>AWS::Serverless::Function
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">FunctionName</span>:<span style="color: #bbbbbb"> </span>insights-api-secondary
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Handler</span>:<span style="color: #bbbbbb"> </span>handler.handler
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">CodeUri</span>:<span style="color: #bbbbbb"> </span>lambda/
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Role</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!GetAtt</span><span style="color: #bbbbbb"> </span>ExecRole.Arn
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">ReservedConcurrentExecutions</span>:<span style="color: #bbbbbb"> </span>5
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">KmsKeyArn</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>KmsKeyArn
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">DeadLetterQueue</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>SQS
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">TargetArn</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!GetAtt</span><span style="color: #bbbbbb"> </span>DeadLetter.Arn
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Environment</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Variables</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">SIGNING_SECRET_ARN</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>SigningSecretArn
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">LOG_LEVEL</span>:<span style="color: #bbbbbb"> </span>info
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Events</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Health</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>HttpApi
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">ApiId</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>InsightsHttpApi
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Method</span>:<span style="color: #bbbbbb"> </span>GET
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Path</span>:<span style="color: #bbbbbb"> </span>/healthz
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">PayloadFormatVersion</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2.0&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Ready</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>HttpApi
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">ApiId</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>InsightsHttpApi
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Method</span>:<span style="color: #bbbbbb"> </span>GET
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Path</span>:<span style="color: #bbbbbb"> </span>/readyz
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">PayloadFormatVersion</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2.0&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Metrics</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>HttpApi
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">ApiId</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>InsightsHttpApi
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Method</span>:<span style="color: #bbbbbb"> </span>GET
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Path</span>:<span style="color: #bbbbbb"> </span>/metrics
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">PayloadFormatVersion</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2.0&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">InsightsHttpApi</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>AWS::Serverless::HttpApi
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">StageName</span>:<span style="color: #bbbbbb"> </span>prod
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Description</span>:<span style="color: #bbbbbb"> </span>SECONDARY HTTP API. Not deployed.
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">AccessLogSettings</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">DestinationArn</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!GetAtt</span><span style="color: #bbbbbb"> </span>LogGroup.Arn
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Format</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&#39;$context.requestId</span><span style="color: #19177C"> </span><span style="color: #BA2121">$context.status</span><span style="color: #19177C"> </span><span style="color: #BA2121">$context.integrationErrorMessage&#39;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">ExecRole</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>AWS::IAM::Role
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">RoleName</span>:<span style="color: #bbbbbb"> </span>insights-api-exec
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">AssumeRolePolicyDocument</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Version</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2012-10-17&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Statement</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">Effect</span>:<span style="color: #bbbbbb"> </span>Allow
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Principal</span>:
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">Service</span>:<span style="color: #bbbbbb"> </span>lambda.amazonaws.com
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Action</span>:<span style="color: #bbbbbb"> </span>sts:AssumeRole
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Policies</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">PolicyName</span>:<span style="color: #bbbbbb"> </span>insights-exec-least
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">PolicyDocument</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Version</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2012-10-17&quot;</span>
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Statement</span>:
+<span style="color: #bbbbbb">              </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">Sid</span>:<span style="color: #bbbbbb"> </span>LogsToSpecificGroup
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Effect</span>:<span style="color: #bbbbbb"> </span>Allow
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Action</span>:
+<span style="color: #bbbbbb">                  </span>-<span style="color: #bbbbbb"> </span>logs:CreateLogStream
+<span style="color: #bbbbbb">                  </span>-<span style="color: #bbbbbb"> </span>logs:PutLogEvents
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Resource</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Sub</span><span style="color: #bbbbbb"> </span>arn:aws:logs:us-east-1:000000000000:log-group:${LogGroupName}:*
+<span style="color: #bbbbbb">              </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">Sid</span>:<span style="color: #bbbbbb"> </span>ReadOneSecret
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Effect</span>:<span style="color: #bbbbbb"> </span>Allow
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Action</span>:
+<span style="color: #bbbbbb">                  </span>-<span style="color: #bbbbbb"> </span>secretsmanager:GetSecretValue
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Resource</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>SigningSecretArn
+<span style="color: #bbbbbb">              </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">Sid</span>:<span style="color: #bbbbbb"> </span>PublishToDeadLetter
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Effect</span>:<span style="color: #bbbbbb"> </span>Allow
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Action</span>:
+<span style="color: #bbbbbb">                  </span>-<span style="color: #bbbbbb"> </span>sqs:SendMessage
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Resource</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!GetAtt</span><span style="color: #bbbbbb"> </span>DeadLetter.Arn
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">DeployRole</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>AWS::IAM::Role
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">RoleName</span>:<span style="color: #bbbbbb"> </span>insights-api-deploy
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Description</span>:<span style="color: #bbbbbb"> </span>SECONDARY deploy role. Update this function only.
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">AssumeRolePolicyDocument</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Version</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2012-10-17&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">Statement</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">Effect</span>:<span style="color: #bbbbbb"> </span>Allow
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Principal</span>:
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">Service</span>:<span style="color: #bbbbbb"> </span>codebuild.amazonaws.com
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Action</span>:<span style="color: #bbbbbb"> </span>sts:AssumeRole
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">Policies</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">PolicyName</span>:<span style="color: #bbbbbb"> </span>insights-deploy-one-function
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">PolicyDocument</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Version</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2012-10-17&quot;</span>
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">Statement</span>:
+<span style="color: #bbbbbb">              </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">Sid</span>:<span style="color: #bbbbbb"> </span>UpdateThisFunctionOnly
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Effect</span>:<span style="color: #bbbbbb"> </span>Allow
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Action</span>:
+<span style="color: #bbbbbb">                  </span>-<span style="color: #bbbbbb"> </span>lambda:UpdateFunctionCode
+<span style="color: #bbbbbb">                  </span>-<span style="color: #bbbbbb"> </span>lambda:UpdateFunctionConfiguration
+<span style="color: #bbbbbb">                  </span>-<span style="color: #bbbbbb"> </span>lambda:GetFunction
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">Resource</span>:<span style="color: #bbbbbb"> </span>arn:aws:lambda:us-east-1:000000000000:function:insights-api-secondary
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">DeadLetter</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>AWS::SQS::Queue
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">QueueName</span>:<span style="color: #bbbbbb"> </span>insights-api-secondary-dlq
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">KmsMasterKeyId</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>KmsKeyArn
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">MessageRetentionPeriod</span>:<span style="color: #bbbbbb"> </span>1209600
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">LogGroup</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Type</span>:<span style="color: #bbbbbb"> </span>AWS::Logs::LogGroup
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Properties</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">LogGroupName</span>:<span style="color: #bbbbbb"> </span>/thistle/insights-api
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">RetentionInDays</span>:<span style="color: #bbbbbb"> </span>30
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">KmsKeyId</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>KmsKeyArn
+
+<span style="color: #008000; font-weight: bold">Outputs</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">HttpApiId</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Value</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>InsightsHttpApi
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">FunctionName</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">Value</span>:<span style="color: #bbbbbb"> </span><span style="color: #B00040">!Ref</span><span style="color: #bbbbbb"> </span>InsightsFunction
+</code></pre></div>
+
+</main>
+</body>
+</html>

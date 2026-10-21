@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sqs-queue</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · Messaging · v1.0.0</p>
+<h1>sqs-queue</h1>
+<p>Queue, dead-letter queue, redrive policy, and server-side encryption.</p>
+<p>Tests passed <span data-metric="modules.sqs-queue.passed">6</span> of <span data-metric="modules.sqs-queue.runs">6</span>. Failed <span data-metric="modules.sqs-queue.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>dlq_message_retention_seconds</td><td><code>number</code></td><td>no</td><td>How long the dead-letter queue keeps a message, in seconds.</td></tr><tr><td>fifo</td><td><code>bool</code></td><td>no</td><td>Create a FIFO queue and a FIFO dead-letter queue. Both names then end in .fifo.</td></tr><tr><td>kms_key_arn</td><td><code>string</code></td><td>no</td><td>Customer managed key ARN or alias used when sse_mode is kms. Must be null for SQS-managed encryption.</td></tr><tr><td>max_receive_count</td><td><code>number</code></td><td>no</td><td>How many receives the main queue allows before the redrive policy sends the message to the dead-letter queue.</td></tr><tr><td>message_retention_seconds</td><td><code>number</code></td><td>no</td><td>How long the main queue keeps a message, in seconds.</td></tr><tr><td>name</td><td><code>string</code></td><td>yes</td><td>Queue name without a .fifo suffix. The module appends .fifo when fifo is true, including on the dead-letter queue.</td></tr><tr><td>sse_mode</td><td><code>string</code></td><td>no</td><td>Server-side encryption mode. sqs uses SQS-managed keys. kms requires kms_key_arn.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr><tr><td>visibility_timeout_seconds</td><td><code>number</code></td><td>no</td><td>Visibility timeout for the main queue, in seconds.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources.</td></tr><tr><td>dlq_arn</td><td>Dead-letter queue ARN.</td></tr><tr><td>dlq_fifo_queue</td><td>True when the dead-letter queue is FIFO.</td></tr><tr><td>dlq_name</td><td>Dead-letter queue name. Ends in .fifo when fifo is true.</td></tr><tr><td>dlq_url</td><td>Dead-letter queue URL.</td></tr><tr><td>fifo_queue</td><td>True when the main queue is FIFO.</td></tr><tr><td>max_receive_count</td><td>maxReceiveCount written into the main queue redrive policy.</td></tr><tr><td>queue_arn</td><td>Main queue ARN.</td></tr><tr><td>queue_name</td><td>Main queue name. Ends in .fifo when fifo is true.</td></tr><tr><td>queue_url</td><td>Main queue URL.</td></tr><tr><td>sqs_managed_sse_enabled</td><td>True when the queues use SQS-managed encryption.</td></tr><tr><td>sse_enabled</td><td>True when SQS-managed encryption is on, or a customer managed key is set.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;orders&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">name</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;orders&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>standard_redrive passed</li><li>fifo_names passed</li><li>kms_sse passed</li><li>custom_receive_count passed</li><li>reject_zero_receive_count passed</li><li>reject_fifo_suffix passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\sqs-queue.tftest.hcl... in progress
+  run &quot;standard_redrive&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_sqs_queue.dlq will be created
+  + resource &quot;aws_sqs_queue&quot; &quot;dlq&quot; {
+      + arn                               = (known after apply)
+      + deduplication_scope               = (known after apply)
+      + fifo_queue                        = false
+      + fifo_throughput_limit             = (known after apply)
+      + id                                = (known after apply)
+      + kms_data_key_reuse_period_seconds = (known after apply)
+      + message_retention_seconds         = 1209600
+      + name                              = &quot;orders-dlq&quot;
+      + name_prefix                       = (known after apply)
+      + policy                            = (known after apply)
+      + redrive_allow_policy              = (known after apply)
+      + redrive_policy                    = (known after apply)
+      + sqs_managed_sse_enabled           = true
+      + tags                              = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;sqs-queue&quot;
+          + &quot;Owner&quot;     = &quot;platform&quot;
+        }
+      + tags_all                          = (known after apply)
+      + url                               = (known after apply)
+    }
+
+  # aws_sqs_queue.this will be created
+  + resource &quot;aws_sqs_queue&quot; &quot;this&quot; {
+      + arn                               = (known after apply)
+      + deduplication_scope               = (known after apply)
+      + fifo_queue                        = false</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/sqs-queue.svg" alt="Resource list for sqs-queue">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Main queue, dead-letter queue, redrive policy, and server-side encryption.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>Amazon SQS</li><li>AWS Key Management Service</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

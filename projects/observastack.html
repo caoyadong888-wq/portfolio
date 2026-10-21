@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ObservaStack — case study</title>
+  <meta name="description" content="Prometheus, Alertmanager, and Grafana stack with promtool tests, SLO burn alerts, and importable dashboards">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="../observastack/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. Configs were validated offline with promtool, amtool, and pint. Larkspur Grocers is fictional, not a client. The public page does not run Prometheus or Grafana.</p>
+    <article class="readme">
+      <h1>ObservaStack</h1>
+      <p>Prometheus, Alertmanager, and Grafana configuration for <strong>Larkspur Grocers</strong>, a fictional grocer. The public page is static. It does not run Prometheus or Grafana. Nothing here is a customer, a traffic figure, an incident, or an MTTR.</p>
+      <p>The page says the checks were recorded at build time. Numbers on the page come from <code>results/checks.json</code>. Screenshots use <code>scripts/synth_openmetrics.py --seed 42</code> and are labeled synthetic.</p>
+      <h2>What is real</h2>
+      <ul><li><code>promtool check config</code>, <code>check rules</code>, <code>test rules</code>, and <code>check metrics</code> run against the files in this directory.</li><li><code>pint --offline</code> lints <code>rules/</code> with <code>policies/.pint.hcl</code>. Exceptions are in <code>policies/pint-exceptions.md</code>.</li><li><code>amtool check-config</code>, <code>amtool config routes test</code>, and <code>amtool template render</code> run against <code>alertmanager/</code>.</li><li>During <code>make screenshots</code>, a local Grafana imports the five dashboard JSON files with <code>POST /api/dashboards/import</code>. The result is <code>checks.json</code> → <code>grafana_import</code>. Alertmanager is started with an empty <code>--cluster.listen-address</code> so it does not gossip on <code>0.0.0.0:9094</code>. After Prometheus, Alertmanager, and Grafana are up, <code>ss -ltnp</code> must show every listening socket of those PIDs on <code>127.0.0.1</code>. That result is <code>checks.json</code> → <code>build_listeners</code>. The processes are stopped when the script exits. Their files live under <code>/tmp/observastack-build/</code> and are deleted afterwards.</li></ul>
+      <h2>Commands</h2>
+      <pre><code class="language-bash">make tools
+      make check
+      make screenshots
+      make showcase
+      make test</code></pre>
+      <p><code>make check</code> does not need the screenshots. <code>make showcase</code> needs <code>results/checks.json</code>, <code>grafana_import</code>, and <code>build_listeners</code>. Re-run <code>make check</code> after screenshots if you want a fresh timestamp; it keeps <code>grafana_import</code> and <code>build_listeners</code>. Then run <code>make showcase</code> again so the page matches.</p>
+      <p>Pinned tools, verified with the publisher&#x27;s checksums, install into <code>.tools/</code> (gitignored):</p>
+      <ul><li>Prometheus / promtool 3.15.0</li><li>Alertmanager / amtool 0.34.1</li><li>pint 0.89.0</li><li>Grafana OSS 13.2.3 (build-time import and screenshots only)</li></ul>
+      <p>Python dependencies are pinned in <code>requirements.txt</code> and installed into <code>.venv/</code>.</p>
+      <h2>Adaptations the tools forced</h2>
+      <ul><li><strong>Metric names.</strong> <code>promtool check metrics</code> rejects node_exporter&#x27;s camelCase <code>node_memory_MemAvailable_bytes</code> / <code>node_memory_MemTotal_bytes</code>, and it rejects a non-histogram <code>_count</code> suffix (<code>pg_stat_activity_count</code>). The catalog uses <code>node_memory_available_bytes</code>, <code>node_memory_total_bytes</code>, and <code>pg_stat_activity_connections</code>. Rules match the catalog. <code>demo-app</code> emits that catalog, including exporter-shaped and engine-shaped series, so the linter sees every name. <code>ALERTS</code> in the demo output and in the screenshot fixture is not the rule engine.</li><li><strong>Alertmanager routes.</strong> A child route replaces its parent receiver. Critical alerts use two sibling routes, both <code>continue: true</code>, so PagerDuty and Slack both match.</li><li><strong>Time intervals.</strong> <code>amtool config routes test</code> in v0.34.1 does not evaluate <code>active_time_intervals</code> or <code>mute_time_intervals</code>. A platform warning resolves to <code>slack-platform</code> in amtool even outside business hours. The config still contains the intervals. <code>faketime</code> is not installed, and the clock is not changed.</li><li><strong>Credentials.</strong> Only <code><em>_file</code> fields. <code>make check</code> writes placeholder files under <code>/tmp/observastack-secrets/</code>. They are not secrets and are not committed. Hosts are <code></em>.larkspur.example</code> or <code>example.invalid</code>. The Prometheus alertmanager target is <code>alertmanager.larkspur.example:9093</code> for that reason.</li><li><strong>Grafana datasource URL.</strong> The committed provisioning file uses <code>${PROMETHEUS_URL}</code> for compose. The screenshot script writes a concrete <code>http://127.0.0.1:19090</code> file under <code>/tmp/observastack-build/</code> and does not keep Grafana&#x27;s <code>data/</code> directory or <code>grafana.db</code> in the repo. Grafana 13.2 ships the Prometheus datasource under <code>data/plugins-bundled</code>. <code>make tools</code> unpacks that tree to <code>.tools/grafana/plugins-bundled/</code> (gitignored). The screenshot run links it into a <code>/tmp</code> homepath at <code>data/plugins-bundled</code>, which is where the server looks. Anonymous org name stays the default <code>Main Org.</code>.</li><li><strong>promtool unit-test output.</strong> v3.15 prints <code>SUCCESS</code> per file, not per case. <code>results/checks.json</code> lists the case names from the YAML and marks them passed when that file exits 0.</li><li><strong>SLO unit-test names.</strong> Group names such as <code>fast_burn_15x</code> are the input burn of the last value sequence (error step / total step / budget), not the workbook thresholds 14.4 / 6 / 3 / 1. The thresholds use strict <code>&gt;</code>. <code>fast_burn_15x</code> keeps a quiet prefix so Fast fires through the 1h+5m branch; the page prints that group&#x27;s computed multiplier and eval times from the test file and <code>checks.json</code>.</li><li><strong>OpenMetrics timestamps</strong> for <code>promtool tsdb create-blocks-from openmetrics</code> are seconds. Rule backfill always passes <code>--output-dir</code> under <code>/tmp/observastack-build/ruleblocks</code>. The tool&#x27;s default output directory is <code>data/</code>, which this repo must not contain.</li></ul>
+      <h2>Not run</h2>
+      <ul><li><code>docker-compose.yml</code> is digest-pinned and is not executed. This box has no Docker. Grafana&#x27;s admin password is <code>${GF_SECURITY_ADMIN_PASSWORD}</code> with no committed value. The Postgres exporter DSN in the default has no password.</li><li><code>.github/workflows/observability.yml</code> is not a repository-root workflow, so GitHub will not run it from this path. <code>make test</code> also expects the showcase, which expects screenshots.</li></ul>
+      <h2>Layout</h2>
+      <p><code>site/observastack/</code> is generated by <code>scripts/build_showcase.py</code>. Do not hand-edit the numbers. The homepage of the portfolio is updated separately, after this demo is accepted.</p>
+    </article>
+    <p class="case-cta"><a class="btn" href="../observastack/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

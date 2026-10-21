@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TerraShelf — case study</title>
+  <meta name="description" content="Reusable, versioned AWS Terraform modules with offline tests and generated docs">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="../terrashelf/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. Modules were tested with a mocked provider. Nothing was deployed to AWS, and nothing was published to the Terraform Registry.</p>
+    <article class="readme">
+      <h1>TerraShelf</h1>
+      <p>TerraShelf is an offline library of reusable AWS Terraform modules. The modules are reference implementations with input validation, outputs, changelogs, and offline tests. Nothing in this tree is deployed to an AWS account. Nothing in this tree is published to the Terraform Registry. <code>OWNER</code> in the source addresses below is a placeholder.</p>
+      <p>SkyForge could later call these modules instead of keeping its own copies of shared building blocks. This repository does not change SkyForge.</p>
+      <h2>Source address</h2>
+      <pre><code class="language-hcl">module &quot;site&quot; {
+        source = &quot;git::https://github.com/OWNER/terrashelf.git//modules/s3-static-site?ref=s3-static-site/v1.1.0&quot;
+
+        name_prefix = &quot;demo-site&quot;
+      }</code></pre>
+      <p>Tags use <code>&lt;module&gt;/vX.Y.Z</code>. See <code>CONTRIBUTING.md</code> for the version rules and <code>catalog.yaml</code> for the eight modules.</p>
+      <h2>Checks</h2>
+      <p><code>scripts/check_all.sh</code> (and <code>scripts/check_all.ps1</code> on Windows) clears AWS credential variables, sets <code>AWS_EC2_METADATA_DISABLED=true</code>, and runs formatting, validation, tflint, <code>terraform test</code>, documentation, checkov, and pytest. Plans in <code>results/plans/</code> come from a mocked provider. ARNs and ids in those files are simulated.</p>
+      <p>Billable service names are listed in <code>catalog.yaml</code>. This README does not quote prices.</p>
+      <h2>Modules</h2>
+      <table><thead><tr><th>Module</th><th>Category</th></tr></thead><tbody><tr><td>s3-static-site</td><td>Web</td></tr><tr><td>github-oidc-role</td><td>CI/CD</td></tr><tr><td>rds-postgres</td><td>Data</td></tr><tr><td>sqs-queue</td><td>Messaging</td></tr><tr><td>lambda-function</td><td>Compute</td></tr><tr><td>cloudwatch-alarms</td><td>Observability</td></tr><tr><td>budget-guard</td><td>Cost</td></tr><tr><td>account-baseline</td><td>Security</td></tr></tbody></table>
+    </article>
+    <p class="case-cta"><a class="btn" href="../terrashelf/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

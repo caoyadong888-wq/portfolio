@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rules/alerts/slo.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../alerts.html">告警</a>
+<a href="../../../slo.html">SLO</a>
+<a href="../../../routing.html">路由</a>
+<a href="../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>rules/alerts/slo.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Multi-window multi-burn-rate alerts from the SRE workbook.</span>
+<span style="color: #3D7B7B; font-style: italic"># Availability objective 99.9% =&gt; budget 0.001.</span>
+<span style="color: #3D7B7B; font-style: italic"># Fast page: 14.4x on (1h and 5m), or 6x on (6h and 30m).</span>
+<span style="color: #3D7B7B; font-style: italic"># Slow ticket: 3x on (1d and 2h), or 1x on (3d and 6h).</span>
+<span style="color: #008000; font-weight: bold">groups</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>slo.alerts
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">rules</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>OrdersApiErrorBudgetBurnFast
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate1h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (14.4 * 0.001)</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate5m{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (14.4 * 0.001)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">or</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate6h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (6 * 0.001)</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate30m{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (6 * 0.001)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>2m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>orders
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>orders-api
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">slo</span>:<span style="color: #bbbbbb"> </span>availability
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Orders API availability error budget is burning fast
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>The orders-api availability SLI is above the fast multi-window burn threshold (14.4x over 5m and 1h, or 6x over 30m and 6h). Page the orders on-call.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/OrdersApiErrorBudgetBurnFast
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>OrdersApiErrorBudgetBurnSlow
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate1d{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (3 * 0.001)</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate2h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (3 * 0.001)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">or</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate3d{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (1 * 0.001)</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_error:ratio_rate6h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (1 * 0.001)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>2m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>orders
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>orders-api
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">slo</span>:<span style="color: #bbbbbb"> </span>availability
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Orders API availability error budget is burning slowly
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>The orders-api availability SLI is above the slow multi-window burn threshold (3x over 2h and 1d, or 1x over 6h and 3d). Open a ticket for the orders team.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/OrdersApiErrorBudgetBurnSlow
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>OrdersApiLatencySLOBurn
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_latency_error:ratio_rate1h{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (14.4 * 0.01)</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_latency_error:ratio_rate5m{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (14.4 * 0.01)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">or</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_latency_error:ratio_rate6h{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (6 * 0.01)</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">slo:sli_latency_error:ratio_rate30m{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (6 * 0.01)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>2m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>orders
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>orders-api
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">slo</span>:<span style="color: #bbbbbb"> </span>latency
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Orders API latency SLI is burning its error budget
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>The share of orders-api requests slower than 300ms is above the fast latency burn threshold (14.4x over 5m and 1h, or 6x over 30m and 6h). The latency objective is 99 percent.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/OrdersApiLatencySLOBurn
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

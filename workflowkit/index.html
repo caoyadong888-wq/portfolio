@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WorkflowKit — three tested n8n templates</title>
+  <link rel="stylesheet" href="css/workflowkit.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <div class="wrap">
+    <header class="topbar">
+      <a href="../">Portfolio</a>
+      <span class="mono">n8n 2.41.6 · Node v24.21.0</span>
+    </header>
+    <main id="content">
+      <section class="hero">
+        <p class="eyebrow">WorkflowKit</p>
+        <h1>Three n8n templates, run locally</h1>
+        <p class="lead">Lead intake, uptime checks, and a daily job-digest. Each file imports with n8n Import from File. The diagrams below are drawn from the workflow JSON.</p>
+        <div class="note">
+          <p>These workflows were run on a local n8n instance (version 2.41.6). This public page does not run n8n.</p>
+          <p>Local execution did not call Google Sheets or Slack. A generated test copy rewrote Append Lead Row and Post Lead Notification into HTTP Request nodes pointed at a local mock. Send Email used a local SMTP receiver, and those messages stayed on this machine. Uptime checks used two local mock URLs in place of the published example.com and example.org defaults. The RSS node read the public Jobicy job feed at https://jobicy.com/?feed=job_feed during the local run. Source: Jobicy (jobicy.com), used with attribution. The downloadable JSON files are the full templates: official nodes, no credential ids, and no disabled test nodes. These templates were not submitted to the n8n Creator Hub.</p>
+        </div>
+      </section>
+      
+      <article class="card" id="lead-intake">
+        <h2>Lead intake</h2>
+        
+        <p class="meta">Local execution 28 · status success · mode webhook</p>
+        <p><a class="pill" href="workflows/lead-intake.json" download>Download workflow JSON</a></p>
+        <div class="canvas-scroll">
+          <img src="canvases/lead-intake.svg" alt="Canvas diagram of Lead intake">
+        </div>
+        <div class="shots">
+          <figure>
+            <img src="screenshots/lead-intake-canvas.png" alt="n8n editor canvas for Lead intake">
+            <figcaption>Editor canvas from the local n8n instance, before the test-copy patch.</figcaption>
+          </figure>
+          <figure>
+            <img src="screenshots/lead-intake-execution.png" alt="Successful execution record for Lead intake">
+            <figcaption>Execution 28, status success.</figcaption>
+          </figure>
+        </div>
+        <h3>Nodes</h3>
+        <table>
+          <thead><tr><th>Name</th><th>Type</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td>Receive Lead</td><td class="mono">n8n-nodes-base.webhook</td><td>POST webhook that waits for a response node.</td></tr><tr><td>Validate Lead Payload</td><td class="mono">n8n-nodes-base.code</td><td>Checks name, email shape, company, and message length.</td></tr><tr><td>Lead Is Valid</td><td class="mono">n8n-nodes-base.if</td><td>Routes invalid payloads to the validation log.</td></tr><tr><td>Log Validation Failure</td><td class="mono">n8n-nodes-base.code</td><td>Appends a validation entry to workflow static data.</td></tr><tr><td>Reply Validation Error</td><td class="mono">n8n-nodes-base.respondToWebhook</td><td>Returns HTTP 400 with the validation result.</td></tr><tr><td>Deduplicate By Email And Day</td><td class="mono">n8n-nodes-base.code</td><td>Drops the same email on the same UTC day.</td></tr><tr><td>Lead Is New</td><td class="mono">n8n-nodes-base.if</td><td>Routes duplicates away from scoring.</td></tr><tr><td>Log Duplicate Lead</td><td class="mono">n8n-nodes-base.code</td><td>Records the duplicate and does not write a row.</td></tr><tr><td>Reply Duplicate</td><td class="mono">n8n-nodes-base.respondToWebhook</td><td>Returns HTTP 200 for a duplicate lead.</td></tr><tr><td>Score Lead</td><td class="mono">n8n-nodes-base.code</td><td>Scores company and message keywords, with a support cap.</td></tr><tr><td>Append Lead Row</td><td class="mono">n8n-nodes-base.googleSheets</td><td>Google Sheets append. The published node has no credential id.</td></tr><tr><td>Post Lead Notification</td><td class="mono">n8n-nodes-base.slack</td><td>Slack message. The published node has no credential id.</td></tr><tr><td>Shape Accepted Reply</td><td class="mono">n8n-nodes-base.code</td><td>Builds the webhook reply without repeating the address.</td></tr><tr><td>Reply Accepted</td><td class="mono">n8n-nodes-base.respondToWebhook</td><td>Returns HTTP 200 for an accepted lead.</td></tr><tr><td>Log Integration Error</td><td class="mono">n8n-nodes-base.code</td><td>Error output from the sheet or Slack node. Writes a log entry.</td></tr><tr><td>Reply Integration Error</td><td class="mono">n8n-nodes-base.respondToWebhook</td><td>Returns HTTP 502 after an integration error is logged.</td></tr>
+          </tbody>
+        </table>
+      </article>
+    
+
+      <article class="card" id="uptime-watcher">
+        <h2>Uptime watcher</h2>
+        
+        <p class="meta">Local execution 32 · status success · mode manual</p>
+        <p><a class="pill" href="workflows/uptime-watcher.json" download>Download workflow JSON</a></p>
+        <div class="canvas-scroll">
+          <img src="canvases/uptime-watcher.svg" alt="Canvas diagram of Uptime watcher">
+        </div>
+        <div class="shots">
+          <figure>
+            <img src="screenshots/uptime-watcher-canvas.png" alt="n8n editor canvas for Uptime watcher">
+            <figcaption>Editor canvas from the local n8n instance, before the test-copy patch.</figcaption>
+          </figure>
+          <figure>
+            <img src="screenshots/uptime-watcher-execution.png" alt="Successful execution record for Uptime watcher">
+            <figcaption>Execution 32, status success.</figcaption>
+          </figure>
+        </div>
+        <h3>Nodes</h3>
+        <table>
+          <thead><tr><th>Name</th><th>Type</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td>Every Ten Minutes</td><td class="mono">n8n-nodes-base.scheduleTrigger</td><td>Schedule trigger, every 10 minutes.</td></tr><tr><td>List Watched URLs</td><td class="mono">n8n-nodes-base.code</td><td>Emits one item per URL. Defaults are example.com and example.org.</td></tr><tr><td>Fetch Watched URL</td><td class="mono">n8n-nodes-base.httpRequest</td><td>HTTP GET that keeps non-2xx responses as data.</td></tr><tr><td>Update Check State</td><td class="mono">n8n-nodes-base.code</td><td>Stores consecutive failures in workflow static data.</td></tr><tr><td>Should Notify</td><td class="mono">n8n-nodes-base.if</td><td>Continues only when this check should send mail.</td></tr><tr><td>Record Quiet Check</td><td class="mono">n8n-nodes-base.noOp</td><td>Quiet path: first failure, later repeats, or an already-up URL.</td></tr><tr><td>Notice Is Recovery</td><td class="mono">n8n-nodes-base.if</td><td>Splits a down alert from a recovery notice.</td></tr><tr><td>Send Recovery Notice</td><td class="mono">n8n-nodes-base.emailSend</td><td>Send Email after status returns from down to up.</td></tr><tr><td>Send Down Alert</td><td class="mono">n8n-nodes-base.emailSend</td><td>Send Email only when failures reach exactly two.</td></tr>
+          </tbody>
+        </table>
+      </article>
+    
+
+      <article class="card" id="rss-job-digest">
+        <h2>RSS job digest</h2>
+        <p>Source: Jobicy (jobicy.com), used with attribution. Each digest item links back to the original Jobicy listing.</p>
+        <p class="meta">Local execution 33 · status success · mode manual</p>
+        <p><a class="pill" href="workflows/rss-job-digest.json" download>Download workflow JSON</a></p>
+        <div class="canvas-scroll">
+          <img src="canvases/rss-job-digest.svg" alt="Canvas diagram of RSS job digest">
+        </div>
+        <div class="shots">
+          <figure>
+            <img src="screenshots/rss-job-digest-canvas.png" alt="n8n editor canvas for RSS job digest">
+            <figcaption>Editor canvas from the local n8n instance, before the test-copy patch.</figcaption>
+          </figure>
+          <figure>
+            <img src="screenshots/rss-job-digest-execution.png" alt="Successful execution record for RSS job digest">
+            <figcaption>Execution 33, status success.</figcaption>
+          </figure>
+        </div>
+        <h3>Nodes</h3>
+        <table>
+          <thead><tr><th>Name</th><th>Type</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td>Daily At Seven</td><td class="mono">n8n-nodes-base.scheduleTrigger</td><td>Schedule trigger at 07:00 UTC.</td></tr><tr><td>Read Public Job Feed</td><td class="mono">n8n-nodes-base.rssFeedRead</td><td>RSS Read of the public Jobicy feed.</td></tr><tr><td>Keep Keyword Matches</td><td class="mono">n8n-nodes-base.code</td><td>Keeps items that match the keyword list.</td></tr><tr><td>Drop Already Sent Items</td><td class="mono">n8n-nodes-base.code</td><td>Hides ids already stored in workflow static data.</td></tr><tr><td>Digest Has Items</td><td class="mono">n8n-nodes-base.if</td><td>Skips the email when nothing new remains.</td></tr><tr><td>Skip Empty Digest</td><td class="mono">n8n-nodes-base.noOp</td><td>Quiet path for an empty day.</td></tr><tr><td>Build Digest Email</td><td class="mono">n8n-nodes-base.code</td><td>One plain-text summary, at most 20 items.</td></tr><tr><td>Send Digest Email</td><td class="mono">n8n-nodes-base.emailSend</td><td>Send Email. Mark-sent runs only after this node.</td></tr><tr><td>Mark Items Sent</td><td class="mono">n8n-nodes-base.code</td><td>Stores sent ids so the next day can skip them.</td></tr>
+          </tbody>
+        </table>
+      </article>
+    
+    </main>
+    <footer>
+      <p>WorkflowKit is a local portfolio demo. The public page is static and does not start n8n.</p>
+    </footer>
+  </div>
+</body>
+</html>

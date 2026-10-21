@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小型企业自动化演示（n8n）</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <style>
+    body { font-family: "Noto Sans CJK SC", "Noto Sans CJK TC", "WenQuanYi Zen Hei", sans-serif; }
+    .banner { background: #fff6e0; border: 1px solid #ead7a1; border-radius: 12px; padding: 12px 14px; margin: 12px 0; }
+    pre, .flow { white-space: pre-wrap; background: #141824; color: #f4f6fb; padding: 12px; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    figure { margin: 0 0 18px; }
+    figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
+    .table-scroll { max-width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px; vertical-align: top; overflow-wrap: anywhere; }
+    img.shot { width: 100%; border: 1px solid var(--line); border-radius: 12px; }
+    .links a { margin-right: 12px; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">作品示例</p>
+      <h1>小型企业自动化演示（n8n）</h1>
+      <p class="lead links"><a href="index.html">English</a> <a href="workflow.json">workflow.json</a> <a href="results.json">results.json</a></p>
+      <p class="value">Webhook 接收客户咨询，按关键词规则分类，把一行写入 n8n 自带的数据表，并返回 JSON。不使用凭据，也不调用外部服务。下面八行是本地 n8n 2.43.8 社区版实跑得到的 DEMO DATA / 演示数据。</p>
+    </div>
+  </header>
+  <main>
+    <section class="section">
+      <div class="wrap">
+        <h2>它做什么</h2>
+        <p>小团队可以把这个工作流放在联系表单前面。询价、故障和明显的垃圾信息会分成不同类别，每次成功调用都留下一行，以后可以改接到表格。</p>
+        <h2>流程</h2>
+        <pre class="flow">POST /webhook/smb-inquiry
+        |
+        v
+Ensure Inquiry Table   数据表创建，名称 smb_inquiries，已存在则复用
+        |
+        v
+Classify Inquiry       下面的关键词规则
+        |
+        v
+Append Inquiry Row     数据表插入一行
+        |
+        v
+Shape Reply            JSON：category 与 row
+        |
+        v
+Reply To Webhook</pre>
+        <h2>分类规则</h2>
+        <p>先把留言转成小写。命中的第一组生效。</p>
+        <ul>
+          <li><strong>spam</strong> — casino、crypto、viagra、短语 “seo backlinks”、单词 “backlink”，或 http / https / www 链接达到三条及以上。</li>
+          <li><strong>sales</strong> — price、quote 或 order。</li>
+          <li><strong>support</strong> — error、broken、refund 或 help。</li>
+          <li><strong>general</strong> — 其余情况。</li>
+        </ul>
+        <p>匹配的是子串，因此 “errors” 算支持，“quotes” 算销售。垃圾信息先于销售和支持判断。</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>截图</h2>
+        <figure>
+          <img class="shot" src="img/01-workflow-editor.png" alt="n8n 编辑器中的咨询分类工作流" width="1280" height="800">
+          <figcaption>已登录后的编辑器画布，工作流处于已发布状态。</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="img/02-executions.png" alt="n8n 执行列表和一次成功运行" width="1280" height="800">
+          <figcaption>执行列表，以及其中一次成功运行。每个节点都已完成。</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="img/03-result-table.png" alt="包含八条演示咨询的 n8n 数据表" width="1280" height="800">
+          <figcaption>八条演示咨询写入后的数据表 smb_inquiries。DEMO DATA / 演示数据。</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>结果</h2>
+        <p class="banner">DEMO DATA / 演示数据。姓名以 DEMO 开头，邮箱使用 example.com。这些是 Webhook 返回的 JSON。</p>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>姓名</th><th>邮箱</th><th>公司</th><th>留言</th><th>类别</th><th>时间</th></tr></thead>
+          <tbody>
+            <tr><td>DEMO Mara Chen</td><td>mara.chen@example.com</td><td>Northwind Outfitters</td><td>Please send a price quote for 20 seats of the annual plan.</td><td>sales</td><td>2026-10-20T02:10:52.563Z</td></tr>
+<tr><td>DEMO Luis Ortega</td><td>luis.ortega@example.com</td><td>Fabrikam Studio</td><td>We want to place an order for the starter package this week.</td><td>sales</td><td>2026-10-20T02:10:52.649Z</td></tr>
+<tr><td>DEMO Priya Shah</td><td>priya.shah@example.com</td><td>Contoso Labs</td><td>The export button is broken and shows an error after login.</td><td>support</td><td>2026-10-20T02:10:52.725Z</td></tr>
+<tr><td>DEMO Owen Blake</td><td>owen.blake@example.com</td><td>Adventure Works</td><td>I need help with a refund for invoice 1042.</td><td>support</td><td>2026-10-20T02:10:52.798Z</td></tr>
+<tr><td>DEMO Casino Promo</td><td>casino.promo@example.com</td><td>Lucky Fields</td><td>Play at our casino tonight and claim a welcome bonus.</td><td>spam</td><td>2026-10-20T02:10:52.853Z</td></tr>
+<tr><td>DEMO Link Farm</td><td>links.farm@example.com</td><td>SEO Partners</td><td>Buy crypto signals and seo backlinks. See https://example.com/a https://example.com/b https://example.com/c</td><td>spam</td><td>2026-10-20T02:10:52.909Z</td></tr>
+<tr><td>DEMO Pill Ads</td><td>pills.ads@example.com</td><td>Health Noise</td><td>Cheap viagra shipped overnight, no questions asked.</td><td>spam</td><td>2026-10-20T02:10:52.968Z</td></tr>
+<tr><td>DEMO Nina Park</td><td>nina.park@example.com</td><td>Alpine Books</td><td>Hello, we read the company page and the catalog looks clear.</td><td>general</td><td>2026-10-20T02:10:53.022Z</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>如何导入</h2>
+        <ol>
+          <li>使用 n8n 社区版 2.43.x。本文件在 2.43.8 上导入并发布成功。</li>
+          <li>下载 <a href="workflow.json">workflow.json</a>。</li>
+          <li>在工作流列表选择从文件导入，或执行 <code>n8n import:workflow --input=workflow.json</code>。</li>
+          <li>发布工作流。2.43 的命令是 <code>n8n publish:workflow --id=WORKFLOW_ID</code>。</li>
+          <li>向 <code>/webhook/smb-inquiry</code> POST JSON，字段为 name、email、company、message。第一次调用会创建数据表 <code>smb_inquiries</code>。</li>
+        </ol>
+        <h2>换成 Google 表格或邮件通知</h2>
+        <p>示例把最后的存储节点做成内置数据表，因此不需要凭据。生产环境中，把 Append Inquiry Row 换成 Google Sheets 的 Append row，并映射 name、email、company、message、category、received_at。如果需要通知某人，在同一条成功路径上加 Gmail 或 SMTP 节点。Reply To Webhook 保持在最后，调用方仍然收到 <code>{category, row}</code>。</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

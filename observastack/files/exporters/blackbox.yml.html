@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>exporters/blackbox.yml</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>exporters/blackbox.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Blackbox modules for the fictional Larkspur storefront.</span>
+<span style="color: #008000; font-weight: bold">modules</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">http_2xx</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">prober</span>:<span style="color: #bbbbbb"> </span>http
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">http</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">method</span>:<span style="color: #bbbbbb"> </span>GET
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">preferred_ip_protocol</span>:<span style="color: #bbbbbb"> </span>ip4
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">valid_status_codes</span>:<span style="color: #bbbbbb"> </span>[]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">fail_if_ssl</span>:<span style="color: #bbbbbb"> </span>false
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">fail_if_not_ssl</span>:<span style="color: #bbbbbb"> </span>false
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">follow_redirects</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">tls_expiry</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">prober</span>:<span style="color: #bbbbbb"> </span>tcp
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">tcp</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">tls</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">preferred_ip_protocol</span>:<span style="color: #bbbbbb"> </span>ip4
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

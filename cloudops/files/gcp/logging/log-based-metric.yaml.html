@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gcp/logging/log-based-metric.yaml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>gcp/logging/log-based-metric.yaml</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">logMetric</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>insights_api_app_errors
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">project</span>:<span style="color: #bbbbbb"> </span>thistle-analytics-demo
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>Application error lines from the insights-api Cloud Run revision.
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">filter</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">    </span><span style="color: #880000">resource.type=&quot;cloud_run_revision&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #880000">resource.labels.service_name=&quot;insights-api&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #880000">severity&gt;=ERROR</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">metricDescriptor</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">metricKind</span>:<span style="color: #bbbbbb"> </span>DELTA
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">valueType</span>:<span style="color: #bbbbbb"> </span>INT64
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">unit</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;1&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">labelExtractors</span>:<span style="color: #bbbbbb"> </span>{}
+</code></pre></div>
+
+</main>
+</body>
+</html>

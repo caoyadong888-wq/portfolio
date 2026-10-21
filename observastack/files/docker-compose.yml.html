@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>docker-compose.yml</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../index.html">概览</a>
+<a href="../alerts.html">告警</a>
+<a href="../slo.html">SLO</a>
+<a href="../routing.html">路由</a>
+<a href="index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>docker-compose.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Not executed here. This box has no Docker. Images are pinned by digest.</span>
+<span style="color: #3D7B7B; font-style: italic"># Named volumes hold Prometheus, Alertmanager, and Grafana state. There is no</span>
+<span style="color: #3D7B7B; font-style: italic"># repo directory named data. Grafana&#39;s admin password comes from the environment.</span>
+<span style="color: #3D7B7B; font-style: italic"># PROMETHEUS_URL is what grafana/provisioning/datasources/prometheus.yml reads.</span>
+
+<span style="color: #008000; font-weight: bold">services</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">prometheus</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>prom/prometheus:v3.15.0@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">command</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>--config.file=/etc/observastack/prometheus/prometheus.yml
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>--storage.tsdb.path=/prometheus
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>--web.listen-address=:9090
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">volumes</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>.:/etc/observastack:ro
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>prom_tsdb:/prometheus
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">ports</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;127.0.0.1:9090:9090&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">mem_limit</span>:<span style="color: #bbbbbb"> </span>512m
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cpus</span>:<span style="color: #bbbbbb"> </span>0.50
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">healthcheck</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">test</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CMD&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;wget&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-q&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-O&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;/dev/null&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;http://127.0.0.1:9090/-/healthy&quot;</span>]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">retries</span>:<span style="color: #bbbbbb"> </span>5
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">alertmanager</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>prom/alertmanager:v0.34.1@sha256:e9733bafb1bdef9b00e25a21f8f99dc26a22224bf16641ad754d1649f4c3357a
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">command</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>--config.file=/etc/observastack/alertmanager/alertmanager.yml
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>--storage.path=/alertmanager
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>--web.listen-address=:9093
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">working_dir</span>:<span style="color: #bbbbbb"> </span>/etc/observastack
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">volumes</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>.:/etc/observastack:ro
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>am_store:/alertmanager
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">ports</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;127.0.0.1:9093:9093&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">mem_limit</span>:<span style="color: #bbbbbb"> </span>256m
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cpus</span>:<span style="color: #bbbbbb"> </span>0.25
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">healthcheck</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">test</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CMD&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;wget&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-q&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-O&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;/dev/null&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;http://127.0.0.1:9093/-/healthy&quot;</span>]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">retries</span>:<span style="color: #bbbbbb"> </span>5
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">grafana</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>grafana/grafana:13.2.3@sha256:b28bae15e219c998fb0e0424ed724930cc61b1f61fb404d47c862f9a23f9e572
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">environment</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">GF_SECURITY_ADMIN_USER</span>:<span style="color: #bbbbbb"> </span>admin
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">GF_SECURITY_ADMIN_PASSWORD</span>:<span style="color: #bbbbbb"> </span>${GF_SECURITY_ADMIN_PASSWORD:?set GF_SECURITY_ADMIN_PASSWORD}
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">GF_ANALYTICS_REPORTING_ENABLED</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;false&quot;</span>
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">GF_ANALYTICS_CHECK_FOR_UPDATES</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;false&quot;</span>
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">GF_PLUGINS_PREINSTALL_DISABLED</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;true&quot;</span>
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">GF_PATHS_PROVISIONING</span>:<span style="color: #bbbbbb"> </span>/etc/observastack/grafana/provisioning
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">PROMETHEUS_URL</span>:<span style="color: #bbbbbb"> </span>http://prometheus:9090
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">volumes</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>.:/etc/observastack:ro
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>grafana_store:/var/lib/grafana
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">ports</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;127.0.0.1:3000:3000&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">mem_limit</span>:<span style="color: #bbbbbb"> </span>512m
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cpus</span>:<span style="color: #bbbbbb"> </span>0.50
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">healthcheck</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">test</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CMD&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;wget&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-q&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-O&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;/dev/null&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;http://127.0.0.1:3000/api/health&quot;</span>]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">retries</span>:<span style="color: #bbbbbb"> </span>8
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">node-exporter</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>prom/node-exporter:v1.9.1@sha256:d00a542e409ee618a4edc67da14dd48c5da66726bbd5537ab2af9c1dfc442c8a
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">mem_limit</span>:<span style="color: #bbbbbb"> </span>128m
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cpus</span>:<span style="color: #bbbbbb"> </span>0.20
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">healthcheck</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">test</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CMD&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;wget&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-q&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-O&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;/dev/null&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;http://127.0.0.1:9100/metrics&quot;</span>]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">retries</span>:<span style="color: #bbbbbb"> </span>5
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">postgres-exporter</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>prometheuscommunity/postgres-exporter:v0.17.1@sha256:38606faa38c54787525fb0ff2fd6b41b4cfb75d455c1df294927c5f611699b17
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">environment</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">DATA_SOURCE_NAME</span>:<span style="color: #bbbbbb"> </span>${POSTGRES_EXPORTER_DSN:-postgresql://larkspur@postgres.larkspur.example:5432/larkspur?sslmode=disable}
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">mem_limit</span>:<span style="color: #bbbbbb"> </span>128m
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cpus</span>:<span style="color: #bbbbbb"> </span>0.20
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">healthcheck</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">test</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CMD&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;wget&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-q&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-O&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;/dev/null&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;http://127.0.0.1:9187/metrics&quot;</span>]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">retries</span>:<span style="color: #bbbbbb"> </span>5
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">blackbox-exporter</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>prom/blackbox-exporter:v0.26.0@sha256:92e05d5fe0df01d3980518dc42f07b778a8997048b57392ebc7f7391ebd7bb06
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">command</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>--config.file=/etc/observastack/exporters/blackbox.yml
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">volumes</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>.:/etc/observastack:ro
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">mem_limit</span>:<span style="color: #bbbbbb"> </span>128m
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cpus</span>:<span style="color: #bbbbbb"> </span>0.20
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">healthcheck</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">test</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CMD&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;wget&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-q&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-O&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;/dev/null&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;http://127.0.0.1:9115/metrics&quot;</span>]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">retries</span>:<span style="color: #bbbbbb"> </span>5
+
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">demo-app</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">build</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">context</span>:<span style="color: #bbbbbb"> </span>.
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">dockerfile</span>:<span style="color: #bbbbbb"> </span>demo-app/Dockerfile
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>observastack-demo-app:local
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">mem_limit</span>:<span style="color: #bbbbbb"> </span>128m
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cpus</span>:<span style="color: #bbbbbb"> </span>0.20
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">healthcheck</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">test</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CMD&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;python&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;-c&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;import</span><span style="color: #19177C"> </span><span style="color: #BA2121">urllib.request;</span><span style="color: #19177C"> </span><span style="color: #BA2121">urllib.request.urlopen(&#39;http://127.0.0.1:8080/healthz&#39;)&quot;</span>]
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeout</span>:<span style="color: #bbbbbb"> </span>5s
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">retries</span>:<span style="color: #bbbbbb"> </span>5
+
+<span style="color: #008000; font-weight: bold">volumes</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">prom_tsdb</span>:<span style="color: #bbbbbb"> </span>{}
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">am_store</span>:<span style="color: #bbbbbb"> </span>{}
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">grafana_store</span>:<span style="color: #bbbbbb"> </span>{}
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

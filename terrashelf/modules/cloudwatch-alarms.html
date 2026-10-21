@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cloudwatch-alarms</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · Observability · v1.0.0</p>
+<h1>cloudwatch-alarms</h1>
+<p>Map-driven alarms that publish to an encrypted SNS topic.</p>
+<p>Tests passed <span data-metric="modules.cloudwatch-alarms.passed">6</span> of <span data-metric="modules.cloudwatch-alarms.runs">6</span>. Failed <span data-metric="modules.cloudwatch-alarms.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>alarms</td><td><code>map(object({
+    kind               = string
+    threshold          = number
+    period             = number
+    evaluation_periods = number
+    dimensions         = map(string)
+  }))</code></td><td>no</td><td>Map of alarm name to definition. Each entry creates one alarm. Supported kinds are alb_5xx_rate, alb_target_response_time, ecs_cpu, ecs_memory, rds_cpu, rds_free_storage, sqs_oldest_message_age, and dlq_depth.</td></tr><tr><td>email_addresses</td><td><code>list(string)</code></td><td>no</td><td>Email addresses subscribed to the alarm topic. Empty creates no subscriptions.</td></tr><tr><td>name_prefix</td><td><code>string</code></td><td>yes</td><td>Prefix for the alarm names, the SNS topic, and the topic key.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>alarm_action_count</td><td>How many actions each alarm is given. Every alarm uses the module SNS topic.</td></tr><tr><td>alarm_count</td><td>Number of alarms created. Equals the number of entries in alarms.</td></tr><tr><td>alarm_names</td><td>Alarm names created by this module.</td></tr><tr><td>alarm_thresholds</td><td>Threshold of each alarm. dlq_depth is forced to 0.</td></tr><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources.</td></tr><tr><td>email_subscription_count</td><td>Email subscriptions on the alarm topic. Zero when email_addresses is empty.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr><tr><td>topic_name</td><td>SNS topic name that receives alarm actions.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;alarms&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">name_prefix</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;demo-obs&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000">alarms</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000">cpu</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #687822">kind</span><span style="color: #bbbbbb">               </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;ecs_cpu&quot;</span>
+<span style="color: #bbbbbb">      </span><span style="color: #687822">threshold</span><span style="color: #bbbbbb">          </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">80</span>
+<span style="color: #bbbbbb">      </span><span style="color: #687822">period</span><span style="color: #bbbbbb">             </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">60</span>
+<span style="color: #bbbbbb">      </span><span style="color: #687822">evaluation_periods</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">3</span>
+<span style="color: #bbbbbb">      </span><span style="color: #008000">dimensions</span><span style="color: #bbbbbb">         </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{<span style="color: #bbbbbb"> </span><span style="color: #687822">ClusterName</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;app&quot;, ServiceName = &quot;api&quot;</span><span style="color: #bbbbbb"> </span>}
+<span style="color: #bbbbbb">    </span>}
+<span style="color: #bbbbbb">  </span>}
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>three_alarms_no_email passed</li><li>single_email passed</li><li>storage_and_age passed</li><li>empty_pack passed</li><li>reject_unknown_kind passed</li><li>reject_bad_email passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\cloudwatch-alarms.tftest.hcl... in progress
+  run &quot;three_alarms_no_email&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_cloudwatch_metric_alarm.this[&quot;cpu&quot;] will be created
+  + resource &quot;aws_cloudwatch_metric_alarm&quot; &quot;this&quot; {
+      + alarm_actions                         = [
+          + (known after apply),
+        ]
+      + alarm_description                     = &quot;cpu (ecs_cpu)&quot;
+      + alarm_name                            = &quot;demo-obs-cpu&quot;
+      + arn                                   = (known after apply)
+      + comparison_operator                   = &quot;GreaterThanThreshold&quot;
+      + evaluate_low_sample_count_percentiles = (known after apply)
+      + evaluation_periods                    = 2
+      + id                                    = (known after apply)
+      + ok_actions                            = [
+          + (known after apply),
+        ]
+      + tags                                  = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;cloudwatch-alarms&quot;
+          + &quot;Owner&quot;     = &quot;platform&quot;
+        }
+      + tags_all                              = (known after apply)
+      + threshold                             = 80
+      + treat_missing_data                    = &quot;notBreaching&quot;
+
+      + metric_query {
+          + id          = &quot;m1&quot;
+          + return_data = true
+
+          + metric {</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/cloudwatch-alarms.svg" alt="Resource list for cloudwatch-alarms">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Map-driven CloudWatch alarms and an encrypted SNS topic.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>Amazon CloudWatch</li><li>Amazon SNS</li><li>AWS Key Management Service</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

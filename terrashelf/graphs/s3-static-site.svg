@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="740" viewBox="0 0 640 740">
+<rect width="100%" height="100%" fill="#f4f0e6"/>
+<text x="16" y="28" font-family="Georgia, serif" font-size="16" fill="#1c1915">s3-static-site</text>
+<text x="16" y="46" font-family="Consolas, monospace" font-size="11" fill="#5c564c">python-hcl2 resource list (graphviz dot was not used)</text>
+<rect x="16" y="64" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="83" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket.site</text>
+<rect x="16" y="100" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="119" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_public_access_block.site</text>
+<rect x="16" y="136" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="155" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_ownership_controls.site</text>
+<rect x="16" y="172" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="191" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_versioning.site</text>
+<rect x="16" y="208" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="227" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_server_side_encryption_configuration.site</text>
+<rect x="16" y="244" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="263" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_lifecycle_configuration.site</text>
+<rect x="16" y="280" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="299" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket.logs</text>
+<rect x="16" y="316" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="335" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_public_access_block.logs</text>
+<rect x="16" y="352" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="371" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_ownership_controls.logs</text>
+<rect x="16" y="388" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="407" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_server_side_encryption_configuration.logs</text>
+<rect x="16" y="424" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="443" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_lifecycle_configuration.logs</text>
+<rect x="16" y="460" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="479" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_cloudfront_origin_access_control.site</text>
+<rect x="16" y="496" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="515" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_cloudfront_response_headers_policy.security</text>
+<rect x="16" y="532" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="551" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_cloudfront_distribution.site</text>
+<rect x="16" y="568" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="587" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_s3_bucket_policy.site</text>
+<rect x="16" y="604" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="623" font-family="Consolas, monospace" font-size="13" fill="#1c1915">aws_route53_record.alias_a</text>
+<rect x="16" y="640" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="659" font-family="Consolas, monospace" font-size="13" fill="#1c1915">data.aws_caller_identity.current</text>
+<rect x="16" y="676" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="695" font-family="Consolas, monospace" font-size="13" fill="#1c1915">data.aws_partition.current</text>
+<rect x="16" y="712" width="608" height="28" rx="4" fill="#fffdf8" stroke="#1c1915"/>
+<text x="28" y="731" font-family="Consolas, monospace" font-size="13" fill="#1c1915">data.aws_region.current</text>
+</svg>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KubeHarbor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <p class="crumbs"><a href="../">Back to portfolio</a> · <a href="../projects/kubeharbor.html">Case study</a></p>
+  <main>
+
+    <h1>KubeHarbor</h1>
+    <p class="banner">Helm chart, Kustomize overlays, and Argo CD apps for a FastAPI service, validated offline. This is a demo. The manifests were rendered and validated offline. Nothing is deployed to a cluster, and kind was not run. Vandelay Industries is fictional. The image <code>ghcr.io/OWNER/ledgerlite:0.1.0</code> is a placeholder and is not claimed to be published. The prod digest is a placeholder sha256.</p>
+    <p class="crumbs"><a href="../">Back to portfolio</a> · <a href="../projects/kubeharbor.html">Case study &amp; README</a></p>
+    <nav class="tabs">
+      <a href="#overview" data-tab="overview">Overview</a>
+      <a href="#checks" data-tab="checks">Checks</a>
+      <a href="#manifests" data-tab="manifests">Manifests</a>
+      <a href="#install" data-tab="install">Install snippets</a>
+    </nav>
+    <section id="overview" data-panel="overview">
+      <h2>Architecture</h2>
+      <img src="architecture.svg" alt="Diagram of ingress-nginx, the ledgerlite namespace, monitoring, kube-dns, and an external database" width="980" height="560">
+      <p>The same drawing is <a href="architecture.svg">architecture.svg</a>.</p>
+      <h2>Environments</h2>
+      <div class="table-wrap"><table>
+<caption>Parsed from the Helm renders. The Kustomize render for the same environment is compared field by field.</caption>
+<thead><tr><th>Environment</th><th>Replicas</th><th>HPA</th><th>API resources</th><th>PDB</th><th>Database</th><th>ServiceMonitor</th><th>Issuer</th><th>Image</th><th>Helm matches Kustomize</th></tr></thead>
+<tbody>
+<tr><td>dev</td><td>1</td><td>off</td><td>50m/64Mi → 250m/256Mi</td><td>none</td><td>inCluster</td><td>off</td><td>letsencrypt-staging</td><td><code>ghcr.io/OWNER/ledgerlite:0.1.0</code></td><td>yes</td></tr>
+<tr><td>staging</td><td>2</td><td>2–4</td><td>100m/128Mi → 500m/256Mi</td><td>minAvailable 1</td><td>external</td><td>on</td><td>letsencrypt-staging</td><td><code>ghcr.io/OWNER/ledgerlite:0.1.0</code></td><td>yes</td></tr>
+<tr><td>prod</td><td>3</td><td>3–10</td><td>250m/256Mi → 1/512Mi</td><td>minAvailable 2</td><td>external</td><td>on</td><td>letsencrypt-prod</td><td><code>ghcr.io/OWNER/ledgerlite@sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef</code></td><td>yes</td></tr>
+</tbody></table></div>
+      <h2>dev → prod</h2>
+      <ul><li><a href="diffs/helm-dev-prod.html">helm dev → prod</a></li>
+<li><a href="diffs/kustomize-dev-prod.html">kustomize dev → prod</a></li></ul>
+    </section>
+    
+    <section id="checks" data-panel="checks">
+      <h2>Checks recorded at build time</h2>
+      <p>Recorded at <span data-metric="recorded_at">2026-10-04T03:20:04+08:00</span>. Tool versions are read from the binaries. Kubernetes schemas are the 1.30.14 standalone-strict set; kubeconform v0.6.7 rejects the version token 1.30.x, so the run uses <span data-metric="kubernetes_version">1.30.14</span>.</p>
+      <h3>helm lint <span class="ver"><span data-metric="tools.helm.version">v3.16.4+g7877b45</span></span></h3>
+      <ul><li>dev: <span data-metric="helm_lint.dev.errors">0</span> errors, exit <span data-metric="helm_lint.dev.exit_code">0</span></li>
+<li>staging: <span data-metric="helm_lint.staging.errors">0</span> errors, exit <span data-metric="helm_lint.staging.exit_code">0</span></li>
+<li>prod: <span data-metric="helm_lint.prod.errors">0</span> errors, exit <span data-metric="helm_lint.prod.exit_code">0</span></li></ul>
+      <h3>helm unittest <span class="ver"><span data-metric="tools.helm_unittest.version">0.7.2</span></span></h3>
+      <p><span data-metric="helm_unittest.suites_passed">6</span> suites passed, <span data-metric="helm_unittest.tests_passed">26</span> tests passed, <span data-metric="helm_unittest.tests_failed">0</span> tests failed.</p>
+      <ul><li>dev renders one replica and the dev resource sizes</li>
+<li>staging renders two replicas</li>
+<li>prod image is a digest and not a tag</li>
+<li>dev renders neither HPA nor PDB</li>
+<li>staging HPA bounds</li>
+<li>staging PDB minAvailable is 1</li>
+<li>prod HPA is 3-10</li>
+<li>prod PDB minAvailable is 2</li>
+<li>dev TLS host and staging issuer</li>
+<li>staging issuer stays letsencrypt-staging</li>
+<li>prod issuer is letsencrypt-prod</li>
+<li>dev default deny and postgres ingress</li>
+<li>staging has no postgres ingress policy and uses the external cidr</li>
+<li>prod still allows prometheus to scrape port 8000</li>
+<li>dev inCluster renders the StatefulSet</li>
+<li>dev headless Service uses clusterIP None</li>
+<li>dev backup CronJob keeps seven dumps</li>
+<li>dev backup PVC is rendered</li>
+<li>staging external does not render StatefulSet</li>
+<li>staging external does not render the backup CronJob</li>
+<li>prod external does not render StatefulSet or CronJob</li>
+<li>dev ServiceMonitor is off and prod is on</li>
+<li>prod renders ServiceMonitor</li>
+<li>fails when existingSecret is empty and external secrets are off</li>
+<li>external secrets render an ExternalSecret without an existingSecret</li>
+<li>dev secret name is the values reference not a literal url</li></ul>
+      <h3>kubeconform <span class="ver"><span data-metric="tools.kubeconform.version">v0.6.7</span></span></h3>
+      <ul><li>helm_dev: valid <span data-metric="kubeconform.helm_dev.valid">19</span>, invalid <span data-metric="kubeconform.helm_dev.invalid">0</span>, errors <span data-metric="kubeconform.helm_dev.errors">0</span>, skipped <span data-metric="kubeconform.helm_dev.skipped">0</span></li>
+<li>helm_staging: valid <span data-metric="kubeconform.helm_staging.valid">17</span>, invalid <span data-metric="kubeconform.helm_staging.invalid">0</span>, errors <span data-metric="kubeconform.helm_staging.errors">0</span>, skipped <span data-metric="kubeconform.helm_staging.skipped">0</span></li>
+<li>helm_prod: valid <span data-metric="kubeconform.helm_prod.valid">17</span>, invalid <span data-metric="kubeconform.helm_prod.invalid">0</span>, errors <span data-metric="kubeconform.helm_prod.errors">0</span>, skipped <span data-metric="kubeconform.helm_prod.skipped">0</span></li>
+<li>kustomize_dev: valid <span data-metric="kubeconform.kustomize_dev.valid">19</span>, invalid <span data-metric="kubeconform.kustomize_dev.invalid">0</span>, errors <span data-metric="kubeconform.kustomize_dev.errors">0</span>, skipped <span data-metric="kubeconform.kustomize_dev.skipped">0</span></li>
+<li>kustomize_staging: valid <span data-metric="kubeconform.kustomize_staging.valid">17</span>, invalid <span data-metric="kubeconform.kustomize_staging.invalid">0</span>, errors <span data-metric="kubeconform.kustomize_staging.errors">0</span>, skipped <span data-metric="kubeconform.kustomize_staging.skipped">0</span></li>
+<li>kustomize_prod: valid <span data-metric="kubeconform.kustomize_prod.valid">17</span>, invalid <span data-metric="kubeconform.kustomize_prod.invalid">0</span>, errors <span data-metric="kubeconform.kustomize_prod.errors">0</span>, skipped <span data-metric="kubeconform.kustomize_prod.skipped">0</span></li>
+<li>externalsecret: valid <span data-metric="kubeconform.externalsecret.valid">20</span>, invalid <span data-metric="kubeconform.externalsecret.invalid">0</span>, errors <span data-metric="kubeconform.externalsecret.errors">0</span>, skipped <span data-metric="kubeconform.externalsecret.skipped">0</span></li>
+<li>argocd: valid <span data-metric="kubeconform.argocd.valid">5</span>, invalid <span data-metric="kubeconform.argocd.invalid">0</span>, errors <span data-metric="kubeconform.argocd.errors">0</span>, skipped <span data-metric="kubeconform.argocd.skipped">0</span></li></ul>
+      <h3>kube-linter <span class="ver"><span data-metric="tools.kube_linter.version">0.7.6</span></span></h3>
+      <p>Errors: <span data-metric="kube_linter.errors">0</span>. Exit code <span data-metric="kube_linter.exit_code">0</span>.</p>
+      <p>kube-linter exclusions: <span data-metric="kube_linter.exclusion_count">0</span>. No check is excluded; the default rules passed.</p>
+      <h3>checkov <span class="ver"><span data-metric="tools.checkov.version">3.2.449</span></span></h3>
+      <p>Passed <span data-metric="checkov.passed">2115</span>, failed <span data-metric="checkov.failed">0</span>, skipped <span data-metric="checkov.skipped">61</span>. Skipped counts findings from a run with no skip flags whose check id is in the skip list. <span data-metric="checkov.skip_rules">4</span> skip rules are configured. Scans: Kubernetes framework on <code>rendered/</code> and <code>gitops/</code>, Helm framework on the chart with <code>values-dev.yaml</code>.</p>
+      <ul>
+        <li>rendered: passed <span data-metric="checkov.kubernetes_rendered.passed">1774</span>, failed <span data-metric="checkov.kubernetes_rendered.failed">0</span>, skipped <span data-metric="checkov.kubernetes_rendered.skipped">42</span></li>
+        <li>gitops: passed <span data-metric="checkov.kubernetes_gitops.passed">0</span>, failed <span data-metric="checkov.kubernetes_gitops.failed">0</span>, skipped <span data-metric="checkov.kubernetes_gitops.skipped">0</span></li>
+        <li>helm chart: passed <span data-metric="checkov.helm_chart.passed">341</span>, failed <span data-metric="checkov.helm_chart.failed">0</span>, skipped <span data-metric="checkov.helm_chart.skipped">19</span></li>
+      </ul>
+      <ul><li><code>CKV_K8S_35</code> LedgerLite reads `DATABASE_URL` from the environment, and the postgres:16-alpine image reads `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` from the environment. The chart only references keys with `secretKeyRef`. It never places a secret value in values or in a rendered Secret.</li>
+<li><code>CKV_K8S_40</code> The API container runs as uid 10001. The postgres:16-alpine image&#x27;s `postgres` user is uid 70, and the StatefulSet and backup CronJob use that uid so the image can write its data directory. Forcing a uid above 10000 would not match the image&#x27;s ownership. The check fires only on those Postgres workloads.</li>
+<li><code>CKV_K8S_43</code> Only the prod API image is digest-pinned, and that digest is a documented placeholder (`sha256:deadbeef` repeated). Dev and staging use the tag `0.1.0`. The in-cluster Postgres image is `postgres:16-alpine`. helm-unittest asserts the prod digest. This check cannot be limited to one environment.</li>
+<li><code>CKV_K8S_21</code> The chart sets `metadata.namespace` from `Release.Namespace`. The six committed renders pass `--namespace ledgerlite-&lt;env&gt;`. Checkov&#x27;s Helm runner calls `helm template` without `--namespace`, so it reports the default namespace. The Kubernetes-framework scan of `rendered/` does not report this check.</li></ul>
+      <h3>pytest <span class="ver"><span data-metric="tools.pytest.version">pytest 8.3.5</span></span></h3>
+      <p>Passed <span data-metric="pytest.passed">17</span>, failed <span data-metric="pytest.failed">0</span>.</p>
+      <h3>Security baseline</h3>
+      <ul><li><span data-metric="policy_tests.0.outcome">passed</span> <code>test_run_as_non_root</code> — Every workload sets runAsNonRoot, and the API user is 10001.</li>
+<li><span data-metric="policy_tests.1.outcome">passed</span> <code>test_read_only_root_fs</code> — Every container sets readOnlyRootFilesystem.</li>
+<li><span data-metric="policy_tests.2.outcome">passed</span> <code>test_no_privilege_escalation</code> — Every container sets allowPrivilegeEscalation to false.</li>
+<li><span data-metric="policy_tests.3.outcome">passed</span> <code>test_drop_all_capabilities</code> — Every container drops the ALL capability.</li>
+<li><span data-metric="policy_tests.4.outcome">passed</span> <code>test_seccomp_runtime_default</code> — Every workload sets seccompProfile RuntimeDefault.</li>
+<li><span data-metric="policy_tests.5.outcome">passed</span> <code>test_requests_and_limits</code> — Every container sets cpu and memory requests and limits.</li>
+<li><span data-metric="policy_tests.6.outcome">passed</span> <code>test_api_probes</code> — The API container has startup, liveness, and readiness probes.</li>
+<li><span data-metric="policy_tests.7.outcome">passed</span> <code>test_image_pins</code> — No image uses the latest tag or omits both a tag and a digest.</li>
+<li><span data-metric="policy_tests.8.outcome">passed</span> <code>test_no_host_namespaces_or_hostpath</code> — No hostNetwork, hostPID, hostIPC, hostPath, or privileged.</li>
+<li><span data-metric="policy_tests.9.outcome">passed</span> <code>test_automount_service_account_token_false</code> — Every workload sets automountServiceAccountToken to false.</li>
+<li><span data-metric="policy_tests.10.outcome">passed</span> <code>test_default_deny_network_policy</code> — Each render includes a default-deny ingress and egress NetworkPolicy.</li>
+<li><span data-metric="policy_tests.11.outcome">passed</span> <code>test_no_plaintext_secret</code> — No render contains a Secret object or a stringData map.</li></ul>
+    </section>
+    
+    <section id="manifests" data-panel="manifests">
+      <h2>Rendered manifests</h2>
+      <p>Pygments highlighted these at build time. Each page groups objects by kind.</p>
+      <ul><li><a href="manifests/helm-dev.html">helm dev</a> (19 objects)</li>
+<li><a href="manifests/helm-staging.html">helm staging</a> (17 objects)</li>
+<li><a href="manifests/helm-prod.html">helm prod</a> (17 objects)</li>
+<li><a href="manifests/kustomize-dev.html">kustomize dev</a> (19 objects)</li>
+<li><a href="manifests/kustomize-staging.html">kustomize staging</a> (17 objects)</li>
+<li><a href="manifests/kustomize-prod.html">kustomize prod</a> (17 objects)</li></ul>
+      <h2>Downloads</h2>
+      <p>The chart archive is from <code>helm package</code>. The YAML files are the Helm renders, not the Kustomize renders.</p>
+      <ul>
+        <li><a href="downloads/ledgerlite-0.1.0.tgz">ledgerlite-0.1.0.tgz</a></li>
+        <li><a href="downloads/rendered-dev.yaml">rendered-dev.yaml</a></li>
+        <li><a href="downloads/rendered-staging.yaml">rendered-staging.yaml</a></li>
+        <li><a href="downloads/rendered-prod.yaml">rendered-prod.yaml</a></li>
+      </ul>
+    </section>
+    <section id="install" data-panel="install">
+      <h2>Install snippets</h2>
+      <p>These are the commands a cluster would use. They were not run here. There is no live cluster in this demo.</p>
+      <h3>Helm</h3>
+      <pre class="src">helm install ledgerlite charts/ledgerlite \
+  --namespace ledgerlite-dev --create-namespace \
+  -f charts/ledgerlite/values-dev.yaml</pre>
+      <h3>Kustomize</h3>
+      <pre class="src">kubectl apply -k kustomize/overlays/dev</pre>
+      <h3>Argo CD</h3>
+      <pre class="src">kubectl apply -f gitops/argocd/project.yaml
+kubectl apply -f gitops/argocd/app-of-apps.yaml</pre>
+      <p>Prod automation is disabled in <code>gitops/argocd/app-prod.yaml</code>. Prune and selfHeal stay on. The files are not applied.</p>
+    </section>
+    
+  </main>
+  <footer><p>Rendered and validated offline. Not deployed to any cluster. The client is fictional.</p></footer>
+  <script src="app.js"></script>
+</body>
+</html>

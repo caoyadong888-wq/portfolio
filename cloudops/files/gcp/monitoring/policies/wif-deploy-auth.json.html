@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gcp/monitoring/policies/wif-deploy-auth.json</title>
+<link rel="stylesheet" href="../../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../../index.html">概览</a>
+<a href="../../../../aws/index.html">AWS 次要</a>
+<a href="../../../index.html">文件</a>
+<a href="../../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>gcp/monitoring/policies/wif-deploy-auth.json</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>{
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;displayName&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;insights-api WIF or deploy SA auth failure&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;combiner&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;OR&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;severity&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;ERROR&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;enabled&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;summary&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Log match for Workload Identity Federation or github-deploy-sa authentication failures.&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;documentation&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;content&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Matches Cloud Audit logs where github-deploy-sa or the GitHub Workload Identity pool fails to mint a token or call Cloud Run. The project number 000000000000 is a placeholder. This policy is not deployed.&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;mimeType&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;text/markdown&quot;</span>
+<span style="color: #bbbbbb">  </span>},
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;conditions&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;displayName&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;WIF or deploy authentication error&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;conditionMatchedLog&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;filter&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;severity&gt;=ERROR AND (protoPayload.authenticationInfo.principalEmail=\&quot;github-deploy-sa@thistle-analytics-demo.iam.gserviceaccount.com\&quot; OR protoPayload.status.message=~\&quot;workloadIdentityPools/github-pool\&quot;)&quot;</span>
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>}
+<span style="color: #bbbbbb">  </span>],
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;notificationChannels&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;projects/thistle-analytics-demo/notificationChannels/placeholder-channel&quot;</span>
+<span style="color: #bbbbbb">  </span>]
+}
+</code></pre></div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2412" height="744" viewBox="216 16 2412 744" role="img">
+<title>Workflow canvas</title>
+<style>text{font-family:system-ui,sans-serif}</style>
+<rect x="240" y="40" width="600" height="340" rx="12" fill="#fef3c7" stroke="#f5d98a"/>
+<text x="254" y="68" font-size="14" font-weight="700" fill="#92400e">How The Job Digest Works</text>
+<rect x="860" y="40" width="420" height="240" rx="12" fill="#fef3c7" stroke="#f5d98a"/>
+<text x="874" y="68" font-size="14" font-weight="700" fill="#92400e">Feed And Mail Setup</text>
+<path d="M 480 440 C 520 440, 500 436.0, 540 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 780 440 C 820 440, 800 436.0, 840 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1080 440 C 1120 440, 1100 436.0, 1140 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1380 440 C 1420 440, 1400 436.0, 1440 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1680 424 C 1720 424, 1700 436.0, 1740 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1680 452 C 1800.0 452, 1320.0 676.0, 1440 676.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1980 440 C 2020 440, 2000 436.0, 2040 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 2280 440 C 2320 440, 2300 436.0, 2340 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<rect x="240" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="252" y="428" font-size="13" font-weight="700" fill="#141824">Daily At Seven</text>
+<text x="252" y="450" font-size="11" fill="#5c6578">scheduleTrigger</text>
+<rect x="540" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="552" y="428" font-size="13" font-weight="700" fill="#141824">Read Public Job Feed</text>
+<text x="552" y="450" font-size="11" fill="#5c6578">rssFeedRead</text>
+<rect x="840" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="852" y="428" font-size="13" font-weight="700" fill="#141824">Keep Keyword Matches</text>
+<text x="852" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="1140" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1152" y="428" font-size="13" font-weight="700" fill="#141824">Drop Already Sent Items</text>
+<text x="1152" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="1440" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1452" y="428" font-size="13" font-weight="700" fill="#141824">Digest Has Items</text>
+<text x="1452" y="450" font-size="11" fill="#5c6578">if</text>
+<rect x="1440" y="640" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1452" y="668" font-size="13" font-weight="700" fill="#141824">Skip Empty Digest</text>
+<text x="1452" y="690" font-size="11" fill="#5c6578">noOp</text>
+<rect x="1740" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1752" y="428" font-size="13" font-weight="700" fill="#141824">Build Digest Email</text>
+<text x="1752" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="2040" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2052" y="428" font-size="13" font-weight="700" fill="#141824">Send Digest Email</text>
+<text x="2052" y="450" font-size="11" fill="#5c6578">emailSend</text>
+<rect x="2340" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2352" y="428" font-size="13" font-weight="700" fill="#141824">Mark Items Sent</text>
+<text x="2352" y="450" font-size="11" fill="#5c6578">code</text>
+</svg>

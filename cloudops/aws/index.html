@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CloudOps AWS secondary</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../index.html">概览</a>
+<a href="index.html">AWS 次要</a>
+<a href="../files/index.html">文件</a>
+<a href="../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<p class="eyebrow">AWS parallel</p>
+<p><span class="badge">次要 secondary</span></p>
+<h1>AWS 次要路径</h1>
+<p class="lead">SECONDARY — AWS parallel; GCP is the primary narrative of this demo.</p>
+<p class="note">次要。这里是 Lambda + API Gateway HTTP API + CodeBuild + GitHub OIDC 片段。没有 VPC，没有负载均衡，没有 NAT。未部署到任何云账号。Thistle Analytics 为虚构。</p>
+<div class="cards">
+<article class="card"><h3>HTTP API</h3><p><a href="../files/aws/template.yaml.html">template.yaml</a></p></article>
+<article class="card"><h3>Lambda 适配器</h3><p><a href="../files/aws/lambda/handler.py.html">handler.py</a></p></article>
+<article class="card"><h3>CodeBuild</h3><p><a href="../files/aws/codebuild/buildspec.yml.html">buildspec.yml</a></p></article>
+<article class="card"><h3>CloudWatch</h3><p><a href="../files/aws/monitoring/alarms.json.html">alarms.json</a></p></article>
+<article class="card"><h3>OIDC 片段</h3><p><a href="../files/aws/.github/workflows/aws-deploy.yml.fragment.html">aws-deploy.yml.fragment</a></p></article>
+</div>
+<p class="note">构建时记录的凭证标记：GCP <span data-metric="gcp_credentials_used">false</span>，AWS <span data-metric="aws_credentials_used">false</span>。</p>
+<footer>
+<p>次要路径同样只做离线校验。没有真实 AWS API 调用，没有编造费用或流量。</p>
+</footer>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aws/iam/deploy-role.yaml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>aws/iam/deploy-role.yaml</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># SECONDARY — AWS parallel; GCP is the primary narrative of this demo.</span>
+<span style="color: #008000; font-weight: bold">kind</span>:<span style="color: #bbbbbb"> </span>AwsIamFragment
+<span style="color: #008000; font-weight: bold">secondary</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #008000; font-weight: bold">role_name</span>:<span style="color: #bbbbbb"> </span>insights-api-deploy
+<span style="color: #008000; font-weight: bold">purpose</span>:<span style="color: #bbbbbb"> </span>deploy
+<span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>Deploy role. May update only function insights-api-secondary.
+<span style="color: #008000; font-weight: bold">bindings</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">member</span>:<span style="color: #bbbbbb"> </span>arn:aws:iam::000000000000:role/insights-api-deploy
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">role</span>:<span style="color: #bbbbbb"> </span>lambda:UpdateFunctionCode
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">resource</span>:<span style="color: #bbbbbb"> </span>arn:aws:lambda:us-east-1:000000000000:function:insights-api-secondary
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">purpose</span>:<span style="color: #bbbbbb"> </span>deploy
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">sa</span>:<span style="color: #bbbbbb"> </span>insights-api-deploy
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">member</span>:<span style="color: #bbbbbb"> </span>arn:aws:iam::000000000000:role/insights-api-deploy
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">role</span>:<span style="color: #bbbbbb"> </span>lambda:GetFunction
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">resource</span>:<span style="color: #bbbbbb"> </span>arn:aws:lambda:us-east-1:000000000000:function:insights-api-secondary
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">purpose</span>:<span style="color: #bbbbbb"> </span>deploy
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">sa</span>:<span style="color: #bbbbbb"> </span>insights-api-deploy
+</code></pre></div>
+
+</main>
+</body>
+</html>

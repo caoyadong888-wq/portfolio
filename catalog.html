@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Written case studies — Portfolio</title>
+  <meta name="description" content="Fifty written reference case studies. They are not live demos and not client projects.">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#catalog">Skip to case studies</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./">Portfolio</a>
+      <nav class="topnav">
+        <a href="./">Live demos</a>
+        <a href="#catalog">Case studies</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="catalog">
+    <p class="eyebrow">Catalog</p>
+    <h1>Fifty written case studies</h1>
+    <p class="note">These notes are for a profile or a proposal. They do not start a process, they do not describe a real customer, and they are separate from the live demos on the home page.</p>
+    <div class="cards">
+          <article class="card" id="replay-skip">
+            <div class="card-body">
+              <h3>ReplaySkip</h3>
+              <p class="tagline">skip a repeated file import</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A nightly file import wrote the same rows again whenever the job was retried.</div>
+                <div><strong>Solution</strong> The reference stores a hash of the file with the UTC day and records a skip when both match.</div>
+                <div><strong>Result</strong> A second upload of the same file is a visible skip instead of a second batch.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">CSV</span><span class="tag">Idempotency</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="cursor-page">
+            <div class="card-body">
+              <h3>CursorPage</h3>
+              <p class="tagline">keyset pagination for a list API</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Offset pagination drifted when rows were inserted during a long export.</div>
+                <div><strong>Solution</strong> The reference uses a stable sort key and an opaque cursor, and rejects a cursor from another filter.</div>
+                <div><strong>Result</strong> A client can resume a list without repeating or skipping rows that arrived mid-export.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">REST API</span><span class="tag">SQLite</span><span class="tag">Pagination</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="outbox-mail">
+            <div class="card-body">
+              <h3>OutboxMail</h3>
+              <p class="tagline">an idempotent notification outbox</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A request that succeeded still sent a second email when the worker retried.</div>
+                <div><strong>Solution</strong> The reference writes the message first, sends it once, and stores the provider id on that row.</div>
+                <div><strong>Result</strong> A retry finds the same row and does not create a second message.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">Email</span><span class="tag">Retries</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="sign-hook">
+            <div class="card-body">
+              <h3>SignHook</h3>
+              <p class="tagline">verify signed inbound webhooks</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Inbound webhooks were accepted with no check that the sender still held the secret.</div>
+                <div><strong>Solution</strong> The reference checks the timestamp window and the HMAC, and stores the event id for one day.</div>
+                <div><strong>Result</strong> A replay of an old body is rejected, and a new event id is stored once.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Webhooks</span><span class="tag">HMAC</span><span class="tag">Security</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="token-bucket">
+            <div class="card-body">
+              <h3>TokenBucket</h3>
+              <p class="tagline">a per-key request budget</p>
+              <div class="psr">
+                <div><strong>Problem</strong> One noisy client could fill the API while other tenants waited.</div>
+                <div><strong>Solution</strong> The reference keeps a token bucket per API key and returns a clear retry-after when the bucket is empty.</div>
+                <div><strong>Result</strong> A burst is absorbed, and a sustained flood is told when to call again.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Redis</span><span class="tag">Rate Limiting</span><span class="tag">API</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="cron-lock">
+            <div class="card-body">
+              <h3>CronLock</h3>
+              <p class="tagline">stop overlapping scheduled jobs</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A slow export was still running when the next timer started a second copy.</div>
+                <div><strong>Solution</strong> The reference takes a lease in SQLite and exits if the previous run still holds it.</div>
+                <div><strong>Result</strong> The timer log shows a skip instead of two writers on the same table.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Linux</span><span class="tag">systemd</span><span class="tag">SQLite</span><span class="tag">Cron</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="stampede-lock">
+            <div class="card-body">
+              <h3>StampedeLock</h3>
+              <p class="tagline">one refresh for a hot cache key</p>
+              <div class="psr">
+                <div><strong>Problem</strong> When a cache key expired, every waiter rebuilt the same expensive report.</div>
+                <div><strong>Solution</strong> The reference lets one worker rebuild and has the others read the new value.</div>
+                <div><strong>Result</strong> A stampede becomes one rebuild plus a set of readers.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Caching</span><span class="tag">SQLite</span><span class="tag">API</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="etag-shelf">
+            <div class="card-body">
+              <h3>EtagShelf</h3>
+              <p class="tagline">conditional GET for JSON snapshots</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A dashboard polled a large JSON snapshot that rarely changed.</div>
+                <div><strong>Solution</strong> The reference returns an ETag and answers 304 when the caller still has that tag.</div>
+                <div><strong>Result</strong> Unchanged polls stay small, and a real change still returns the new body.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">HTTP</span><span class="tag">Caching</span><span class="tag">JSON</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="dead-letter">
+            <div class="card-body">
+              <h3>DeadLetter</h3>
+              <p class="tagline">a page for jobs that gave up</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Failed jobs disappeared into a log file nobody opened.</div>
+                <div><strong>Solution</strong> The reference moves a job to a dead-letter table after the retry budget and shows the last error.</div>
+                <div><strong>Result</strong> An operator can see the payload and the error without reading a raw log.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">SQLite</span><span class="tag">Queues</span><span class="tag">Retries</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="replay-hook">
+            <div class="card-body">
+              <h3>ReplayHook</h3>
+              <p class="tagline">replay one stored webhook</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A downstream timeout left the operator with no way to try that one event again.</div>
+                <div><strong>Solution</strong> The reference stores the raw body and can post that same body once more under a new attempt id.</div>
+                <div><strong>Result</strong> The original event stays intact, and the new attempt is a separate row.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Webhooks</span><span class="tag">SQLite</span><span class="tag">API</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="spam-gate">
+            <div class="card-body">
+              <h3>SpamGate</h3>
+              <p class="tagline">score obvious form abuse</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A public form accepted the same body many times from disposable addresses.</div>
+                <div><strong>Solution</strong> The reference scores duplicate bodies and disposable domains, and holds those rows for review.</div>
+                <div><strong>Result</strong> A repeated paste is queued for a person instead of creating another ticket.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Forms</span><span class="tag">SQLite</span><span class="tag">Validation</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="tz-roster">
+            <div class="card-body">
+              <h3>TzRoster</h3>
+              <p class="tagline">an on-call roster in UTC</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Handover notes named local times and the next person missed the window.</div>
+                <div><strong>Solution</strong> The reference stores every shift in UTC and renders it in the viewer&#x27;s zone.</div>
+                <div><strong>Result</strong> The roster page shows one unambiguous start and end for each shift.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Scheduling</span><span class="tag">SQLite</span><span class="tag">Linux</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="slug-tenant">
+            <div class="card-body">
+              <h3>SlugTenant</h3>
+              <p class="tagline">route a host to one tenant</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Two customers shared a process and a request could read the other customer&#x27;s rows.</div>
+                <div><strong>Solution</strong> The reference maps the host header to a tenant id and applies that id on every query.</div>
+                <div><strong>Result</strong> A request for an unknown host is refused before it touches tenant data.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Multi-tenant</span><span class="tag">SQLite</span><span class="tag">HTTP</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="sql-reader">
+            <div class="card-body">
+              <h3>SqlReader</h3>
+              <p class="tagline">a read-only query allowlist</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Support wanted answers from the database without a writable login.</div>
+                <div><strong>Solution</strong> The reference exposes a fixed set of SELECT statements with bound parameters.</div>
+                <div><strong>Result</strong> A viewer can run those queries and cannot send arbitrary SQL.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">SQL</span><span class="tag">FastAPI</span><span class="tag">Security</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="migrate-dry">
+            <div class="card-body">
+              <h3>MigrateDry</h3>
+              <p class="tagline">a migration dry-run report</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A schema change was applied before anyone saw which tables it touched.</div>
+                <div><strong>Solution</strong> The reference prints the planned statements and the row counts they would scan, and stops there.</div>
+                <div><strong>Result</strong> The report is a review artifact. It does not alter the database.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">Migrations</span><span class="tag">SQL</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="fixture-lab">
+            <div class="card-body">
+              <h3>FixtureLab</h3>
+              <p class="tagline">deterministic fixtures for tests</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Tests failed when they depended on wall-clock time or insert order.</div>
+                <div><strong>Solution</strong> The reference builds fixtures from a seed and freezes the clock used by the test.</div>
+                <div><strong>Result</strong> The same seed produces the same rows on a second run.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">pytest</span><span class="tag">SQLite</span><span class="tag">Testing</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="pact-fixture">
+            <div class="card-body">
+              <h3>PactFixture</h3>
+              <p class="tagline">consumer examples for one API</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A client and a server drifted because each side invented its own example.</div>
+                <div><strong>Solution</strong> The reference stores one request and response pair and checks both sides against it.</div>
+                <div><strong>Result</strong> A changed field fails the fixture check before either side is released.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">OpenAPI</span><span class="tag">JSON</span><span class="tag">pytest</span><span class="tag">REST API</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="load-note">
+            <div class="card-body">
+              <h3>LoadNote</h3>
+              <p class="tagline">summarize a local load-test log</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A load test left a raw log and no single page of what it actually hit.</div>
+                <div><strong>Solution</strong> The reference reads a log the operator already recorded and charts status codes and latency.</div>
+                <div><strong>Result</strong> The page describes that local run only. It does not send traffic anywhere.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">HTTP</span><span class="tag">JSON</span><span class="tag">FastAPI</span><span class="tag">Testing</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="csp-inbox">
+            <div class="card-body">
+              <h3>CspInbox</h3>
+              <p class="tagline">collect Content-Security-Policy reports</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Browser CSP violations were invisible until a customer pasted a console screenshot.</div>
+                <div><strong>Solution</strong> The reference accepts the report endpoint and groups the blocked URLs.</div>
+                <div><strong>Result</strong> A reviewer sees which directive fired and how often, with no page content stored.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Security</span><span class="tag">HTTP</span><span class="tag">SQLite</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="unit-lint">
+            <div class="card-body">
+              <h3>UnitLint</h3>
+              <p class="tagline">review a systemd unit file</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A unit file shipped without a restart limit or a writable directory of its own.</div>
+                <div><strong>Solution</strong> The reference reads the unit text and lists missing Restart, User, and ProtectSystem lines.</div>
+                <div><strong>Result</strong> The output is a checklist. It does not install or start the unit.</div>
+              </div>
+              <div class="tags"><span class="tag">Linux</span><span class="tag">systemd</span><span class="tag">Python</span><span class="tag">DevOps</span><span class="tag">Security</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="disk-mark">
+            <div class="card-body">
+              <h3>DiskMark</h3>
+              <p class="tagline">alert before a disk fills</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A host filled its disk overnight and the only signal was a failed write.</div>
+                <div><strong>Solution</strong> The reference records free space on a timer and opens a row when it crosses a watermark.</div>
+                <div><strong>Result</strong> The page shows the samples it recorded. It does not page a real phone.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Linux</span><span class="tag">Monitoring</span><span class="tag">SQLite</span><span class="tag">systemd</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="cert-cal">
+            <div class="card-body">
+              <h3>CertCal</h3>
+              <p class="tagline">a calendar of certificate dates</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Certificate expiry was a date in a ticket that nobody reread.</div>
+                <div><strong>Solution</strong> The reference reads PEM files the operator points at and lists the not-after dates.</div>
+                <div><strong>Result</strong> A certificate inside the warning window is a row on the calendar.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">TLS</span><span class="tag">Linux</span><span class="tag">Monitoring</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="dns-log">
+            <div class="card-body">
+              <h3>DnsLog</h3>
+              <p class="tagline">diff two zone files</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A zone edit had no record of which records moved.</div>
+                <div><strong>Solution</strong> The reference parses two zone files and lists added, removed, and changed records.</div>
+                <div><strong>Result</strong> The diff is a review file. It does not publish DNS.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">DNS</span><span class="tag">Linux</span><span class="tag">Diff</span><span class="tag">DevOps</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="redirect-map">
+            <div class="card-body">
+              <h3>RedirectMap</h3>
+              <p class="tagline">test a table of redirects</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A redirect spreadsheet and the live server disagreed about status codes.</div>
+                <div><strong>Solution</strong> The reference reads the table and checks each path against a base URL the operator supplies.</div>
+                <div><strong>Result</strong> Mismatched status or location lines are listed. The tool only reads.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">nginx</span><span class="tag">HTTP</span><span class="tag">Testing</span><span class="tag">DevOps</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="i18n-cover">
+            <div class="card-body">
+              <h3>I18nCover</h3>
+              <p class="tagline">find missing translation keys</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A locale file shipped with keys the template never used, and missed keys the template did use.</div>
+                <div><strong>Solution</strong> The reference compares template keys with each locale file.</div>
+                <div><strong>Result</strong> Missing and unused keys are two lists a reviewer can fix.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">i18n</span><span class="tag">JSON</span><span class="tag">Testing</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for Full-Stack &amp; DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="audit-trail">
+            <div class="card-body">
+              <h3>AuditTrail</h3>
+              <p class="tagline">an admin action log</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Support could not tell who changed a setting after a complaint.</div>
+                <div><strong>Solution</strong> The reference appends actor, action, and target for each write, and does not store secrets.</div>
+                <div><strong>Result</strong> A viewer can filter the log by day and by actor.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">SQLite</span><span class="tag">Audit</span><span class="tag">Security</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="role-grid">
+            <div class="card-body">
+              <h3>RoleGrid</h3>
+              <p class="tagline">a permission matrix a reviewer can read</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Role rules lived in code and a new hire could not see them.</div>
+                <div><strong>Solution</strong> The reference renders role against action from one table the tests also read.</div>
+                <div><strong>Result</strong> The page and the tests disagree if someone edits only one of them.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Authorization</span><span class="tag">SQLite</span><span class="tag">OpenAPI</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="csv-gate">
+            <div class="card-body">
+              <h3>CsvGate</h3>
+              <p class="tagline">a CSV import with a dry-run</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A bad CSV was imported before anyone saw the rejected rows.</div>
+                <div><strong>Solution</strong> The reference parses the file, reports row errors, and writes nothing unless the operator confirms.</div>
+                <div><strong>Result</strong> The dry-run page lists the rows that would be skipped and why.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">CSV</span><span class="tag">SQLite</span><span class="tag">FastAPI</span><span class="tag">Validation</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="job-table">
+            <div class="card-body">
+              <h3>JobTable</h3>
+              <p class="tagline">a table of background jobs</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Background work had no list of what was waiting, running, or finished.</div>
+                <div><strong>Solution</strong> The reference stores state transitions and shows them on one page.</div>
+                <div><strong>Result</strong> An operator can see a queued job become running and then finished or failed.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">SQLite</span><span class="tag">Queues</span><span class="tag">Linux</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="retry-budget">
+            <div class="card-body">
+              <h3>RetryBudget</h3>
+              <p class="tagline">a ceiling on retries</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A failing dependency was retried without a limit and crowded out other work.</div>
+                <div><strong>Solution</strong> The reference counts attempts and stops at a budget, then records the stop.</div>
+                <div><strong>Result</strong> The job page shows how many tries remain before it gives up.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Retries</span><span class="tag">SQLite</span><span class="tag">FastAPI</span><span class="tag">Queues</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="incident-note">
+            <div class="card-body">
+              <h3>IncidentNote</h3>
+              <p class="tagline">a short incident write-up</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Incident notes were a chat thread that vanished by the next day.</div>
+                <div><strong>Solution</strong> The reference stores start, impact, and the next update as a page.</div>
+                <div><strong>Result</strong> A reader sees the timeline without joining the chat.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Markdown</span><span class="tag">SQLite</span><span class="tag">Status Page</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="backup-rotate">
+            <div class="card-body">
+              <h3>BackupRotate</h3>
+              <p class="tagline">keep a fixed number of snapshots</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Backups accumulated until the disk, not a policy, decided what to delete.</div>
+                <div><strong>Solution</strong> The reference keeps a named count of snapshots and deletes only older ones after a successful new copy.</div>
+                <div><strong>Result</strong> The page lists what it kept and what it removed.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">Linux</span><span class="tag">Backups</span><span class="tag">systemd</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="log-sample">
+            <div class="card-body">
+              <h3>LogSample</h3>
+              <p class="tagline">sample structured logs</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A busy service logged every line and the useful errors were hard to find.</div>
+                <div><strong>Solution</strong> The reference keeps error lines and a sample of the rest, with the rule written on the page.</div>
+                <div><strong>Result</strong> A reviewer can see the sample rate instead of guessing which lines were dropped.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">JSON</span><span class="tag">Logging</span><span class="tag">Linux</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="secret-pre">
+            <div class="card-body">
+              <h3>SecretPre</h3>
+              <p class="tagline">a pre-commit secret scan</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A token in a fixture had landed in a commit before review.</div>
+                <div><strong>Solution</strong> The reference scans the staged diff for a fixed set of token shapes and exits non-zero on a hit.</div>
+                <div><strong>Result</strong> The report names the file and the rule. It does not print the secret.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Git</span><span class="tag">Security</span><span class="tag">CI</span><span class="tag">Linux</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="dep-audit">
+            <div class="card-body">
+              <h3>DepAudit</h3>
+              <p class="tagline">a dependency advisory report</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Dependency review was a spreadsheet updated after an incident.</div>
+                <div><strong>Solution</strong> The reference reads a lockfile and writes the advisory ids it was given.</div>
+                <div><strong>Result</strong> The page is a report of that input. It does not claim a live vulnerability feed.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">pip</span><span class="tag">Security</span><span class="tag">CI</span><span class="tag">Linux</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="sitemap-diff">
+            <div class="card-body">
+              <h3>SitemapDiff</h3>
+              <p class="tagline">see what a sitemap added</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A release changed the sitemap and nobody listed the new URLs.</div>
+                <div><strong>Solution</strong> The reference diffs two sitemap files and groups added and removed locations.</div>
+                <div><strong>Result</strong> The result is a review list, not a crawl of someone else&#x27;s site.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">SEO</span><span class="tag">XML</span><span class="tag">HTTP</span><span class="tag">Diff</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="link-check">
+            <div class="card-body">
+              <h3>LinkCheck</h3>
+              <p class="tagline">list broken links on one site</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A content site shipped links that 404&#x27;d a week later.</div>
+                <div><strong>Solution</strong> The reference reads a seed URL the operator owns and records status codes.</div>
+                <div><strong>Result</strong> Broken links are a table. The tool stops at the host it was given.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">HTTP</span><span class="tag">HTML</span><span class="tag">Testing</span><span class="tag">SEO</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="thumb-pipe">
+            <div class="card-body">
+              <h3>ThumbPipe</h3>
+              <p class="tagline">thumbnails with a width cap</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Uploads were stored at original size and the list page became heavy.</div>
+                <div><strong>Solution</strong> The reference writes a bounded thumbnail beside the original and refuses a file over the cap.</div>
+                <div><strong>Result</strong> The list page uses the thumbnail. The original stays available.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Images</span><span class="tag">FastAPI</span><span class="tag">Linux</span><span class="tag">Pillow</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="md-preview">
+            <div class="card-body">
+              <h3>MdPreview</h3>
+              <p class="tagline">preview Markdown before publish</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Authors published Markdown that rendered differently from the editor.</div>
+                <div><strong>Solution</strong> The reference renders with the same rules as the public page and shows a side-by-side preview.</div>
+                <div><strong>Result</strong> A heading or table that will break is visible before publish.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Markdown</span><span class="tag">FastAPI</span><span class="tag">HTML</span><span class="tag">Content</span></div>
+              <p class="note">Written reference for Full-Stack &amp; DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="clog-gen">
+            <div class="card-body">
+              <h3>ClogGen</h3>
+              <p class="tagline">a changelog from commit titles</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Release notes were rewritten from memory after the tag already existed.</div>
+                <div><strong>Solution</strong> The reference groups conventional commit titles between two refs.</div>
+                <div><strong>Result</strong> The changelog is a draft a person still edits. It does not push a tag.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Git</span><span class="tag">Markdown</span><span class="tag">CI</span><span class="tag">Release</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="badge-svg">
+            <div class="card-body">
+              <h3>BadgeSvg</h3>
+              <p class="tagline">an uptime badge from local checks</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A status badge on a README was a static image that never changed.</div>
+                <div><strong>Solution</strong> The reference draws an SVG from checks the same process already stored.</div>
+                <div><strong>Result</strong> The badge matches the stored rows. It does not invent an uptime percentage.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">SVG</span><span class="tag">Monitoring</span><span class="tag">FastAPI</span><span class="tag">SQLite</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="health-side">
+            <div class="card-body">
+              <h3>HealthSide</h3>
+              <p class="tagline">a health file beside a process</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A process looked running while its port was refusing connections.</div>
+                <div><strong>Solution</strong> The reference writes a health file only after a local HTTP check succeeds.</div>
+                <div><strong>Result</strong> A supervisor can read that file and tell a live port from a live PID.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Linux</span><span class="tag">systemd</span><span class="tag">HTTP</span><span class="tag">Monitoring</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="openapi-diff">
+            <div class="card-body">
+              <h3>OpenapiDiff</h3>
+              <p class="tagline">diff two OpenAPI files</p>
+              <div class="psr">
+                <div><strong>Problem</strong> An API change removed a field and the client found out in production.</div>
+                <div><strong>Solution</strong> The reference diffs two OpenAPI documents and lists removed paths and required fields.</div>
+                <div><strong>Result</strong> The diff fails a check when a previously required field disappears.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">OpenAPI</span><span class="tag">REST API</span><span class="tag">Diff</span><span class="tag">pytest</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="flag-file">
+            <div class="card-body">
+              <h3>FlagFile</h3>
+              <p class="tagline">feature flags in a file</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A feature flag lived in code and needed a deploy to turn off.</div>
+                <div><strong>Solution</strong> The reference reads a JSON file on a timer and exposes the current flags on a page.</div>
+                <div><strong>Result</strong> Turning a flag off is a file change. The page shows the value it loaded.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">JSON</span><span class="tag">Configuration</span><span class="tag">Testing</span></div>
+              <p class="note">Written reference for Backend engineer. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="release-note">
+            <div class="card-body">
+              <h3>ReleaseNote</h3>
+              <p class="tagline">a one-page release note</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A release had a tag and no note of what an operator should watch.</div>
+                <div><strong>Solution</strong> The reference fills a fixed template: changes, checks, and how to roll back.</div>
+                <div><strong>Result</strong> The note is a file in the repo. It does not deploy anything.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Markdown</span><span class="tag">Git</span><span class="tag">CI</span><span class="tag">Release</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="budget-page">
+            <div class="card-body">
+              <h3>BudgetPage</h3>
+              <p class="tagline">error budget from a probe log</p>
+              <div class="psr">
+                <div><strong>Problem</strong> An error budget was a number in a slide, not a calculation from probes.</div>
+                <div><strong>Solution</strong> The reference reads a probe log and shows remaining budget for a stated window.</div>
+                <div><strong>Result</strong> The figure is the arithmetic of that log. It is labelled as such.</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Monitoring</span><span class="tag">SQLite</span><span class="tag">FastAPI</span><span class="tag">SLO</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="rollback-card">
+            <div class="card-body">
+              <h3>RollbackCard</h3>
+              <p class="tagline">a rollback card before release</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A release had no written way back to the previous build.</div>
+                <div><strong>Solution</strong> The reference is a one-page card: the previous artifact, the reload command, and the check URL.</div>
+                <div><strong>Result</strong> The card is documentation. Running it is still a person&#x27;s decision.</div>
+              </div>
+              <div class="tags"><span class="tag">Linux</span><span class="tag">systemd</span><span class="tag">nginx</span><span class="tag">Python</span><span class="tag">Runbooks</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="compose-lint">
+            <div class="card-body">
+              <h3>ComposeLint</h3>
+              <p class="tagline">review a Compose file</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A Compose file published a database port and had no healthcheck.</div>
+                <div><strong>Solution</strong> The reference reads the file and lists ports bound on all interfaces and services without a healthcheck.</div>
+                <div><strong>Result</strong> The output is a review list. It does not start containers.</div>
+              </div>
+              <div class="tags"><span class="tag">Docker Compose</span><span class="tag">Docker</span><span class="tag">YAML</span><span class="tag">Python</span><span class="tag">Security</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="nginx-map">
+            <div class="card-body">
+              <h3>NginxMap</h3>
+              <p class="tagline">explain a location map</p>
+              <div class="psr">
+                <div><strong>Problem</strong> An nginx config grew location blocks that nobody could summarize.</div>
+                <div><strong>Solution</strong> The reference parses location and proxy_pass lines into a table.</div>
+                <div><strong>Result</strong> A reviewer sees which path goes to which upstream. The tool does not reload nginx.</div>
+              </div>
+              <div class="tags"><span class="tag">nginx</span><span class="tag">Linux</span><span class="tag">Python</span><span class="tag">HTTP</span><span class="tag">DevOps</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+          <article class="card" id="runbook-index">
+            <div class="card-body">
+              <h3>RunbookIndex</h3>
+              <p class="tagline">an index of handover notes</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Handover notes were scattered and a new operator could not find the restart steps.</div>
+                <div><strong>Solution</strong> The reference indexes Markdown titles and the first command in each note.</div>
+                <div><strong>Result</strong> The index is a page of links. It does not execute the commands.</div>
+              </div>
+              <div class="tags"><span class="tag">Markdown</span><span class="tag">Python</span><span class="tag">Linux</span><span class="tag">Runbooks</span><span class="tag">FastAPI</span></div>
+              <p class="note">Written reference for DevOps. Not a live process and not a client project.</p>
+            </div>
+          </article>
+    </div>
+  </main>
+  <footer class="foot">
+    <div class="wrap">Fictional names only. The live demos are listed on the home page.</div>
+  </footer>
+</body>
+</html>

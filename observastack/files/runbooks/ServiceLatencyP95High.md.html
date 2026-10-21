@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>runbooks/ServiceLatencyP95High.md</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>runbooks/ServiceLatencyP95High.md</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold"># ServiceLatencyP95High</span>
+
+Larkspur Grocers is fictional. This note explains the alert. It is not an incident report. It does not record a page, a customer impact, or an MTTR.
+
+<span style="color: #800080; font-weight: bold">## Signal</span>
+
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Severity: <span style="color: #BA2121">`warning`</span>
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Team: <span style="color: #BA2121">`platform`</span>
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Pending duration (<span style="color: #BA2121">`for`</span>): 10m
+
+<span style="color: #BA2121">```promql</span>
+<span style="color: #008000; font-weight: bold">max</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">by</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #19177C">service</span><span style="color: #666666">)</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #19177C">service_route</span><span style="border: 1px solid #FF0000">:</span><span style="color: #19177C">http_request_duration_seconds</span><span style="border: 1px solid #FF0000">:</span><span style="color: #19177C">p95_5m</span><span style="color: #666666">)</span>
+<span style="color: #666666">&gt;</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">on</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #19177C">service</span><span style="color: #666666">)</span>
+<span style="color: #19177C">service</span><span style="border: 1px solid #FF0000">:</span><span style="color: #19177C">http_latency_p95_threshold_seconds</span><span style="border: 1px solid #FF0000">:</span><span style="color: #19177C">constant</span>
+<span style="color: #BA2121">```</span>
+
+<span style="color: #800080; font-weight: bold">## What the condition means</span>
+
+The worst route p95 is above the per-service constant recorded in service:http_latency_p95_threshold_seconds:constant. Thresholds are not copied into the alert.
+
+<span style="color: #800080; font-weight: bold">## What an on-call would check</span>
+
+<span style="color: #008000; font-weight: bold">1.</span> Read the expression above and the recording rules it uses.
+<span style="color: #008000; font-weight: bold">2.</span> Compare it with the promtool unit tests in <span style="color: #BA2121">`tests/rules/`</span>. Every alert except Watchdog has a firing case and a non-firing case.
+<span style="color: #008000; font-weight: bold">3.</span> The annotation <span style="color: #BA2121">`runbook_url`</span> is <span style="color: #BA2121">`https://runbooks.larkspur.example/ServiceLatencyP95High`</span>. That host is a placeholder. This file is the copy in the repo.
+<span style="color: #008000; font-weight: bold">4.</span> This stack does not page anyone. Receivers use <span style="color: #BA2121">`*_file`</span> credential paths and <span style="color: #BA2121">`example.invalid`</span>.
+
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

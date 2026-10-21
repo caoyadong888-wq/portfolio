@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gcp/monitoring/policies/run-5xx-ratio.json</title>
+<link rel="stylesheet" href="../../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../../index.html">概览</a>
+<a href="../../../../aws/index.html">AWS 次要</a>
+<a href="../../../index.html">文件</a>
+<a href="../../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>gcp/monitoring/policies/run-5xx-ratio.json</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>{
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;displayName&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;insights-api Cloud Run 5xx ratio&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;combiner&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;OR&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;severity&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;CRITICAL&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;enabled&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;summary&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Cloud Run 5xx responses above 5 percent of the request rate for 5 minutes.&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;documentation&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;content&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;insights-api returned too many 5xx responses. Check the Cloud Run revision logs and the latest deploy. This policy is offline configuration for the fictional Thistle Analytics demo and is not deployed.&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;mimeType&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;text/markdown&quot;</span>
+<span style="color: #bbbbbb">  </span>},
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;conditions&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;displayName&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;5xx ratio over 5 percent&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;conditionThreshold&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;filter&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;resource.type=\&quot;cloud_run_revision\&quot; AND resource.labels.service_name=\&quot;insights-api\&quot; AND metric.type=\&quot;run.googleapis.com/request_count\&quot; AND metric.labels.response_code_class=\&quot;5xx\&quot;&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;comparison&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;COMPARISON_GT&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;thresholdValue&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">0.05</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;duration&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;300s&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;aggregations&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">          </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;alignmentPeriod&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;60s&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;perSeriesAligner&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;ALIGN_RATE&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;crossSeriesReducer&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;REDUCE_SUM&quot;</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>]
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>}
+<span style="color: #bbbbbb">  </span>],
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;notificationChannels&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;projects/thistle-analytics-demo/notificationChannels/placeholder-channel&quot;</span>
+<span style="color: #bbbbbb">  </span>]
+}
+</code></pre></div>
+
+</main>
+</body>
+</html>

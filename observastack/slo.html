@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ObservaStack SLO</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="index.html">概览</a>
+<a href="alerts.html">告警</a>
+<a href="slo.html">SLO</a>
+<a href="routing.html">路由</a>
+<a href="files/index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<h1>SLO 燃烧率</h1>
+<p>orders-api 可用率目标 99.9%（错误预算 0.001，30 天）。延迟 SLI 是「快于 300ms 的请求比例」，目标 99%（预算 0.01）。下表是规则表达式里的阈值，来自 SRE Workbook，不是单元测试喂进去的错误率。</p>
+<table>
+<thead><tr><th>规则倍数</th><th>长窗口</th><th>短窗口</th><th>30 天预算消耗</th><th>规则</th></tr></thead>
+<tbody>
+<tr><td>14.4</td><td>1h</td><td>5m</td><td>1 小时约消耗 2%</td><td>OrdersApiErrorBudgetBurnFast 的 1h+5m 支</td></tr>
+<tr><td>6</td><td>6h</td><td>30m</td><td>6 小时约消耗 5%</td><td>OrdersApiErrorBudgetBurnFast 的 6h+30m 支</td></tr>
+<tr><td>3</td><td>1d</td><td>2h</td><td>1 天约消耗 10%</td><td>OrdersApiErrorBudgetBurnSlow 的 1d+2h 支</td></tr>
+<tr><td>1</td><td>3d</td><td>6h</td><td>3 天约消耗 10%</td><td>OrdersApiErrorBudgetBurnSlow 的 3d+6h 支</td></tr>
+<tr><td>14.4 / 6</td><td>1h / 6h</td><td>5m / 30m</td><td>延迟预算 0.01</td><td>OrdersApiLatencySLOBurn</td></tr>
+</tbody>
+</table>
+<p>下面每一行的输入倍数由 tests/rules/slo.test.yml 的 input_series 最后一段步长算出（错误增量 / 总增量 / 预算），再写入 checks.json。eval_time、firing 和结果来自同一次 promtool 记录。比较是严格大于，所以触发用例的输入高于规则倍数，而不是等于规则倍数。</p>
+<table>
+<thead><tr><th>测试组</th><th>输入倍数</th><th>告警</th><th>eval_time</th><th>firing</th><th>结果</th></tr></thead>
+<tbody>
+<tr><td><span data-metric="promtool_test_rules.cases.27.group">fast_burn_15x</span></td><td><span data-metric="promtool_test_rules.cases.27.input_burn_multiplier">15</span></td><td><span data-metric="promtool_test_rules.cases.27.alertname">OrdersApiErrorBudgetBurnFast</span></td><td><span data-metric="promtool_test_rules.cases.27.eval_time">5h58m</span></td><td><span data-metric="promtool_test_rules.cases.27.firing">false</span></td><td><span data-metric="promtool_test_rules.cases.27.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.28.group">fast_burn_15x</span></td><td><span data-metric="promtool_test_rules.cases.28.input_burn_multiplier">15</span></td><td><span data-metric="promtool_test_rules.cases.28.alertname">OrdersApiErrorBudgetBurnFast</span></td><td><span data-metric="promtool_test_rules.cases.28.eval_time">5h59m</span></td><td><span data-metric="promtool_test_rules.cases.28.firing">true</span></td><td><span data-metric="promtool_test_rules.cases.28.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.29.group">fast_burn_15x</span></td><td><span data-metric="promtool_test_rules.cases.29.input_burn_multiplier">15</span></td><td><span data-metric="promtool_test_rules.cases.29.alertname">OrdersApiErrorBudgetBurnSlow</span></td><td><span data-metric="promtool_test_rules.cases.29.eval_time">5h58m</span></td><td><span data-metric="promtool_test_rules.cases.29.firing">true</span></td><td><span data-metric="promtool_test_rules.cases.29.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.30.group">fast_burn_15x</span></td><td><span data-metric="promtool_test_rules.cases.30.input_burn_multiplier">15</span></td><td><span data-metric="promtool_test_rules.cases.30.alertname">OrdersApiErrorBudgetBurnSlow</span></td><td><span data-metric="promtool_test_rules.cases.30.eval_time">5h59m</span></td><td><span data-metric="promtool_test_rules.cases.30.firing">true</span></td><td><span data-metric="promtool_test_rules.cases.30.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.31.group">slow_burn_3_5x_only</span></td><td><span data-metric="promtool_test_rules.cases.31.input_burn_multiplier">3.5</span></td><td><span data-metric="promtool_test_rules.cases.31.alertname">OrdersApiErrorBudgetBurnFast</span></td><td><span data-metric="promtool_test_rules.cases.31.eval_time">3m</span></td><td><span data-metric="promtool_test_rules.cases.31.firing">false</span></td><td><span data-metric="promtool_test_rules.cases.31.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.32.group">slow_burn_3_5x_only</span></td><td><span data-metric="promtool_test_rules.cases.32.input_burn_multiplier">3.5</span></td><td><span data-metric="promtool_test_rules.cases.32.alertname">OrdersApiErrorBudgetBurnSlow</span></td><td><span data-metric="promtool_test_rules.cases.32.eval_time">2m</span></td><td><span data-metric="promtool_test_rules.cases.32.firing">false</span></td><td><span data-metric="promtool_test_rules.cases.32.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.33.group">slow_burn_3_5x_only</span></td><td><span data-metric="promtool_test_rules.cases.33.input_burn_multiplier">3.5</span></td><td><span data-metric="promtool_test_rules.cases.33.alertname">OrdersApiErrorBudgetBurnSlow</span></td><td><span data-metric="promtool_test_rules.cases.33.eval_time">3m</span></td><td><span data-metric="promtool_test_rules.cases.33.firing">true</span></td><td><span data-metric="promtool_test_rules.cases.33.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.34.group">burn_0_5x_neither</span></td><td><span data-metric="promtool_test_rules.cases.34.input_burn_multiplier">0.5</span></td><td><span data-metric="promtool_test_rules.cases.34.alertname">OrdersApiErrorBudgetBurnFast</span></td><td><span data-metric="promtool_test_rules.cases.34.eval_time">10m</span></td><td><span data-metric="promtool_test_rules.cases.34.firing">false</span></td><td><span data-metric="promtool_test_rules.cases.34.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.35.group">burn_0_5x_neither</span></td><td><span data-metric="promtool_test_rules.cases.35.input_burn_multiplier">0.5</span></td><td><span data-metric="promtool_test_rules.cases.35.alertname">OrdersApiErrorBudgetBurnSlow</span></td><td><span data-metric="promtool_test_rules.cases.35.eval_time">10m</span></td><td><span data-metric="promtool_test_rules.cases.35.firing">false</span></td><td><span data-metric="promtool_test_rules.cases.35.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.36.group">latency_burn_fires</span></td><td><span data-metric="promtool_test_rules.cases.36.input_burn_multiplier">50</span></td><td><span data-metric="promtool_test_rules.cases.36.alertname">OrdersApiLatencySLOBurn</span></td><td><span data-metric="promtool_test_rules.cases.36.eval_time">8h</span></td><td><span data-metric="promtool_test_rules.cases.36.firing">true</span></td><td><span data-metric="promtool_test_rules.cases.36.result">passed</span></td></tr>
+<tr><td><span data-metric="promtool_test_rules.cases.37.group">latency_burn_quiet</span></td><td><span data-metric="promtool_test_rules.cases.37.input_burn_multiplier">1</span></td><td><span data-metric="promtool_test_rules.cases.37.alertname">OrdersApiLatencySLOBurn</span></td><td><span data-metric="promtool_test_rules.cases.37.eval_time">8h</span></td><td><span data-metric="promtool_test_rules.cases.37.firing">false</span></td><td><span data-metric="promtool_test_rules.cases.37.result">passed</span></td></tr>
+</tbody>
+</table>
+<p>这些组的 input_series 有多段，表上的倍数是最后一段的步长，不是整段平均：fast_burn_15x。 fast_burn_15x 的 OrdersApiErrorBudgetBurnFast 在 5h58m 不触发，在 5h59m 触发。输入倍数是 15。 Fast 规则要 1h 与 5m 同时高于 14.4 倍，或 6h 与 30m 同时高于 6 倍，并持续 for 2m。fast_burn_15x 把高错误率放在尾段，所以 Fast 在 5h58m 仍为空，到 5h59m 才出现。这个时刻对上的是 1h+5m 那一支。 fast_burn_15x 的 OrdersApiErrorBudgetBurnSlow 在 5h58m、5h59m 触发。输入倍数是 15。 slow_burn_3_5x_only 的 OrdersApiErrorBudgetBurnFast 在 3m 不触发。输入倍数是 3.5。 slow_burn_3_5x_only 的 OrdersApiErrorBudgetBurnSlow 在 2m 不触发，在 3m 触发。输入倍数是 3.5。 burn_0_5x_neither 的 OrdersApiErrorBudgetBurnFast 在 10m 不触发。输入倍数是 0.5。 burn_0_5x_neither 的 OrdersApiErrorBudgetBurnSlow 在 10m 不触发。输入倍数是 0.5。 latency_burn_fires 的 OrdersApiLatencySLOBurn 在 8h 触发。输入倍数是 50。 latency_burn_quiet 的 OrdersApiLatencySLOBurn 在 8h 不触发。输入倍数是 1。</p>
+<p class="note">延迟组的组名没有倍数记号。它们的输入倍数用同一套末段步长，预算是 0.01。Watchdog 只有 firing 用例，不在这张表里。</p>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

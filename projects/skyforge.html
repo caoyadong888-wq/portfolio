@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyForge — case study</title>
+  <meta name="description" content="Terraform for AWS: single-EC2 Docker host or ECS Fargate, tested offline.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/skyforge/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. Reference architecture and offline tests. Initech is fictional, not a client.</p>
+    <article class="readme">
+      <h1>SkyForge</h1>
+      <p>Terraform for AWS: a single-EC2 Docker host, or ECS Fargate, tested offline.</p>
+      <p>This is a reference architecture and an offline test for a fictional Initech <code>checkout-api</code>. It is not a client project. No AWS account is used, <code>terraform apply</code> is not run, and nothing on this page is a price.</p>
+      <p>The live demo reads <code>data/checks.json</code>. That file is written by <code>scripts/record_checks.py</code> from the tools on the build machine. The page labels it 构建时记录 (recorded at build time) and does not re-run Terraform when someone opens it.</p>
+      <p>The build recorded at <code>2026-10-03T05:19:53Z</code> used Terraform v1.9.8, TFLint 0.55.1, and checkov 3.2.449, with <code>AWS_ACCESS_KEY_ID</code> empty. <code>terraform fmt -check</code>, <code>terraform validate</code> (both routes and the state bootstrap), and tflint passed. <code>terraform test</code> passed 6 runs. checkov reported 218 passed, 14 failed, and 2 skipped. The 14 failures are LOW. The two skipped checks are HIGH (<code>CKV_AWS_355</code>, <code>CKV_AWS_290</code>) on the Session Manager statement, because <code>ssmmessages</code>, <code>ec2messages</code>, and <code>ssm:UpdateInstanceInformation</code> do not support a resource ARN. The same reasons are in <code>data/checks.json</code>.</p>
+      <h2>Two routes</h2>
+      <p>Both routes share <code>infra/modules/</code> and <code>infra/envs/dev.tfvars</code> / <code>infra/envs/prod.tfvars</code>. Provider and module versions are pinned. Resources carry <code>Project</code>, <code>Env</code>, and <code>Owner</code>. AMI and account ids come from data sources or variables.</p>
+      <p><strong>Single EC2.</strong> One Amazon Linux 2023 host (<code>t3.small</code> in the dev file, <code>t3.medium</code> in prod). <code>user_data</code> installs Docker and Compose and starts the app behind nginx. The security group opens 80 and 443. Administration is SSM Session Manager, so port 22 stays closed. An Elastic IP, the CloudWatch agent, and a daily DLM snapshot of the encrypted EBS volume are included.</p>
+      <p><strong>ECS Fargate.</strong> A VPC across two availability zones, with public and private subnets and one NAT gateway that can be turned off. When NAT is off, interface endpoints cover ECR, logs, and Session Manager, and an S3 gateway endpoint stays. An ALB terminates 443 with an ACM certificate passed in as a variable and redirects 80. ECR stores the image. The Fargate service scales on CPU. Logs go to CloudWatch. The app secret is an SSM SecureString. RDS Postgres is optional and off in the example files.</p>
+      <p><code>infra/bootstrap/</code> is a separate root for the state bucket (encrypted, public access blocked) and the DynamoDB lock. The offline checks keep a local backend. <code>infra/backend.hcl.example</code> shows the later switch. <code>infra/RUNBOOK.md</code> is the from-zero plan, rollback, resize, certificate change, logs, and <code>terraform destroy</code>. It names the AWS charge items for each route and does not estimate a bill.</p>
+      <p><code>infra/docker/Dockerfile</code> is a multi-stage build. The process is not root and has a healthcheck. <code>infra/scripts/push_ecr.sh</code> is the push script. The demo does not run it.</p>
+      <p><code>infra/.github/workflows/terraform.yml</code> runs fmt, validate, tflint, checkov, and <code>terraform test</code>. Plan runs only on <code>workflow_dispatch</code>, after GitHub OIDC assumes a deploy role. The workflow file is not executed from this repository, and it does not apply.</p>
+      <h2>What the page shows</h2>
+      <ol><li>One SVG diagram per route.</li><li>A resource table parsed with python-hcl2 from the <code>.tf</code> files: module calls, resource types, and counts. A module file is counted once, not once per caller.</li><li>Check cards: pass or fail, durations, and the <code>terraform test</code> run list. The numbers match <code>data/checks.json</code>.</li><li>A read-only file browser for the Terraform, tests, and workflow under <code>infra/</code>. There is no button that runs Terraform.</li><li>A comparison of the single host and Fargate on complexity, availability, and operations. Sizes are read from the tfvars files. No amounts.</li></ol>
+      <h2>Run</h2>
+      <p>The process listens on <code>127.0.0.1:18807</code>. Open <code>http://127.0.0.1:18807/</code>. The public URL is <code>https://3.1.79.63/portfolio/skyforge/</code>. Links are relative, so the same page works at the process root and under that prefix.</p>
+      <pre><code class="language-bash">curl -fsS http://127.0.0.1:18807/healthz</code></pre>
+      <p><code>deploy/skyforge.service</code> is the systemd unit (<code>MemoryMax=150M</code>, <code>DATA_DIR=/opt/portfolio/skyforge/data</code>). <code>pytest</code> covers the health check, the match against <code>data/checks.json</code>, the parsed inventory, the dev/prod size split, path traversal, and the absence of any apply route.</p>
+      <p><img alt="Desktop" src="../img/skyforge-desktop.png"></p>
+      <p><img alt="Mobile" src="../img/skyforge-mobile.png"></p>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/skyforge/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

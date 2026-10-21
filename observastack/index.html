@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ObservaStack</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="index.html">概览</a>
+<a href="alerts.html">告警</a>
+<a href="slo.html">SLO</a>
+<a href="routing.html">路由</a>
+<a href="files/index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<p class="eyebrow">作品集演示 · 监控</p>
+<h1>ObservaStack</h1>
+<p class="lead">给虚构的生鲜零售商 Larkspur Grocers 写的 Prometheus、Alertmanager 和 Grafana 配置。规则有 promtool 单元测试，路由有 amtool 断言，仪表盘在构建机的 Grafana 上真实导入过。</p>
+<p class="note">Larkspur Grocers 是虚构的。这里没有客户、流量、事故或 MTTR。公开页面不运行这些进程。</p>
+<p><span class="stamp">构建时记录</span> <span class="note">recorded</span> <span data-metric="recorded">build-time</span> · <span data-metric="recorded_at">2026-10-07T08:30:03+08:00</span></p>
+<h2>架构</h2>
+<figure>
+<img src="architecture.svg" alt="架构图：采集端到 Prometheus，再到 Alertmanager 和 Grafana。配置真实且经过离线校验；公开页面没有运行这些进程。">
+<figcaption>配置真实且经过离线校验；公开页面没有运行这些进程。</figcaption>
+</figure>
+<h2>和 PulseBoard 的区别</h2>
+<table>
+<thead><tr><th>维度</th><th>PulseBoard</th><th>ObservaStack</th></tr></thead>
+<tbody>
+<tr><td>引擎</td><td>自研 Python 和 SQLite</td><td>真实的 Prometheus、Alertmanager、Grafana 配置</td></tr>
+<tr><td>告警规则</td><td>3 条示例，未校验</td><td>promtool check rules，并且 promtool test rules 覆盖每一条</td></tr>
+<tr><td>SLO</td><td>一条 1 小时可用率规则</td><td>多窗口、多燃烧率（14.4 / 6 / 3 / 1）加录制规则，可用率和延迟两个 SLI</td></tr>
+<tr><td>路由</td><td>模拟通知日志</td><td>真实 alertmanager.yml，amtool check-config 和 routes test</td></tr>
+<tr><td>仪表盘</td><td>自绘页面，外加 1 份示例 JSON</td><td>5 份可导入的 Grafana JSON，构建时真实导入并截图</td></tr>
+<tr><td>规则 lint</td><td>无</td><td>pint 离线模式，外加策略测试</td></tr>
+</tbody>
+</table>
+<h2>离线校验</h2>
+<p class="note">卡片上的值来自 results/checks.json，标注为构建时记录。schemaVersion <span data-metric="schema_version">39</span>。</p>
+<div class="cards">
+<article class="card"><div class="k">promtool</div><div class="v"><span data-metric="tools.promtool.version">promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)</span></div></article>
+<article class="card"><div class="k">prometheus</div><div class="v"><span data-metric="tools.prometheus.version">prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)</span></div></article>
+<article class="card"><div class="k">amtool</div><div class="v"><span data-metric="tools.amtool.version">amtool, version 0.34.1 (branch: HEAD, revision: 73c6bfe7393929211294c1954f30d8ed78e4d0ad)</span></div></article>
+<article class="card"><div class="k">alertmanager</div><div class="v"><span data-metric="tools.alertmanager.version">alertmanager, version 0.34.1 (branch: HEAD, revision: 73c6bfe7393929211294c1954f30d8ed78e4d0ad)</span></div></article>
+<article class="card"><div class="k">pint</div><div class="v"><span data-metric="tools.pint.version">0.89.0 (revision: 6a8eca9b3386f28d3566e6e90f070f156e1cd868)</span></div></article>
+<article class="card"><div class="k">grafana</div><div class="v"><span data-metric="tools.grafana.version">grafana version 13.2.3</span></div></article>
+<article class="card"><div class="k">pytest</div><div class="v"><span data-metric="tools.pytest.version">pytest 8.3.5</span></div></article>
+<article class="card"><div class="k">check config exit</div><div class="v"><span data-metric="promtool_check_config.exit_code">0</span></div></article>
+<article class="card"><div class="k">check rules exit</div><div class="v"><span data-metric="promtool_check_rules.exit_code">0</span></div></article>
+<article class="card"><div class="k">rules found</div><div class="v"><span data-metric="promtool_check_rules.rules">38</span></div></article>
+<article class="card"><div class="k">unit tests passed</div><div class="v"><span data-metric="promtool_test_rules.passed">44</span></div></article>
+<article class="card"><div class="k">unit tests failed</div><div class="v"><span data-metric="promtool_test_rules.failed">0</span></div></article>
+<article class="card"><div class="k">unit tests exit</div><div class="v"><span data-metric="promtool_test_rules.exit_code">0</span></div></article>
+<article class="card"><div class="k">check metrics exit</div><div class="v"><span data-metric="promtool_check_metrics.exit_code">0</span></div></article>
+<article class="card"><div class="k">check metrics problems</div><div class="v"><span data-metric="promtool_check_metrics.problems">0</span></div></article>
+<article class="card"><div class="k">pint exit</div><div class="v"><span data-metric="pint.exit_code">0</span></div></article>
+<article class="card"><div class="k">pint bugs</div><div class="v"><span data-metric="pint.bugs">0</span></div></article>
+<article class="card"><div class="k">pint warnings</div><div class="v"><span data-metric="pint.warnings">0</span></div></article>
+<article class="card"><div class="k">amtool check-config exit</div><div class="v"><span data-metric="amtool_check_config.exit_code">0</span></div></article>
+<article class="card"><div class="k">routes passed</div><div class="v"><span data-metric="amtool_routes.passed">9</span></div></article>
+<article class="card"><div class="k">routes failed</div><div class="v"><span data-metric="amtool_routes.failed">0</span></div></article>
+<article class="card"><div class="k">routes exit</div><div class="v"><span data-metric="amtool_routes.exit_code">0</span></div></article>
+<article class="card"><div class="k">dashboard expr exit</div><div class="v"><span data-metric="dashboard_exprs.exit_code">0</span></div></article>
+<article class="card"><div class="k">dashboard expr count</div><div class="v"><span data-metric="dashboard_exprs.expr_count">23</span></div></article>
+<article class="card"><div class="k">pytest passed</div><div class="v"><span data-metric="pytest.passed">15</span></div></article>
+<article class="card"><div class="k">pytest failed</div><div class="v"><span data-metric="pytest.failed">0</span></div></article>
+<article class="card"><div class="k">pytest exit</div><div class="v"><span data-metric="pytest.exit_code">0</span></div></article>
+</div>
+<h3>Grafana 导入</h3>
+<p>二进制版本 <span data-metric="grafana_import.grafana_version">grafana version 13.2.3</span>。每一份都是 POST /api/dashboards/import 的真实返回。</p>
+<ul>
+<li>larkspur-alerting: HTTP <span data-metric="grafana_import.dashboards.0.http_status">200</span>, imported <span data-metric="grafana_import.dashboards.0.imported">true</span>, panels <span data-metric="grafana_import.dashboards.0.source_panels">4</span>/<span data-metric="grafana_import.dashboards.0.imported_panels">4</span></li>
+<li>larkspur-node: HTTP <span data-metric="grafana_import.dashboards.1.http_status">200</span>, imported <span data-metric="grafana_import.dashboards.1.imported">true</span>, panels <span data-metric="grafana_import.dashboards.1.source_panels">4</span>/<span data-metric="grafana_import.dashboards.1.imported_panels">4</span></li>
+<li>larkspur-postgres: HTTP <span data-metric="grafana_import.dashboards.2.http_status">200</span>, imported <span data-metric="grafana_import.dashboards.2.imported">true</span>, panels <span data-metric="grafana_import.dashboards.2.source_panels">3</span>/<span data-metric="grafana_import.dashboards.2.imported_panels">3</span></li>
+<li>larkspur-service-overview: HTTP <span data-metric="grafana_import.dashboards.3.http_status">200</span>, imported <span data-metric="grafana_import.dashboards.3.imported">true</span>, panels <span data-metric="grafana_import.dashboards.3.source_panels">6</span>/<span data-metric="grafana_import.dashboards.3.imported_panels">6</span></li>
+<li>larkspur-slo: HTTP <span data-metric="grafana_import.dashboards.4.http_status">200</span>, imported <span data-metric="grafana_import.dashboards.4.imported">true</span>, panels <span data-metric="grafana_import.dashboards.4.source_panels">6</span>/<span data-metric="grafana_import.dashboards.4.imported_panels">6</span></li>
+</ul>
+<h3>构建时监听</h3>
+<p class="note">截图脚本启动 Alertmanager 时传入空的 --cluster.listen-address，关闭 9094 上的 gossip。三个进程就绪后，ss -ltnp 必须看到它们的监听套接字都在 127.0.0.1 上。ok <span data-metric="build_listeners.ok">true</span>。地址 <span data-metric="build_listeners.listen">127.0.0.1:13000,127.0.0.1:19090,127.0.0.1:19093</span>。套接字数 <span data-metric="build_listeners.socket_count">3</span>。</p>
+<h2>仪表盘画廊</h2>
+<p class="note">截图来自构建机本地 Grafana。曲线是 synth_openmetrics.py --seed 42 的合成序列，再经 promtool 回填录制规则。告警图上的 ALERTS 序列也是这个脚本生成的夹具，不是规则引擎的页面，除非文件名写明 API 里确实有 firing 告警。</p>
+<figure>
+<img src="img/desktop.png" alt="Desktop, service overview. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>Desktop, service overview. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+
+<figure>
+<img src="img/dash-service-overview.png" alt="Service overview. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>Service overview. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+
+<figure>
+<img src="img/dash-slo.png" alt="SLO. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>SLO. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+
+<figure>
+<img src="img/dash-node.png" alt="Node USE. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>Node USE. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+
+<figure>
+<img src="img/dash-postgres.png" alt="Postgres. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>Postgres. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+
+<figure>
+<img src="img/dash-alerting.png" alt="Alerting fixture. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>Alerting fixture. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+
+<figure>
+<img src="img/mobile.png" alt="SLO, mobile width. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>SLO, mobile width. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+<figure>
+<img src="img/prometheus-alerts.png" alt="Prometheus alerts page, Watchdog was firing in the API. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>Prometheus alerts page, Watchdog was firing in the API. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+<figure>
+<img src="img/alertmanager-alerts.png" alt="Alertmanager, Watchdog was listed by the API. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry.">
+<figcaption>Alertmanager, Watchdog was listed by the API. 合成数据（seed 42），非生产遥测. Synthetic data (seed 42), not production telemetry. 构建时在构建机本地 Grafana 渲染。</figcaption>
+</figure>
+
+<h2>下载</h2>
+<ul>
+<li><a href="downloads/observastack-config-0.1.0.tar.gz">observastack-config-0.1.0.tar.gz</a></li>
+<li><a href="downloads/larkspur-alerting.json">larkspur-alerting.json</a></li>
+<li><a href="downloads/larkspur-node.json">larkspur-node.json</a></li>
+<li><a href="downloads/larkspur-postgres.json">larkspur-postgres.json</a></li>
+<li><a href="downloads/larkspur-service-overview.json">larkspur-service-overview.json</a></li>
+<li><a href="downloads/larkspur-slo.json">larkspur-slo.json</a></li>
+</ul>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

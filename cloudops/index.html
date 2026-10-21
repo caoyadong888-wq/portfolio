@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CloudOps</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="index.html">概览</a>
+<a href="aws/index.html">AWS 次要</a>
+<a href="files/index.html">文件</a>
+<a href="downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<p class="eyebrow">作品集演示 · 云厂商 DevOps</p>
+<h1>CloudOps</h1>
+<p class="lead">GCP 优先的云厂商 DevOps 配置包：Cloud Run + Cloud Build + IAM + Secret Manager + Monitoring 即代码；AWS 为次要平行示例；全部离线校验；未部署到任何云账号；Thistle Analytics 为虚构。</p>
+<p class="note">配置真实且经过离线校验；未部署到任何云账号。页面上的通过与失败计数来自 results/checks.json，标注为构建时记录。</p>
+<p><span class="stamp">构建时记录</span> <span class="note">recorded</span> <span data-metric="recorded">build-time</span> · <span data-metric="recorded_at">2026-10-07T09:22:56+08:00</span></p>
+<h2>架构</h2>
+<figure>
+<img src="architecture.svg" alt="架构图：GitHub 与 Cloud Build 到 Artifact Registry 和 Cloud Run，旁边是 Secret Manager、IAM 和 Monitoring。AWS 次要路径在虚线框里。未部署。">
+<figcaption>配置真实且经过离线校验；未部署到任何云账号。AWS 路径在虚线框中，标记为次要。</figcaption>
+</figure>
+<h2>和 SkyForge / TerraShelf / KubeHarbor 的区别</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>维度</th><th>SkyForge</th><th>TerraShelf</th><th>KubeHarbor</th><th>CloudOps</th></tr></thead>
+<tbody>
+<tr><td>主叙事</td><td>单一产品的 AWS Terraform 参考架构</td><td>可复用 AWS Terraform 模块库</td><td>厂商无关的 Kubernetes 清单</td><td>GCP 优先的云厂商 DevOps。AWS 只是更薄的平行示例</td></tr>
+<tr><td>计算</td><td>EC2 Docker 或 ECS Fargate</td><td>模块里的 AWS 资源</td><td>Helm 与 Kustomize</td><td>Cloud Run。不写 VPC 或 ECS 模块，不写通用 Helm chart</td></tr>
+<tr><td>流水线</td><td>Terraform fmt / validate / tflint</td><td>模块 matrix</td><td>helm lint / kubeconform</td><td>Cloud Build YAML 与 GitHub 到 GCP 的 Workload Identity Federation</td></tr>
+<tr><td>密钥与权限</td><td>SSM Parameter Store</td><td>Secrets Manager</td><td>existingSecret</td><td>Secret Manager 与最小权限 IAM，用 conftest 离线断言</td></tr>
+<tr><td>监控</td><td>CloudWatch</td><td>cloudwatch-alarms 模块</td><td>ServiceMonitor</td><td>Cloud Monitoring 告警策略即代码。AWS CloudWatch 只是次要片段</td></tr>
+</tbody>
+</table></div>
+<h2>GCP 流水线</h2>
+<p class="note">步骤名来自 checks.json 里记录的 cloudbuild.yaml。链接打开渲染后的文件。</p>
+<div class="cards"><article class="card step"><div class="k">Cloud Build step</div><div class="v"><a href="files/gcp/build/cloudbuild.yaml.html"><span data-metric="cloudbuild_steps.0.id">lint</span></a></div></article><article class="card step"><div class="k">Cloud Build step</div><div class="v"><a href="files/gcp/build/cloudbuild.yaml.html"><span data-metric="cloudbuild_steps.1.id">test</span></a></div></article><article class="card step"><div class="k">Cloud Build step</div><div class="v"><a href="files/gcp/build/cloudbuild.yaml.html"><span data-metric="cloudbuild_steps.2.id">build</span></a></div></article><article class="card step"><div class="k">Cloud Build step</div><div class="v"><a href="files/gcp/build/cloudbuild.yaml.html"><span data-metric="cloudbuild_steps.3.id">push</span></a></div></article><article class="card step"><div class="k">Cloud Build step</div><div class="v"><a href="files/gcp/build/cloudbuild.yaml.html"><span data-metric="cloudbuild_steps.4.id">deploy</span></a></div></article></div>
+<h2>IAM 最小权限</h2>
+<p class="note">服务账号绑定来自 checks.json。Rego 正例退出码 <span data-metric="conftest.exit_code">0</span>，失败数 <span data-metric="conftest.failed">0</span>。负向夹具按预期失败的文件数 <span data-metric="rego_negative.failed_as_expected">5</span>。</p>
+<div class="table-scroll"><table>
+<thead><tr><th>用途</th><th>账号</th><th>角色</th><th>资源</th><th>成员</th></tr></thead>
+<tbody>
+<tr><td><span data-metric="iam.0.purpose">deploy</span></td><td class="mono"><span data-metric="iam.0.sa">cloud-build-sa</span></td><td class="mono"><span data-metric="iam.0.role">roles/run.admin</span></td><td class="mono"><span data-metric="iam.0.resource">projects/thistle-analytics-demo/locations/asia-east1/services/insights-api</span></td><td class="mono"><span data-metric="iam.0.member">serviceAccount:cloud-build-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.1.purpose">deploy</span></td><td class="mono"><span data-metric="iam.1.sa">cloud-build-sa</span></td><td class="mono"><span data-metric="iam.1.role">roles/artifactregistry.writer</span></td><td class="mono"><span data-metric="iam.1.resource">projects/thistle-analytics-demo/locations/asia-east1/repositories/apps</span></td><td class="mono"><span data-metric="iam.1.member">serviceAccount:cloud-build-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.2.purpose">deploy</span></td><td class="mono"><span data-metric="iam.2.sa">cloud-build-sa</span></td><td class="mono"><span data-metric="iam.2.role">roles/iam.serviceAccountUser</span></td><td class="mono"><span data-metric="iam.2.resource">projects/thistle-analytics-demo/serviceAccounts/insights-api-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td><td class="mono"><span data-metric="iam.2.member">serviceAccount:cloud-build-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.3.purpose">deploy</span></td><td class="mono"><span data-metric="iam.3.sa">github-deploy-sa</span></td><td class="mono"><span data-metric="iam.3.role">roles/run.admin</span></td><td class="mono"><span data-metric="iam.3.resource">projects/thistle-analytics-demo/locations/asia-east1/services/insights-api</span></td><td class="mono"><span data-metric="iam.3.member">serviceAccount:github-deploy-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.4.purpose">deploy</span></td><td class="mono"><span data-metric="iam.4.sa">github-deploy-sa</span></td><td class="mono"><span data-metric="iam.4.role">roles/artifactregistry.writer</span></td><td class="mono"><span data-metric="iam.4.resource">projects/thistle-analytics-demo/locations/asia-east1/repositories/apps</span></td><td class="mono"><span data-metric="iam.4.member">serviceAccount:github-deploy-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.5.purpose">deploy</span></td><td class="mono"><span data-metric="iam.5.sa">github-deploy-sa</span></td><td class="mono"><span data-metric="iam.5.role">roles/iam.serviceAccountUser</span></td><td class="mono"><span data-metric="iam.5.resource">projects/thistle-analytics-demo/serviceAccounts/insights-api-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td><td class="mono"><span data-metric="iam.5.member">serviceAccount:github-deploy-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.6.purpose">wif</span></td><td class="mono"><span data-metric="iam.6.sa">github-deploy-sa</span></td><td class="mono"><span data-metric="iam.6.role">roles/iam.workloadIdentityUser</span></td><td class="mono"><span data-metric="iam.6.resource">projects/thistle-analytics-demo/serviceAccounts/github-deploy-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td><td class="mono"><span data-metric="iam.6.member">principalSet://iam.googleapis.com/projects/000000000000/locations/global/workloadIdentityPools/github-pool/attribute.repository/example.invalid/thistle-analytics/insights-api</span></td></tr>
+<tr><td><span data-metric="iam.7.purpose">runtime</span></td><td class="mono"><span data-metric="iam.7.sa">insights-api-sa</span></td><td class="mono"><span data-metric="iam.7.role">roles/secretmanager.secretAccessor</span></td><td class="mono"><span data-metric="iam.7.resource">projects/thistle-analytics-demo/secrets/insights-api-signing-key</span></td><td class="mono"><span data-metric="iam.7.member">serviceAccount:insights-api-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.8.purpose">runtime</span></td><td class="mono"><span data-metric="iam.8.sa">insights-api-sa</span></td><td class="mono"><span data-metric="iam.8.role">roles/logging.logWriter</span></td><td class="mono"><span data-metric="iam.8.resource">projects/thistle-analytics-demo</span></td><td class="mono"><span data-metric="iam.8.member">serviceAccount:insights-api-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.9.purpose">runtime</span></td><td class="mono"><span data-metric="iam.9.sa">insights-api-sa</span></td><td class="mono"><span data-metric="iam.9.role">roles/cloudtrace.agent</span></td><td class="mono"><span data-metric="iam.9.resource">projects/thistle-analytics-demo</span></td><td class="mono"><span data-metric="iam.9.member">serviceAccount:insights-api-sa@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+<tr><td><span data-metric="iam.10.purpose">invoker</span></td><td class="mono"><span data-metric="iam.10.sa">internal-caller</span></td><td class="mono"><span data-metric="iam.10.role">roles/run.invoker</span></td><td class="mono"><span data-metric="iam.10.resource">projects/thistle-analytics-demo/locations/asia-east1/services/insights-api</span></td><td class="mono"><span data-metric="iam.10.member">serviceAccount:internal-caller@thistle-analytics-demo.iam.gserviceaccount.com</span></td></tr>
+</tbody>
+</table></div>
+<h2>Monitoring 目录</h2>
+<p class="note">策略数 <span data-metric="monitoring_schema.policies">6</span>。Schema 退出码 <span data-metric="monitoring_schema.exit_code">0</span>。passed 列是 schema 校验结果，不是线上告警状态。</p>
+<div class="table-scroll"><table>
+<thead><tr><th>策略</th><th>严重级别</th><th>条件摘要</th><th>schema</th></tr></thead>
+<tbody>
+<tr><td><span data-metric="monitoring_schema.catalog.0.name">insights-api instance and concurrency anomaly</span></td><td><span data-metric="monitoring_schema.catalog.0.severity">WARNING</span></td><td><span data-metric="monitoring_schema.catalog.0.summary">Billable instance count at the maxScale cap, or concurrent requests above the container concurrency.</span></td><td><span data-metric="monitoring_schema.catalog.0.passed">true</span></td></tr>
+<tr><td><span data-metric="monitoring_schema.catalog.1.name">insights-api application error log spike</span></td><td><span data-metric="monitoring_schema.catalog.1.severity">ERROR</span></td><td><span data-metric="monitoring_schema.catalog.1.summary">Log-based metric insights_api_app_errors increased above 20 lines in 5 minutes.</span></td><td><span data-metric="monitoring_schema.catalog.1.passed">true</span></td></tr>
+<tr><td><span data-metric="monitoring_schema.catalog.2.name">insights-api Cloud Run 5xx ratio</span></td><td><span data-metric="monitoring_schema.catalog.2.severity">CRITICAL</span></td><td><span data-metric="monitoring_schema.catalog.2.summary">Cloud Run 5xx responses above 5 percent of the request rate for 5 minutes.</span></td><td><span data-metric="monitoring_schema.catalog.2.passed">true</span></td></tr>
+<tr><td><span data-metric="monitoring_schema.catalog.3.name">insights-api Cloud Run p95 latency</span></td><td><span data-metric="monitoring_schema.catalog.3.severity">WARNING</span></td><td><span data-metric="monitoring_schema.catalog.3.summary">Request latency p95 above 800 milliseconds for 5 minutes.</span></td><td><span data-metric="monitoring_schema.catalog.3.passed">true</span></td></tr>
+<tr><td><span data-metric="monitoring_schema.catalog.4.name">insights-api uptime check failed</span></td><td><span data-metric="monitoring_schema.catalog.4.severity">CRITICAL</span></td><td><span data-metric="monitoring_schema.catalog.4.summary">Uptime check against insights-api.thistle.example /healthz failed.</span></td><td><span data-metric="monitoring_schema.catalog.4.passed">true</span></td></tr>
+<tr><td><span data-metric="monitoring_schema.catalog.5.name">insights-api WIF or deploy SA auth failure</span></td><td><span data-metric="monitoring_schema.catalog.5.severity">ERROR</span></td><td><span data-metric="monitoring_schema.catalog.5.summary">Log match for Workload Identity Federation or github-deploy-sa authentication failures.</span></td><td><span data-metric="monitoring_schema.catalog.5.passed">true</span></td></tr>
+</tbody>
+</table></div>
+<h2>AWS <span class="badge">次要 secondary</span></h2>
+<p class="note">Lambda、API Gateway HTTP API、CodeBuild 和 CloudWatch 是平行示例。GCP 才是主叙事。<a href="aws/index.html">打开次要页</a>。</p>
+<h2>检查结果</h2>
+<p class="note">工具版本和退出码都来自同一次 make check。时区是 Asia/Shanghai。</p>
+<div class="cards">
+<article class="card"><div class="k">terraform</div><div class="v"><span data-metric="tools.terraform.version">Terraform v1.9.8</span></div></article>
+<article class="card"><div class="k">tflint</div><div class="v"><span data-metric="tools.tflint.version">TFLint version 0.55.1</span></div></article>
+<article class="card"><div class="k">checkov</div><div class="v"><span data-metric="tools.checkov.version">3.2.449</span></div></article>
+<article class="card"><div class="k">conftest</div><div class="v"><span data-metric="tools.conftest.version">Conftest: 0.71.1</span></div></article>
+<article class="card"><div class="k">actionlint</div><div class="v"><span data-metric="tools.actionlint.version">1.7.12</span></div></article>
+<article class="card"><div class="k">shellcheck</div><div class="v"><span data-metric="tools.shellcheck.version">version: 0.11.0</span></div></article>
+<article class="card"><div class="k">yamllint</div><div class="v"><span data-metric="tools.yamllint.version">yamllint 1.35.1</span></div></article>
+<article class="card"><div class="k">pytest</div><div class="v"><span data-metric="tools.pytest.version">pytest 8.3.5</span></div></article>
+<article class="card"><div class="k">ruff</div><div class="v"><span data-metric="tools.ruff.version">ruff 0.11.12</span></div></article>
+<article class="card"><div class="k">schema</div><div class="v"><span data-metric="schema_version">1</span></div></article>
+<article class="card"><div class="k">gcp credentials used</div><div class="v"><span data-metric="gcp_credentials_used">false</span></div></article>
+<article class="card"><div class="k">aws credentials used</div><div class="v"><span data-metric="aws_credentials_used">false</span></div></article>
+<article class="card"><div class="k">yamllint exit</div><div class="v"><span data-metric="yamllint.exit_code">0</span></div></article>
+<article class="card"><div class="k">actionlint exit</div><div class="v"><span data-metric="actionlint.exit_code">0</span></div></article>
+<article class="card"><div class="k">ruff exit</div><div class="v"><span data-metric="ruff.exit_code">0</span></div></article>
+<article class="card"><div class="k">terraform fmt exit</div><div class="v"><span data-metric="terraform_fmt.exit_code">0</span></div></article>
+<article class="card"><div class="k">terraform validate exit</div><div class="v"><span data-metric="terraform_validate.exit_code">0</span></div></article>
+<article class="card"><div class="k">terraform test exit</div><div class="v"><span data-metric="terraform_test.exit_code">0</span></div></article>
+<article class="card"><div class="k">terraform test passed</div><div class="v"><span data-metric="terraform_test.passed">1</span></div></article>
+<article class="card"><div class="k">terraform test failed</div><div class="v"><span data-metric="terraform_test.failed">0</span></div></article>
+<article class="card"><div class="k">tflint exit</div><div class="v"><span data-metric="tflint.exit_code">0</span></div></article>
+<article class="card"><div class="k">checkov exit</div><div class="v"><span data-metric="checkov.exit_code">0</span></div></article>
+<article class="card"><div class="k">checkov high failed</div><div class="v"><span data-metric="checkov.high_failed">0</span></div></article>
+<article class="card"><div class="k">checkov failed</div><div class="v"><span data-metric="checkov.failed">0</span></div></article>
+<article class="card"><div class="k">pytest exit</div><div class="v"><span data-metric="pytest.exit_code">0</span></div></article>
+<article class="card"><div class="k">pytest passed</div><div class="v"><span data-metric="pytest.passed">24</span></div></article>
+<article class="card"><div class="k">pytest failed</div><div class="v"><span data-metric="pytest.failed">0</span></div></article>
+<article class="card"><div class="k">app coverage percent</div><div class="v"><span data-metric="coverage.percent">100.0</span></div></article>
+</div>
+
+<h2>本地页面截图</h2>
+<p class="note">下面两张图是本静态页在构建机上的无头浏览器渲染。不是 GCP Console，也不是 AWS Console。</p>
+<figure>
+<img src="img/desktop.png" alt="Desktop render of this static CloudOps page. Not a cloud console. Not deployed.">
+<figcaption>Desktop render of this static page. Not a cloud console. Not deployed.</figcaption>
+</figure>
+<figure>
+<img src="img/mobile.png" alt="Mobile render of this static CloudOps page. Not a cloud console. Not deployed.">
+<figcaption>Mobile render of this static page. Not a cloud console. Not deployed.</figcaption>
+</figure>
+
+<h2>下载</h2>
+<p><a href="downloads/cloudops-config-0.1.0.tar.gz">cloudops-config-0.1.0.tar.gz</a> 含 gcp/、aws/、policies/、fixtures/。不含工具二进制，不含密钥值。</p>
+<footer>
+<p>Thistle Analytics 是虚构客户。这里没有真实客户、流量、费用或 SLA。配置经过离线校验，构建期没有调用真实 GCP 或 AWS API。未部署到任何云账号。</p>
+</footer>
+
+</main>
+</body>
+</html>

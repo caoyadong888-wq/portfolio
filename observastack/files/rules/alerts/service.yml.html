@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rules/alerts/service.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../alerts.html">告警</a>
+<a href="../../../slo.html">SLO</a>
+<a href="../../../routing.html">路由</a>
+<a href="../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>rules/alerts/service.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">groups</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>service.alerts
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">rules</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>ServiceHighErrorRate
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">service:http_requests:rate5m &gt; 0</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">service:http_requests_errors:rate5m</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">service:http_requests:rate5m</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">) &gt; 0.05</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>10m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>HTTP 5xx ratio is above 5 percent
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>More than 5 percent of HTTP requests for a service have been 5xx over 5 minutes, and the condition has held for 10 minutes.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/ServiceHighErrorRate
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>ServiceLatencyP95High
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">max by (service) (service_route:http_request_duration_seconds:p95_5m)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">&gt; on (service)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">service:http_latency_p95_threshold_seconds:constant</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>10m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>HTTP p95 latency is above the service threshold
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>The worst route p95 for a service is above the constant recorded in service:http_latency_p95_threshold_seconds:constant.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/ServiceLatencyP95High
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>PaymentsQueueBacklog
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">service:payments_queue_oldest_age_seconds:max &gt; 300</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">max by (service) (deriv(payments_queue_depth[10m])) &gt; 0</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>payments
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Payments queue oldest message is over 5 minutes and depth is rising
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>The oldest payments message is older than 300 seconds and payments_queue_depth is increasing. Consumers are not keeping up.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/PaymentsQueueBacklog
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

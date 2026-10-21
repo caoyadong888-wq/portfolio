@@ -1,0 +1,324 @@
+{
+  "name": "Uptime watcher",
+  "nodes": [
+    {
+      "id": "00000000-0000-4000-8000-000000002001",
+      "name": "How Uptime Watcher Works",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        40
+      ],
+      "parameters": {
+        "content": "## Uptime watcher\nThe schedule fires every 10 minutes.\nList Watched URLs emits one item per URL. The default list is https://example.com/ and https://example.org/.\nFetch Watched URL performs the HTTP check and keeps non-2xx responses as data.\nUpdate Check State stores consecutiveFailures and status in workflow static data.\nSend Down Alert and Send Recovery Notice use the Send Email node. Attach an SMTP credential in the n8n UI.\nSet WORKFLOWKIT_FROM and WORKFLOWKIT_TO in the n8n environment before activating.",
+        "height": 280,
+        "width": 560,
+        "color": 5
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000002002",
+      "name": "Alert Rule",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        860,
+        40
+      ],
+      "parameters": {
+        "content": "## Two failures, then one alert\nFailure 1: status degraded, no alert.\nFailure 2: status down, send one down alert.\nFurther failures stay down and do not send another alert.\nThe next success after status down sends a recovery email and sets status up.",
+        "height": 240,
+        "width": 420,
+        "color": 3
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000002003",
+      "name": "Every Ten Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        400
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000002004",
+      "name": "List Watched URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function watchedUrls(override) {\n  const text = String(override || '').trim();\n  if (text) {\n    return text.split(',').map(function (part) { return part.trim(); }).filter(Boolean);\n  }\n  return ['https://example.com/', 'https://example.org/'];\n}\n\nif (typeof $input === 'undefined') {\n  return { watchedUrls: watchedUrls };\n}\n\nconst urls = watchedUrls('');\nreturn urls.map(function (url) { return { json: { url: url } }; });\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000002005",
+      "name": "Fetch Watched URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        820,
+        400
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 15000
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000002006",
+      "name": "Update Check State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function nextCheckState(previous, ok) {\n  const prev = previous && typeof previous === 'object' ? previous : {};\n  const prevFailures = Number(prev.consecutiveFailures || 0);\n  const prevStatus = prev.status || 'unknown';\n  if (ok) {\n    const recovered = prevStatus === 'down';\n    return {\n      consecutiveFailures: 0,\n      status: 'up',\n      notify: recovered,\n      kind: recovered ? 'recovery' : 'none',\n    };\n  }\n  const consecutiveFailures = prevFailures + 1;\n  const alert = consecutiveFailures === 2;\n  return {\n    consecutiveFailures: consecutiveFailures,\n    status: consecutiveFailures >= 2 ? 'down' : 'degraded',\n    notify: alert,\n    kind: alert ? 'down' : 'none',\n  };\n}\n\nfunction isHttpOk(json) {\n  const value = json && json.statusCode;\n  const code = typeof value === 'number' ? value : Number(value || 0);\n  return code >= 200 && code < 400;\n}\n\nfunction pairedIndex(item, fallback) {\n  const paired = item && item.pairedItem;\n  if (paired && typeof paired.item === 'number') return paired.item;\n  if (Array.isArray(paired) && paired[0] && typeof paired[0].item === 'number') return paired[0].item;\n  return fallback;\n}\n\nif (typeof $input === 'undefined') {\n  return { nextCheckState: nextCheckState, isHttpOk: isHttpOk };\n}\n\nconst responses = $input.all();\nconst sources = $('List Watched URLs').all();\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.checks || typeof staticData.checks !== 'object') staticData.checks = {};\nconst out = [];\nfor (let i = 0; i < responses.length; i++) {\n  const response = responses[i];\n  const idx = pairedIndex(response, i);\n  const source = sources[idx] && sources[idx].json ? sources[idx].json : {};\n  const url = source.url || '';\n  const ok = isHttpOk(response.json || {});\n  const next = nextCheckState(staticData.checks[url], ok);\n  staticData.checks[url] = {\n    consecutiveFailures: next.consecutiveFailures,\n    status: next.status,\n  };\n  out.push({\n    json: {\n      url: url,\n      httpStatus: (response.json && response.json.statusCode) || 0,\n      consecutiveFailures: next.consecutiveFailures,\n      status: next.status,\n      notify: next.notify ? 'yes' : 'no',\n      kind: next.kind,\n      subject: 'Uptime ' + next.kind + ' ' + url,\n      text: 'URL ' + url + ' is ' + next.status + ' after ' + next.consecutiveFailures + ' consecutive failures.',\n    },\n  });\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000002008",
+      "name": "Should Notify",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1420,
+        400
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000002007",
+              "leftValue": "={{ $json.notify }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000002009",
+      "name": "Record Quiet Check",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        640
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000200b",
+      "name": "Notice Is Recovery",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1720,
+        400
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-00000000200a",
+              "leftValue": "={{ $json.kind }}",
+              "rightValue": "recovery",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000200c",
+      "name": "Send Recovery Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2020,
+        280
+      ],
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "fromEmail": "={{ $env.WORKFLOWKIT_FROM }}",
+        "toEmail": "={{ $env.WORKFLOWKIT_TO }}",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000200d",
+      "name": "Send Down Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2020,
+        520
+      ],
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "fromEmail": "={{ $env.WORKFLOWKIT_FROM }}",
+        "toEmail": "={{ $env.WORKFLOWKIT_TO }}",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every Ten Minutes": {
+      "main": [
+        [
+          {
+            "node": "List Watched URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Watched URLs": {
+      "main": [
+        [
+          {
+            "node": "Fetch Watched URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Watched URL": {
+      "main": [
+        [
+          {
+            "node": "Update Check State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Check State": {
+      "main": [
+        [
+          {
+            "node": "Should Notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Notify": {
+      "main": [
+        [
+          {
+            "node": "Notice Is Recovery",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Record Quiet Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notice Is Recovery": {
+      "main": [
+        [
+          {
+            "node": "Send Recovery Notice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Down Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

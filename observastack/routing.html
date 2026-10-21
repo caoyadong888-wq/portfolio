@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ObservaStack 路由</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="index.html">概览</a>
+<a href="alerts.html">告警</a>
+<a href="slo.html">SLO</a>
+<a href="routing.html">路由</a>
+<a href="files/index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<h1>路由</h1>
+<p class="note">amtool config routes test 不计算 active_time_intervals。warning 且 team=platform 在工具里会落到 slack-platform，即使不在 Asia/Shanghai 的工作时间。这是工具的行为，页面没有改时间。</p>
+<h2>amtool config routes show</h2>
+<pre data-metric="amtool_routes.show">Routing tree:
+.
+└── default-route  receiver: default
+    ├── {alertname="Watchdog"}  receiver: deadman-webhook
+    ├── {severity="critical"}  continue: true  receiver: pagerduty-oncall
+    ├── {severity="critical"}  continue: true  receiver: slack-incidents
+    ├── {team="payments"}  receiver: slack-payments
+    ├── {team="orders"}  receiver: email-oncall
+    ├── {severity="warning"}  receiver: slack-platform
+    └── {severity="info"}  receiver: null</pre>
+<h2>断言</h2>
+<table>
+<thead><tr><th>用例</th><th>期望 receivers</th><th>实际</th><th>结果</th></tr></thead>
+<tbody>
+<tr><td><span data-metric="amtool_routes.cases.0.name">critical_platform_instance_down</span></td><td><code><span data-metric="amtool_routes.cases.0.expected">pagerduty-oncall,slack-incidents</span></code></td><td><code><span data-metric="amtool_routes.cases.0.actual">pagerduty-oncall,slack-incidents</span></code></td><td><span data-metric="amtool_routes.cases.0.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.1.name">critical_orders_fast_burn</span></td><td><code><span data-metric="amtool_routes.cases.1.expected">pagerduty-oncall,slack-incidents,email-oncall</span></code></td><td><code><span data-metric="amtool_routes.cases.1.actual">pagerduty-oncall,slack-incidents,email-oncall</span></code></td><td><span data-metric="amtool_routes.cases.1.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.2.name">critical_payments</span></td><td><code><span data-metric="amtool_routes.cases.2.expected">pagerduty-oncall,slack-incidents,slack-payments</span></code></td><td><code><span data-metric="amtool_routes.cases.2.actual">pagerduty-oncall,slack-incidents,slack-payments</span></code></td><td><span data-metric="amtool_routes.cases.2.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.3.name">warning_orders_slow_burn</span></td><td><code><span data-metric="amtool_routes.cases.3.expected">email-oncall</span></code></td><td><code><span data-metric="amtool_routes.cases.3.actual">email-oncall</span></code></td><td><span data-metric="amtool_routes.cases.3.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.4.name">warning_payments_queue</span></td><td><code><span data-metric="amtool_routes.cases.4.expected">slack-payments</span></code></td><td><code><span data-metric="amtool_routes.cases.4.actual">slack-payments</span></code></td><td><span data-metric="amtool_routes.cases.4.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.5.name">warning_platform_memory</span></td><td><code><span data-metric="amtool_routes.cases.5.expected">slack-platform</span></code></td><td><code><span data-metric="amtool_routes.cases.5.actual">slack-platform</span></code></td><td><span data-metric="amtool_routes.cases.5.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.6.name">info_discarded</span></td><td><code><span data-metric="amtool_routes.cases.6.expected">null</span></code></td><td><code><span data-metric="amtool_routes.cases.6.actual">null</span></code></td><td><span data-metric="amtool_routes.cases.6.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.7.name">watchdog_deadman</span></td><td><code><span data-metric="amtool_routes.cases.7.expected">deadman-webhook</span></code></td><td><code><span data-metric="amtool_routes.cases.7.actual">deadman-webhook</span></code></td><td><span data-metric="amtool_routes.cases.7.result">passed</span></td></tr>
+<tr><td><span data-metric="amtool_routes.cases.8.name">unclassified_default</span></td><td><code><span data-metric="amtool_routes.cases.8.expected">default</span></code></td><td><code><span data-metric="amtool_routes.cases.8.actual">default</span></code></td><td><span data-metric="amtool_routes.cases.8.result">passed</span></td></tr>
+</tbody>
+</table>
+<h2>inhibit</h2>
+<ul>
+<li>InstanceDown 抑制同一 instance 上的其他告警。</li>
+<li>critical 抑制同一 alertname 和 service 的 warning。</li>
+<li>OrdersApiErrorBudgetBurnFast 抑制 service=orders-api 的 ServiceHighErrorRate。</li>
+</ul>
+<p>每条 inhibit 都设置了 equal。工作时间是周一到周五 09:00–18:00 Asia/Shanghai。维护窗口是周日 02:00–04:00 Asia/Shanghai。</p>
+<h2>模板渲染</h2>
+<p class="note">下面是 amtool template render 用一份样例 JSON 渲染的文本。样例不是发出去的通知，也不是一次事故。</p>
+<h3>Slack</h3>
+<pre data-metric="template_render.slack">[FIRING:1] OrdersApiErrorBudgetBurnFast
+*OrdersApiErrorBudgetBurnFast* severity=critical
+Orders API availability error budget is burning fast
+Sample payload for template rendering. Not a sent notification and not an incident.
+Runbook: https://runbooks.larkspur.example/OrdersApiErrorBudgetBurnFast
+Alerts: 1</pre>
+<h3>Email 主题</h3>
+<pre data-metric="template_render.email">[FIRING:1] OrdersApiErrorBudgetBurnFast runbook https://runbooks.larkspur.example/OrdersApiErrorBudgetBurnFast</pre>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

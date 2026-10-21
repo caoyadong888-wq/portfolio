@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aws/.github/workflows/aws-deploy.yml.fragment</title>
+<link rel="stylesheet" href="../../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../../index.html">概览</a>
+<a href="../../../../aws/index.html">AWS 次要</a>
+<a href="../../../index.html">文件</a>
+<a href="../../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>aws/.github/workflows/aws-deploy.yml.fragment</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code># SECONDARY — AWS parallel; GCP is the primary narrative of this demo.
+# Fragment only. Not a workflow in .github/workflows, so the validate workflow does not deploy it.
+name: aws-deploy-secondary
+on:
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::000000000000:role/insights-api-deploy
+          aws-region: us-east-1
+          role-session-name: cloudops-secondary
+      - name: document the update
+        run: echo &quot;SECONDARY update-function would run here. make check does not call AWS.&quot;
+</code></pre></div>
+
+</main>
+</body>
+</html>

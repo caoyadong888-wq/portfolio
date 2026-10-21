@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rules/alerts/meta.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../alerts.html">告警</a>
+<a href="../../../slo.html">SLO</a>
+<a href="../../../routing.html">路由</a>
+<a href="../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>rules/alerts/meta.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">groups</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>meta.alerts
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">rules</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>PrometheusRuleEvaluationFailures
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>increase(prometheus_rule_evaluation_failures_total[5m]) &gt; 0
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>10m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Prometheus is failing to evaluate rules
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>prometheus_rule_evaluation_failures_total has been increasing over every 5 minute window for 10 minutes.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/PrometheusRuleEvaluationFailures
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>AlertmanagerNotificationsFailing
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service) (rate(alertmanager_notifications_failed_total[5m]))</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service) (rate(alertmanager_notifications_total[5m]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">) &gt; 0.10</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service) (rate(alertmanager_notifications_total[5m])) &gt; 0</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>15m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Alertmanager is failing more than 10 percent of notifications
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>The 5 minute failure ratio of alertmanager notifications has stayed above 0.10 for 15 minutes.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/AlertmanagerNotificationsFailing
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># Dead-man&#39;s switch. It is firing whenever Prometheus can evaluate rules.</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># A for duration would hide a stalled pipeline. alerts/comparison flags</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># the intentional always-firing expression.</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># pint disable alerts/for</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># pint disable alerts/comparison</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>Watchdog
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>vector(1)
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>info
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Watchdog is firing
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>This alert is always firing. The deadman receiver must see it. If it stops arriving, the alert pipeline is down.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/Watchdog
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PipeForge</title>
+  <link rel="icon" href="img/favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <main id="content" class="wrap">
+
+    <header class="hero">
+      <p class="eyebrow">CI/CD · GitHub Actions · Stage B</p>
+      <h1>PipeForge</h1>
+      <p class="lead">公开仓库已建立，流水线在 GitHub Actions 上真实运行；公司是虚构的；不部署到任何服务器。页面上的 run 链接来自 GitHub API 的构建时记录，徽章是唯一的外部图片。</p>
+      <p class="banner">Recorded state: <span data-metric="runs:display_name">caoyadong888-wq / pipeforge-demo</span>. Marker <span data-metric="runs:marker">STAGE-B-LIVE</span>. Recorded from the live GitHub Actions API for the public demo repository.</p>
+      <nav class="nav">
+        <a href="#badges">Badges</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#runs">Runs</a>
+        <a href="#stages">Stages</a>
+        <a href="#workflows">Workflows</a>
+        <a href="#release">Release</a>
+        <a href="#checks">Offline checks</a>
+        <a href="../index.html">Portfolio</a>
+      </nav>
+    </header>
+
+    <section class="section" id="badges">
+      <h2>Badges</h2>
+      <p class="muted">The live image URLs use <code>caoyadong888-wq/pipeforge-demo</code>. They are the only external images on this page. The recorded copies below are build-time fallbacks.</p>
+      <div class="badge-grid">
+        <article class="panel">
+          <h3>ci.yml</h3>
+          <p>构建时记录：<span data-metric="runs:status">live</span>，<time datetime="2026-10-07T08:29:50+08:00"><span data-metric="runs:recorded_at">2026-10-07T08:29:50+08:00</span></time>（Asia/Shanghai）</p>
+          <div class="badge-row">
+            <img src="img/badge-ci-recorded.svg" alt="Recorded CI badge fallback captured at build time" referrerpolicy="no-referrer" width="480" height="44">
+            <a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/workflows/ci.yml">
+              <img class="badge-live" src="https://github.com/caoyadong888-wq/pipeforge-demo/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status (live from GitHub)" referrerpolicy="no-referrer" data-fallback="img/badge-ci-recorded.svg" data-note="ci-badge-note">
+            </a>
+          </div>
+          <p id="ci-badge-note" class="note" hidden>GitHub 徽章不可达，显示的是构建时记录</p>
+        </article>
+        <article class="panel">
+          <h3>release.yml</h3>
+          <p>构建时记录：<span data-metric="runs:status">live</span>，<time datetime="2026-10-07T08:29:50+08:00"><span data-metric="runs:recorded_at">2026-10-07T08:29:50+08:00</span></time>（Asia/Shanghai）</p>
+          <div class="badge-row">
+            <img src="img/badge-release-recorded.svg" alt="Recorded release badge fallback captured at build time" referrerpolicy="no-referrer" width="480" height="44">
+            <a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/workflows/release.yml">
+              <img class="badge-live" src="https://github.com/caoyadong888-wq/pipeforge-demo/actions/workflows/release.yml/badge.svg?branch=main" alt="Release status (live from GitHub)" referrerpolicy="no-referrer" data-fallback="img/badge-release-recorded.svg" data-note="release-badge-note">
+            </a>
+          </div>
+          <p id="release-badge-note" class="note" hidden>GitHub 徽章不可达，显示的是构建时记录</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="pipeline">
+      <h2>Pipeline</h2>
+      <p class="muted">lint and the four test cells run first. build needs both. sbom and scan run in parallel after build. summary runs after all of them. publish runs only from release.yml after that same ci workflow succeeds.</p>
+      <img src="pipeline.svg" alt="Diagram of lint, test 3.10 through 3.13, build, parallel sbom and scan, summary, and release publish" referrerpolicy="no-referrer" width="760" height="720">
+      <p class="muted">The same drawing is <a href="pipeline.svg">pipeline.svg</a>.</p>
+    </section>
+
+    <section class="section" id="runs">
+      <h2>Recent runs</h2>
+      <p>Recorded runs: <span data-metric="runs:run_count">28</span>. Status <span data-metric="runs:status">live</span>.</p>
+      <div class="table-wrap"><table>
+        <caption>From results/runs.json. Live run ids from the public repository.</caption>
+        <thead><tr><th>Workflow</th><th>Event</th><th>Branch</th><th>Commit</th><th>Conclusion</th><th>Duration</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551982137">ci.yml</a></td><td>push</td><td>main</td><td><code>2263a41</code></td><td>success</td><td>164s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551982072">codeql.yml</a></td><td>push</td><td>main</td><td><code>2263a41</code></td><td>success</td><td>100s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551951433">make-ghcr-public.yml</a></td><td>workflow_dispatch</td><td>main</td><td><code>0386901</code></td><td>failure</td><td>8s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551947294">codeql.yml</a></td><td>push</td><td>main</td><td><code>0386901</code></td><td>success</td><td>70s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551947149">ci.yml</a></td><td>push</td><td>main</td><td><code>0386901</code></td><td>cancelled</td><td>26s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551879968">make-ghcr-public.yml</a></td><td>workflow_dispatch</td><td>main</td><td><code>da796d5</code></td><td>failure</td><td>23s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551875247">codeql.yml</a></td><td>push</td><td>main</td><td><code>da796d5</code></td><td>success</td><td>57s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551875143">ci.yml</a></td><td>push</td><td>main</td><td><code>da796d5</code></td><td>success</td><td>124s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551394825">release.yml</a></td><td>push</td><td>v0.1.0</td><td><code>f653c0b</code></td><td>success</td><td>228s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551391341">ci.yml</a></td><td>push</td><td>main</td><td><code>f653c0b</code></td><td>success</td><td>134s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551391297">codeql.yml</a></td><td>push</td><td>main</td><td><code>f653c0b</code></td><td>success</td><td>66s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551303310">release.yml</a></td><td>push</td><td>v0.1.0</td><td><code>568d7b3</code></td><td>failure</td><td>2s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551297827">codeql.yml</a></td><td>push</td><td>main</td><td><code>568d7b3</code></td><td>success</td><td>59s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551297797">ci.yml</a></td><td>push</td><td>main</td><td><code>568d7b3</code></td><td>success</td><td>151s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551142319">codeql.yml</a></td><td>pull_request</td><td>dependabot/pip/uvicorn-gte-0.30-and-lt-0.55</td><td><code>84d667f</code></td><td>success</td><td>58s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37551142317">ci.yml</a></td><td>pull_request</td><td>dependabot/pip/uvicorn-gte-0.30-and-lt-0.55</td><td><code>84d667f</code></td><td>success</td><td>168s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550952032">ci.yml</a></td><td>pull_request</td><td>demo/intentional-scan-block</td><td><code>33603f7</code></td><td>failure (intentional)</td><td>220s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550952025">codeql.yml</a></td><td>pull_request</td><td>demo/intentional-scan-block</td><td><code>33603f7</code></td><td>success</td><td>88s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550947381">codeql.yml</a></td><td>pull_request</td><td>demo/intentional-scan-block</td><td><code>b81a239</code></td><td>cancelled</td><td>4s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550947349">ci.yml</a></td><td>pull_request</td><td>demo/intentional-scan-block</td><td><code>b81a239</code></td><td>cancelled</td><td>50s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550942038">ci.yml</a></td><td>pull_request</td><td>demo/add-express-service-level</td><td><code>c505198</code></td><td>success</td><td>191s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550942009">codeql.yml</a></td><td>pull_request</td><td>demo/add-express-service-level</td><td><code>c505198</code></td><td>success</td><td>65s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550930377">ci.yml</a></td><td>push</td><td>main</td><td><code>b65fc71</code></td><td>success</td><td>204s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550930321">codeql.yml</a></td><td>push</td><td>main</td><td><code>b65fc71</code></td><td>success</td><td>58s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550498656">codeql.yml</a></td><td>pull_request</td><td>dependabot/pip/uvicorn-gte-0.30-and-lt-0.55</td><td><code>1f9a155</code></td><td>success</td><td>140s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550498596">ci.yml</a></td><td>pull_request</td><td>dependabot/pip/uvicorn-gte-0.30-and-lt-0.55</td><td><code>1f9a155</code></td><td>failure</td><td>274s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550483446">ci.yml</a></td><td>pull_request</td><td>dependabot/pip/fastapi-gte-0.115-and-lt-0.143</td><td><code>b63b99e</code></td><td>failure</td><td>270s</td></tr>
+<tr><td><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550483440">codeql.yml</a></td><td>pull_request</td><td>dependabot/pip/fastapi-gte-0.115-and-lt-0.143</td><td><code>b63b99e</code></td><td>success</td><td>142s</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted">Run graph fallback (open a linked run above for the live Actions page):</p>
+      <img src="img/run-graph.png" alt="Local fallback graphic for the Actions run graph" referrerpolicy="no-referrer" width="960" height="420">
+      <p class="banner">Intentionally scan-blocked pull request(s) (not merged):</p><ul><li><a href="https://github.com/caoyadong888-wq/pipeforge-demo/actions/runs/37550952032">DEMO ONLY: intentional Trivy scan block</a> — Deliberately blocked by Trivy: installs Django==3.2.0 with fixed CRITICAL/HIGH CVEs.</li></ul>
+    </section>
+
+    <section class="section" id="stages">
+      <h2>Stages</h2>
+      <div class="cards">
+        <article class="panel" id="job-lint">
+        <h3>lint</h3>
+        <p>Runs ruff, mypy, and a sha256-checked actionlint binary with shellcheck beside it.</p>
+        <p class="muted">Pinned tools and a shell-checked run script catch workflow mistakes before the test matrix spends minutes.</p>
+        <p><a href="workflows/ci.html#line-40">ci.yml line 40</a></p>
+      </article><article class="panel" id="job-test">
+        <h3>test</h3>
+        <p>Pytest on Python 3.10, 3.11, 3.12, and 3.13. Coverage must stay at or above 90 percent. fail-fast is off.</p>
+        <p class="muted">One Python version can hide a syntax or typing gap. The matrix is the whole supported range, and one red cell does not cancel the others.</p>
+        <p><a href="workflows/ci.html#line-77">ci.yml line 77</a></p>
+      </article><article class="panel" id="job-build">
+        <h3>build</h3>
+        <p>Builds the wheel and sdist, then builds the image with push false and load true, and saves image.tar.</p>
+        <p class="muted">CI proves the image builds. It does not publish it. Publish happens only on a version tag, from the archive the scanner already saw.</p>
+        <p><a href="workflows/ci.html#line-143">ci.yml line 143</a></p>
+      </article><article class="panel" id="job-sbom">
+        <h3>sbom</h3>
+        <p>Syft writes SPDX JSON and CycloneDX JSON for the image, and SPDX JSON for the source tree.</p>
+        <p class="muted">Two image formats cover consumers that accept only one of them. The source SBOM is a separate file.</p>
+        <p><a href="workflows/ci.html#line-213">ci.yml line 213</a></p>
+      </article><article class="panel" id="job-scan">
+        <h3>scan</h3>
+        <p>Trivy scans the image archive at CRITICAL and HIGH, ignores unfixed issues, and fails the job when exit-code is 1. SARIF is uploaded for code scanning.</p>
+        <p class="muted">A scanner that always exits 0 does not gate a release. The failing exit code is the gate.</p>
+        <p><a href="workflows/ci.html#line-280">ci.yml line 280</a></p>
+      </article><article class="panel" id="job-summary">
+        <h3>summary</h3>
+        <p>Writes each job result, the local image id, and the CycloneDX component count into the run summary.</p>
+        <p class="muted">Those values are passed in through environment variables. The run script does not interpolate event fields.</p>
+        <p><a href="workflows/ci.html#line-302">ci.yml line 302</a></p>
+      </article><article class="panel" id="job-publish">
+        <h3>publish</h3>
+        <p>On a v*.*.* tag, pushes the scanned image to GHCR as the version and a short sha, attests the image, wheel, and sdist, and attaches those files plus SHA256SUMS to a GitHub Release.</p>
+        <p class="muted">There is no floating latest tag and no server rollout. The token is GITHUB_TOKEN.</p>
+        <p><a href="workflows/release.html#line-68">release.yml line 68</a></p>
+      </article><article class="panel" id="job-permissions">
+        <h3>permissions</h3>
+        <p>The workflow token starts at contents: read. Only the scan job, CodeQL, and publish raise it, and only for the scope that job uses.</p>
+        <p class="muted">A pull request run does not receive a write token for packages or releases. Checkout sets persist-credentials to false.</p>
+        <p><a href="workflows/ci.html#line-12">ci.yml line 12</a></p>
+      </article>
+      </div>
+    </section>
+
+    <section class="section" id="workflows">
+      <h2>Workflow YAML</h2>
+      <p class="muted">Highlighted from snapshot <code>2263a414fe628107f433d708f83dd82cc29e55a6</code>. Blob links point at the public repository.</p>
+      <ul>
+        <li><a href="workflows/ci.html">ci.yml</a> · <a href="https://github.com/caoyadong888-wq/pipeforge-demo/blob/2263a414fe628107f433d708f83dd82cc29e55a6/.github/workflows/ci.yml">blob</a></li>
+        <li><a href="workflows/release.html">release.yml</a> · <a href="https://github.com/caoyadong888-wq/pipeforge-demo/blob/2263a414fe628107f433d708f83dd82cc29e55a6/.github/workflows/release.yml">blob</a></li>
+        <li><a href="workflows/codeql.html">codeql.yml</a> · <a href="https://github.com/caoyadong888-wq/pipeforge-demo/blob/2263a414fe628107f433d708f83dd82cc29e55a6/.github/workflows/codeql.yml">blob</a></li>
+      </ul>
+    </section>
+
+    <section class="section" id="release">
+      <h2>Release artifacts</h2>
+      <p>Recorded releases: <span data-metric="releases:release_count">1</span>. State <span data-metric="releases:status">live</span>. Recorded from the live GitHub Releases / Packages API for the public demo repository.</p>
+      <ul>
+        <li>GHCR package: <a href="https://github.com/caoyadong888-wq/pipeforge-demo/pkgs/container/pipeforge-demo">https://github.com/caoyadong888-wq/pipeforge-demo/pkgs/container/pipeforge-demo</a>. Decision: visibility <span data-metric="releases:package_visibility_decision">public</span>, current state public.</li>
+        <li>GitHub Release: <a href="https://github.com/caoyadong888-wq/pipeforge-demo/releases">https://github.com/caoyadong888-wq/pipeforge-demo/releases</a></li>
+        <li>Attestations: linked from the GitHub Release / package after the tag publish job.</li>
+        <li>Repository root: <a href="https://github.com/caoyadong888-wq/pipeforge-demo">caoyadong888-wq/pipeforge-demo</a></li>
+      </ul>
+      <h3>Locked decisions</h3>
+      <ul>
+        <li>Owner: caoyadong888-wq/pipeforge-demo (existing account; isolated via a separate public repo).</li>
+        <li>The public README does not link back to the portfolio host.</li>
+        <li>The GHCR package visibility decision is public. Current state: public.</li>
+        <li>Demo PRs: one normal PR and one deliberately scan-blocked PR. Decision id <span data-metric="releases:demo_pr_decision">one-demo-pr-and-one-scan-blocked-pr</span>.</li>
+        <li>Branch protection on main requires CI. Decision id <span data-metric="releases:ruleset_decision">main-requires-ci</span>. State applied.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="checks">
+      <h2>Offline checks</h2>
+      <p>构建时记录. Recorded at <span data-metric="checks:recorded_at">2026-10-07T08:30:30+08:00</span>. Stage <span data-metric="checks:stage">B</span>. Owner status <span data-metric="checks:owner_status">set</span>. Image build <span data-metric="checks:docker_image_build">not-run-locally</span>. The box has no Docker, so this checkout does not claim an image was built here.</p>
+      <div class="cards">
+        <section class="panel">
+          <h3>actionlint <span data-metric="checks:tools.actionlint.version">1.7.12</span></h3>
+          <p>Errors <span data-metric="checks:tools.actionlint.errors">0</span>. Result <span data-metric="checks:tools.actionlint.result">pass</span>. shellcheck <span data-metric="checks:tools.shellcheck.version">0.11.0</span> is on PATH for the <code>run:</code> scripts.</p>
+        </section>
+        <section class="panel">
+          <h3>zizmor <span data-metric="checks:tools.zizmor.version">1.30.1</span></h3>
+          <p>High <span data-metric="checks:tools.zizmor.high">0</span>. Medium <span data-metric="checks:tools.zizmor.medium">0</span>. Informational <span data-metric="checks:tools.zizmor.informational">1</span>. Result <span data-metric="checks:tools.zizmor.result">pass</span>.</p>
+          <ul><li><span data-metric="checks:zizmor_findings.0.severity">informational</span> <code><span data-metric="checks:zizmor_findings.0.ident">superfluous-actions</span></code> /workspace/pipeforge-demo/.github/workflows/release.yml</li></ul>
+        </section>
+        <section class="panel">
+          <h3>ruff <span data-metric="checks:tools.ruff.version">ruff 0.16.10</span></h3>
+          <p>Errors <span data-metric="checks:tools.ruff.errors">0</span>. Result <span data-metric="checks:tools.ruff.result">pass</span>.</p>
+        </section>
+        <section class="panel">
+          <h3>mypy <span data-metric="checks:tools.mypy.version">mypy 2.4.0 (compiled: yes)</span></h3>
+          <p>Errors <span data-metric="checks:tools.mypy.errors">0</span>. Result <span data-metric="checks:tools.mypy.result">pass</span>.</p>
+        </section>
+        <section class="panel">
+          <h3>pytest <span data-metric="checks:tools.pytest.version">pytest 9.1.1</span></h3>
+          <p>Passed <span data-metric="checks:tools.pytest.passed">35</span>. Failed <span data-metric="checks:tools.pytest.failed">0</span>. Coverage <span data-metric="checks:tools.pytest.coverage_percent">98.7</span> percent. Result <span data-metric="checks:tools.pytest.result">pass</span>.</p>
+        </section>
+        <section class="panel">
+          <h3>Workflow policy</h3>
+          <p>Passed <span data-metric="checks:tools.workflow_policy.passed">15</span>. Failed <span data-metric="checks:tools.workflow_policy.failed">0</span>. Result <span data-metric="checks:tools.workflow_policy.result">pass</span>.</p>
+          <ul><li><span data-metric="checks:policy_tests.0.outcome">passed</span> <code><span data-metric="checks:policy_tests.0.name">test_checkout_drops_credentials</span></code></li>
+<li><span data-metric="checks:policy_tests.1.outcome">passed</span> <code><span data-metric="checks:policy_tests.1.name">test_dependabot_covers_actions_pip_and_docker_weekly</span></code></li>
+<li><span data-metric="checks:policy_tests.2.outcome">passed</span> <code><span data-metric="checks:policy_tests.2.name">test_jobs_have_timeouts</span></code></li>
+<li><span data-metric="checks:policy_tests.3.outcome">passed</span> <code><span data-metric="checks:policy_tests.3.name">test_no_pull_request_target</span></code></li>
+<li><span data-metric="checks:policy_tests.4.outcome">passed</span> <code><span data-metric="checks:policy_tests.4.name">test_only_github_token_secret_is_referenced</span></code></li>
+<li><span data-metric="checks:policy_tests.5.outcome">passed</span> <code><span data-metric="checks:policy_tests.5.name">test_public_readme_does_not_link_to_the_portfolio_host</span></code></li>
+<li><span data-metric="checks:policy_tests.6.outcome">passed</span> <code><span data-metric="checks:policy_tests.6.name">test_python_matrix_is_exactly_3_10_through_3_13</span></code></li>
+<li><span data-metric="checks:policy_tests.7.outcome">passed</span> <code><span data-metric="checks:policy_tests.7.name">test_release_does_not_push_latest</span></code></li>
+<li><span data-metric="checks:policy_tests.8.outcome">passed</span> <code><span data-metric="checks:policy_tests.8.name">test_run_scripts_do_not_interpolate_event_context</span></code></li>
+<li><span data-metric="checks:policy_tests.9.outcome">passed</span> <code><span data-metric="checks:policy_tests.9.name">test_scan_fails_on_critical_and_high</span></code></li>
+<li><span data-metric="checks:policy_tests.10.outcome">passed</span> <code><span data-metric="checks:policy_tests.10.name">test_snapshot_manifest_tracks_main</span></code></li>
+<li><span data-metric="checks:policy_tests.11.outcome">passed</span> <code><span data-metric="checks:policy_tests.11.name">test_top_level_permissions_are_contents_read</span></code></li>
+<li><span data-metric="checks:policy_tests.12.outcome">passed</span> <code><span data-metric="checks:policy_tests.12.name">test_uses_are_full_shas</span></code></li>
+<li><span data-metric="checks:policy_tests.13.outcome">passed</span> <code><span data-metric="checks:policy_tests.13.name">test_workflows_have_no_deploy_channel</span></code></li>
+<li><span data-metric="checks:policy_tests.14.outcome">passed</span> <code><span data-metric="checks:policy_tests.14.name">test_write_permissions_stay_on_the_whitelist</span></code></li></ul>
+        </section>
+      </div>
+    </section>
+    <script src="app.js"></script>
+
+  </main>
+  <footer class="wrap">
+    <p>Kestrel Parcel Co. is fictional. The badge image is the only external image this page requests. Stage A has no real GitHub Actions run. The repository README does not link back to a portfolio host.</p>
+  </footer>
+</body>
+</html>

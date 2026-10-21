@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>demo-app/Dockerfile</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>demo-app/Dockerfile</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">FROM</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">python:3.12-alpine@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4</span>
+<span style="color: #008000; font-weight: bold">WORKDIR</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">/app</span>
+<span style="color: #008000; font-weight: bold">COPY</span><span style="color: #bbbbbb"> </span>metrics/catalog.yml<span style="color: #bbbbbb"> </span>/catalog/catalog.yml
+<span style="color: #008000; font-weight: bold">COPY</span><span style="color: #bbbbbb"> </span>demo-app/app.py<span style="color: #bbbbbb"> </span>/app/app.py
+<span style="color: #008000; font-weight: bold">ENV</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">CATALOG_PATH</span><span style="color: #666666">=</span>/catalog/catalog.yml
+<span style="color: #008000; font-weight: bold">ENV</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">PORT</span><span style="color: #666666">=8080</span>
+<span style="color: #008000; font-weight: bold">EXPOSE</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">8080</span>
+<span style="color: #008000; font-weight: bold">USER</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">nobody</span>
+<span style="color: #008000; font-weight: bold">CMD</span><span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;python&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;/app/app.py&quot;</span>]
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

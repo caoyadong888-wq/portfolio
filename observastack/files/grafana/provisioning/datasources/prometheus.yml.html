@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>grafana/provisioning/datasources/prometheus.yml</title>
+<link rel="stylesheet" href="../../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../../index.html">概览</a>
+<a href="../../../../alerts.html">告警</a>
+<a href="../../../../slo.html">SLO</a>
+<a href="../../../../routing.html">路由</a>
+<a href="../../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>grafana/provisioning/datasources/prometheus.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">apiVersion</span>:<span style="color: #bbbbbb"> </span>1
+<span style="color: #008000; font-weight: bold">datasources</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>Prometheus
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>prometheus
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">access</span>:<span style="color: #bbbbbb"> </span>proxy
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">uid</span>:<span style="color: #bbbbbb"> </span>prometheus
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">isDefault</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">editable</span>:<span style="color: #bbbbbb"> </span>false
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">url</span>:<span style="color: #bbbbbb"> </span>${PROMETHEUS_URL}
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">jsonData</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeInterval</span>:<span style="color: #bbbbbb"> </span>15s
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

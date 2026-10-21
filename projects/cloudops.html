@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CloudOps — case study</title>
+  <meta name="description" content="GCP-first Cloud Run DevOps: Cloud Build, WIF, least-privilege IAM, Secret Manager, and monitoring as code; thin AWS secondary">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="../cloudops/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. Configs were validated offline with no cloud credentials. Thistle Analytics is fictional, not a client. Nothing was deployed to GCP or AWS.</p>
+    <article class="readme">
+      <h1>CloudOps</h1>
+      <p>GCP-first cloud DevOps config for a fictional product, Thistle Analytics. The service is <code>insights-api</code>: it accepts product events and returns in-process counts. AWS is a thin secondary parallel (Lambda, API Gateway HTTP API, CodeBuild). This repository does not deploy either path.</p>
+      <p>Configs are real and offline-validated. They are <strong>not deployed to any cloud account</strong>.</p>
+      <p>Thistle Analytics is fictional. There are no customers, no traffic figures, no prices, and no SLA in this demo.</p>
+      <h2>What is checked</h2>
+      <p><code>make check</code> unsets cloud credential variables, then runs yamllint, actionlint, ruff, conftest, a JSON Schema check of the monitoring policies, <code>terraform fmt</code> / <code>init -backend=false</code> / <code>validate</code> / <code>test</code> with <code>mock_provider</code>, tflint, checkov, and pytest. <code>results/checks.json</code> is written by that run. The label is <code>recorded: build-time</code>, with an Asia/Shanghai timestamp.</p>
+      <pre><code class="language-bash">cd cloudops
+      make tools
+      make check
+      make showcase
+      make test</code></pre>
+      <p><code>make showcase</code> writes <code>site/cloudops/</code> from <code>results/checks.json</code>. Run it after <code>make check</code>, then <code>make test</code>, so the page numbers match the file.</p>
+      <p>Nothing in the Makefile calls <code>gcloud</code>, the AWS CLI, <code>terraform apply</code>, or a remote host.</p>
+      <h2>Layout</h2>
+      <ul><li><code>app/</code> — FastAPI process. No database and no outbound HTTP.</li><li><code>gcp/</code> — Cloud Run, Cloud Build, IAM, Secret Manager, Monitoring, Logging, Workload Identity Federation, and a Terraform expression of the same intent.</li><li><code>aws/</code> — secondary. The README in that directory says so in the first section.</li><li><code>policies/</code> — Rego and the monitoring JSON Schema.</li><li><code>fixtures/</code> — compliant IAM documents and negative ones that conftest must reject.</li><li><code>docs/RUNBOOK.md</code> — what a real deploy would touch. Service names only. No amounts.</li></ul>
+      <h2>Next step for a real project</h2>
+      <p>Read <code>docs/RUNBOOK.md</code>. Replace <code>thistle-analytics-demo</code>, project number <code>000000000000</code>, and the placeholder KMS key name with values from an account you are allowed to change. Pin the Cloud Run secret version. Do not grant public <code>run.admin</code>.</p>
+    </article>
+    <p class="case-cta"><a class="btn" href="../cloudops/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

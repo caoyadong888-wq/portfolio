@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ObservaStack 文件</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../index.html">概览</a>
+<a href="../alerts.html">告警</a>
+<a href="../slo.html">SLO</a>
+<a href="../routing.html">路由</a>
+<a href="index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>配置文件</h1><p class="note">构建时用 pygments 渲染，样式内联，没有外部字体。</p><ul class="file-list"><li><a href="prometheus/prometheus.yml.html">prometheus/prometheus.yml</a></li>
+<li><a href="prometheus/targets/node.yml.html">prometheus/targets/node.yml</a></li>
+<li><a href="prometheus/targets/orders-api.yml.html">prometheus/targets/orders-api.yml</a></li>
+<li><a href="prometheus/targets/payments-worker.yml.html">prometheus/targets/payments-worker.yml</a></li>
+<li><a href="prometheus/targets/postgres.yml.html">prometheus/targets/postgres.yml</a></li>
+<li><a href="prometheus/targets/storefront.yml.html">prometheus/targets/storefront.yml</a></li>
+<li><a href="rules/recording/queue.yml.html">rules/recording/queue.yml</a></li>
+<li><a href="rules/recording/red.yml.html">rules/recording/red.yml</a></li>
+<li><a href="rules/recording/slo.yml.html">rules/recording/slo.yml</a></li>
+<li><a href="rules/recording/use.yml.html">rules/recording/use.yml</a></li>
+<li><a href="rules/alerts/infra.yml.html">rules/alerts/infra.yml</a></li>
+<li><a href="rules/alerts/meta.yml.html">rules/alerts/meta.yml</a></li>
+<li><a href="rules/alerts/service.yml.html">rules/alerts/service.yml</a></li>
+<li><a href="rules/alerts/slo.yml.html">rules/alerts/slo.yml</a></li>
+<li><a href="alertmanager/alertmanager.yml.html">alertmanager/alertmanager.yml</a></li>
+<li><a href="alertmanager/templates/email.tmpl.html">alertmanager/templates/email.tmpl</a></li>
+<li><a href="alertmanager/templates/slack.tmpl.html">alertmanager/templates/slack.tmpl</a></li>
+<li><a href="grafana/dashboards/larkspur-alerting.json.html">grafana/dashboards/larkspur-alerting.json</a></li>
+<li><a href="grafana/dashboards/larkspur-node.json.html">grafana/dashboards/larkspur-node.json</a></li>
+<li><a href="grafana/dashboards/larkspur-postgres.json.html">grafana/dashboards/larkspur-postgres.json</a></li>
+<li><a href="grafana/dashboards/larkspur-service-overview.json.html">grafana/dashboards/larkspur-service-overview.json</a></li>
+<li><a href="grafana/dashboards/larkspur-slo.json.html">grafana/dashboards/larkspur-slo.json</a></li>
+<li><a href="grafana/provisioning/datasources/prometheus.yml.html">grafana/provisioning/datasources/prometheus.yml</a></li>
+<li><a href="grafana/provisioning/dashboards/dashboards.yml.html">grafana/provisioning/dashboards/dashboards.yml</a></li>
+<li><a href="exporters/blackbox.yml.html">exporters/blackbox.yml</a></li>
+<li><a href="metrics/catalog.yml.html">metrics/catalog.yml</a></li>
+<li><a href="docker-compose.yml.html">docker-compose.yml</a></li>
+<li><a href="demo-app/app.py.html">demo-app/app.py</a></li>
+<li><a href="demo-app/Dockerfile.html">demo-app/Dockerfile</a></li>
+<li><a href="demo-app/README.md.html">demo-app/README.md</a></li>
+<li><a href="tests/routing_cases.yml.html">tests/routing_cases.yml</a></li>
+<li><a href="policies/.pint.hcl.html">policies/.pint.hcl</a></li>
+<li><a href="policies/pint-exceptions.md.html">policies/pint-exceptions.md</a></li>
+<li><a href="runbooks/AlertmanagerNotificationsFailing.md.html">runbooks/AlertmanagerNotificationsFailing.md</a></li>
+<li><a href="runbooks/BlackboxProbeFailed.md.html">runbooks/BlackboxProbeFailed.md</a></li>
+<li><a href="runbooks/InstanceDown.md.html">runbooks/InstanceDown.md</a></li>
+<li><a href="runbooks/NodeFilesystemFillingUp.md.html">runbooks/NodeFilesystemFillingUp.md</a></li>
+<li><a href="runbooks/NodeMemoryHigh.md.html">runbooks/NodeMemoryHigh.md</a></li>
+<li><a href="runbooks/OrdersApiErrorBudgetBurnFast.md.html">runbooks/OrdersApiErrorBudgetBurnFast.md</a></li>
+<li><a href="runbooks/OrdersApiErrorBudgetBurnSlow.md.html">runbooks/OrdersApiErrorBudgetBurnSlow.md</a></li>
+<li><a href="runbooks/OrdersApiLatencySLOBurn.md.html">runbooks/OrdersApiLatencySLOBurn.md</a></li>
+<li><a href="runbooks/PaymentsQueueBacklog.md.html">runbooks/PaymentsQueueBacklog.md</a></li>
+<li><a href="runbooks/PostgresConnectionsNearLimit.md.html">runbooks/PostgresConnectionsNearLimit.md</a></li>
+<li><a href="runbooks/PostgresDown.md.html">runbooks/PostgresDown.md</a></li>
+<li><a href="runbooks/PrometheusRuleEvaluationFailures.md.html">runbooks/PrometheusRuleEvaluationFailures.md</a></li>
+<li><a href="runbooks/ScrapeTargetMissing.md.html">runbooks/ScrapeTargetMissing.md</a></li>
+<li><a href="runbooks/ServiceHighErrorRate.md.html">runbooks/ServiceHighErrorRate.md</a></li>
+<li><a href="runbooks/ServiceLatencyP95High.md.html">runbooks/ServiceLatencyP95High.md</a></li>
+<li><a href="runbooks/TLSCertExpiringSoon.md.html">runbooks/TLSCertExpiringSoon.md</a></li>
+<li><a href="runbooks/Watchdog.md.html">runbooks/Watchdog.md</a></li></ul>
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

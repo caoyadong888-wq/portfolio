@@ -1,0 +1,603 @@
+{
+  "name": "Lead intake",
+  "nodes": [
+    {
+      "id": "00000000-0000-4000-8000-000000001001",
+      "name": "How Lead Intake Works",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        40
+      ],
+      "parameters": {
+        "content": "## Lead intake\nPOST /webhook/lead-intake, then:\n1. Validate name, email, company, and message.\n2. Drop the same email on the same UTC day. Seen keys live in workflow static data.\n3. Score with the rules in Score Lead (base, company, keywords, support cap).\n4. Append a row with the Google Sheets node.\n5. Post a short Slack message.\nInvalid payloads and duplicates reply on their own branches and write a log entry.\nA failure on the sheet or Slack node follows the error output into Log Integration Error.",
+        "height": 280,
+        "width": 520,
+        "color": 4
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001002",
+      "name": "Credentials And Error Branch",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        40
+      ],
+      "parameters": {
+        "content": "## Credentials\nThis file has no credential ids.\nIn the n8n UI, attach Google Sheets OAuth on Append Lead Row and a Slack credential on Post Lead Notification.\nReplace REPLACE_WITH_SPREADSHEET_ID and the channel name lead-alerts.\nThe error output is only for integration failures. Validation and duplicates are normal branches.",
+        "height": 280,
+        "width": 460,
+        "color": 6
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001003",
+      "name": "Receive Lead",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        400
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "00000000-0000-4000-8000-00000000a001"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001004",
+      "name": "Validate Lead Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function looksLikeEmail(value) {\n  const text = String(value || '').trim();\n  const at = text.indexOf('@');\n  if (at <= 0 || at !== text.lastIndexOf('@')) return false;\n  const local = text.slice(0, at);\n  const domain = text.slice(at + 1);\n  if (!/^[A-Za-z0-9._%+\\-]+$/.test(local)) return false;\n  if (!/^[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}$/.test(domain)) return false;\n  return true;\n}\n\nfunction validateLead(body) {\n  const source = body && typeof body === 'object' ? body : {};\n  const errors = [];\n  const name = String(source.name || '').trim();\n  const email = String(source.email || '').trim().toLowerCase();\n  const company = String(source.company || '').trim();\n  const message = String(source.message || '').trim();\n  const origin = String(source.source || 'webhook').trim() || 'webhook';\n  if (name.length < 2) errors.push('name must be at least 2 characters');\n  if (!looksLikeEmail(email)) errors.push('email format is invalid');\n  if (!company) errors.push('company is required');\n  if (message.length < 5) errors.push('message must be at least 5 characters');\n  return {\n    ok: errors.length === 0,\n    errors: errors,\n    lead: { name: name, email: email, company: company, message: message, source: origin },\n  };\n}\n\nif (typeof $input === 'undefined') {\n  return { validateLead: validateLead, looksLikeEmail: looksLikeEmail };\n}\n\nconst item = $input.first().json || {};\nconst body = item.body && typeof item.body === 'object' ? item.body : item;\nconst check = validateLead(body);\nreturn [{\n  json: {\n    valid: check.ok ? 'yes' : 'no',\n    errors: check.errors,\n    lead: check.lead,\n    httpStatus: check.ok ? 200 : 400,\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001006",
+      "name": "Lead Is Valid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        400
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000001005",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001007",
+      "name": "Log Validation Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        640
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function validationLog(item) {\n  return {\n    valid: 'no',\n    duplicate: 'no',\n    accepted: 'no',\n    errors: item && item.errors ? item.errors : [],\n    httpStatus: 400,\n    branch: 'validation',\n  };\n}\n\nif (typeof $input === 'undefined') {\n  return { validationLog: validationLog };\n}\n\nconst item = $input.first().json || {};\nconst entry = validationLog(item);\nconst staticData = $getWorkflowStaticData('global');\nif (!Array.isArray(staticData.logs)) staticData.logs = [];\nstaticData.logs.push({ at: new Date().toISOString(), branch: 'validation', errors: entry.errors });\nif (staticData.logs.length > 50) staticData.logs = staticData.logs.slice(-50);\nreturn [{ json: entry }];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001008",
+      "name": "Reply Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        640
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseCode": 400
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001009",
+      "name": "Deduplicate By Email And Day",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function dedupeDecision(seen, email, utcDay) {\n  const key = String(email || '').toLowerCase() + '|' + String(utcDay || '');\n  const map = seen && typeof seen === 'object' ? seen : {};\n  return {\n    key: key,\n    duplicate: Object.prototype.hasOwnProperty.call(map, key),\n  };\n}\n\nif (typeof $input === 'undefined') {\n  return { dedupeDecision: dedupeDecision };\n}\n\nconst lead = $input.first().json.lead || {};\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.seen || typeof staticData.seen !== 'object') staticData.seen = {};\nconst day = new Date().toISOString().slice(0, 10);\nconst decision = dedupeDecision(staticData.seen, lead.email, day);\nif (!decision.duplicate) staticData.seen[decision.key] = day;\nreturn [{\n  json: {\n    name: lead.name,\n    email: lead.email,\n    company: lead.company,\n    message: lead.message,\n    source: lead.source,\n    duplicate: decision.duplicate ? 'yes' : 'no',\n    dedupeKey: decision.key,\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000100b",
+      "name": "Lead Is New",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1400,
+        400
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-00000000100a",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": "no",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000100c",
+      "name": "Log Duplicate Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        640
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function duplicateLog(item) {\n  return {\n    valid: 'yes',\n    duplicate: 'yes',\n    accepted: 'no',\n    name: item && item.name ? item.name : '',\n    company: item && item.company ? item.company : '',\n    httpStatus: 200,\n    branch: 'duplicate',\n  };\n}\n\nif (typeof $input === 'undefined') {\n  return { duplicateLog: duplicateLog };\n}\n\nconst item = $input.first().json || {};\nconst entry = duplicateLog(item);\nconst staticData = $getWorkflowStaticData('global');\nif (!Array.isArray(staticData.logs)) staticData.logs = [];\nstaticData.logs.push({ at: new Date().toISOString(), branch: 'duplicate', dedupeKey: item.dedupeKey || '' });\nif (staticData.logs.length > 50) staticData.logs = staticData.logs.slice(-50);\nreturn [{ json: entry }];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000100d",
+      "name": "Reply Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1700,
+        640
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000100e",
+      "name": "Score Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function scoreLead(lead) {\n  const message = String((lead && lead.message) || '');\n  const company = String((lead && lead.company) || '');\n  let score = 10;\n  const reasons = ['base +10'];\n  if (company.trim().length >= 2) {\n    score += 10;\n    reasons.push('company present +10');\n  }\n  const rules = [\n    ['budget', 20],\n    ['timeline', 15],\n    ['demo', 10],\n    ['pricing', 10],\n    ['integration', 8],\n  ];\n  const lower = message.toLowerCase();\n  for (let i = 0; i < rules.length; i++) {\n    const word = rules[i][0];\n    const points = rules[i][1];\n    if (lower.indexOf(word) !== -1) {\n      score += points;\n      reasons.push(word + ' +' + points);\n    }\n  }\n  if (/\\b(support|refund|outage|bug|broken)\\b/i.test(message) && score > 39) {\n    score = 39;\n    reasons.push('support wording caps the score at 39');\n  }\n  if (score > 100) {\n    score = 100;\n    reasons.push('capped at 100');\n  }\n  if (score < 0) score = 0;\n  let band = 'cold';\n  if (score >= 70) band = 'hot';\n  else if (score >= 40) band = 'warm';\n  reasons.push('total ' + score);\n  return { score: score, band: band, reasons: reasons };\n}\n\nif (typeof $input === 'undefined') {\n  return { scoreLead: scoreLead };\n}\n\nconst lead = $input.first().json;\nconst scored = scoreLead(lead);\nreturn [{\n  json: {\n    name: lead.name,\n    email: lead.email,\n    company: lead.company,\n    message: lead.message,\n    source: lead.source,\n    score: scored.score,\n    band: scored.band,\n    reasonsText: scored.reasons.join('; '),\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-00000000100f",
+      "name": "Append Lead Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2000,
+        400
+      ],
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "company": "={{ $json.company }}",
+            "score": "={{ $json.score }}",
+            "band": "={{ $json.band }}",
+            "source": "={{ $json.source }}",
+            "message": "={{ $json.message }}",
+            "reasons": "={{ $json.reasonsText }}",
+            "email": "={{ $json.email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "band",
+              "displayName": "band",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reasons",
+              "displayName": "reasons",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001010",
+      "name": "Post Lead Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        2300,
+        400
+      ],
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "lead-alerts",
+          "mode": "name"
+        },
+        "text": "={{ $json.band + ' lead ' + $json.name + ' at ' + $json.company + ' score ' + $json.score }}",
+        "otherOptions": {}
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001011",
+      "name": "Shape Accepted Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function acceptedReply(lead) {\n  return {\n    accepted: 'yes',\n    valid: 'yes',\n    duplicate: 'no',\n    name: lead && lead.name ? lead.name : '',\n    company: lead && lead.company ? lead.company : '',\n    score: lead && typeof lead.score === 'number' ? lead.score : null,\n    band: lead && lead.band ? lead.band : '',\n    httpStatus: 200,\n  };\n}\n\nif (typeof $input === 'undefined') {\n  return { acceptedReply: acceptedReply };\n}\n\nconst lead = $('Score Lead').first().json;\nreturn [{ json: acceptedReply(lead) }];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001012",
+      "name": "Reply Accepted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2900,
+        400
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001013",
+      "name": "Log Integration Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        680
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function appendLog(logs, entry) {\n  const next = Array.isArray(logs) ? logs.slice() : [];\n  next.push(entry);\n  return next.slice(-50);\n}\n\nfunction errorMessage(item) {\n  if (!item || typeof item !== 'object') return 'integration node failed';\n  const err = item.error;\n  if (typeof err === 'string' && err) return err;\n  if (err && typeof err === 'object') {\n    if (typeof err.message === 'string' && err.message) return err.message;\n    if (typeof err.description === 'string' && err.description) return err.description;\n  }\n  if (typeof item.message === 'string' && item.message) return item.message;\n  return 'integration node failed';\n}\n\nif (typeof $input === 'undefined') {\n  return { appendLog: appendLog, errorMessage: errorMessage };\n}\n\nconst item = $input.first().json || {};\nconst entry = {\n  at: new Date().toISOString(),\n  branch: 'integration',\n  message: errorMessage(item),\n};\nconst staticData = $getWorkflowStaticData('global');\nstaticData.logs = appendLog(staticData.logs, entry);\nreturn [{\n  json: {\n    valid: 'yes',\n    accepted: 'no',\n    logged: 'yes',\n    branch: 'integration',\n    message: entry.message,\n    httpStatus: 502,\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001014",
+      "name": "Reply Integration Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2600,
+        680
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseCode": 502
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive Lead": {
+      "main": [
+        [
+          {
+            "node": "Validate Lead Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Lead Payload": {
+      "main": [
+        [
+          {
+            "node": "Lead Is Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Is Valid": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate By Email And Day",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Validation Failure": {
+      "main": [
+        [
+          {
+            "node": "Reply Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate By Email And Day": {
+      "main": [
+        [
+          {
+            "node": "Lead Is New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Is New": {
+      "main": [
+        [
+          {
+            "node": "Score Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Duplicate Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Duplicate Lead": {
+      "main": [
+        [
+          {
+            "node": "Reply Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Lead": {
+      "main": [
+        [
+          {
+            "node": "Append Lead Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Lead Row": {
+      "main": [
+        [
+          {
+            "node": "Post Lead Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Log Integration Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Lead Notification": {
+      "main": [
+        [
+          {
+            "node": "Shape Accepted Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Log Integration Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Accepted Reply": {
+      "main": [
+        [
+          {
+            "node": "Reply Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Integration Error": {
+      "main": [
+        [
+          {
+            "node": "Reply Integration Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

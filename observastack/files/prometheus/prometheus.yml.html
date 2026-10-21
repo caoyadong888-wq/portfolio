@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>prometheus/prometheus.yml</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>prometheus/prometheus.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Larkspur Grocers is fictional. Hosts are placeholders, not a live estate.</span>
+<span style="color: #008000; font-weight: bold">global</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">scrape_interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">evaluation_interval</span>:<span style="color: #bbbbbb"> </span>15s
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">external_labels</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">env</span>:<span style="color: #bbbbbb"> </span>prod
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cluster</span>:<span style="color: #bbbbbb"> </span>larkspur-demo
+
+<span style="color: #008000; font-weight: bold">rule_files</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span>../rules/recording/*.yml
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span>../rules/alerts/*.yml
+
+<span style="color: #008000; font-weight: bold">alerting</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">alertmanagers</span>:
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">static_configs</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">targets</span>:
+<span style="color: #bbbbbb">            </span>-<span style="color: #bbbbbb"> </span>alertmanager.larkspur.example:9093
+
+<span style="color: #008000; font-weight: bold">scrape_configs</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>prometheus
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">static_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">targets</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>prometheus.larkspur.example:9090
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service_src</span>:<span style="color: #bbbbbb"> </span>prometheus
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team_src</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>alertmanager
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">static_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">targets</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>alertmanager.larkspur.example:9093
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service_src</span>:<span style="color: #bbbbbb"> </span>alertmanager
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team_src</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>storefront
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">file_sd_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">files</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>targets/storefront.yml
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>orders-api
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">file_sd_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">files</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>targets/orders-api.yml
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">metric_relabel_configs</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># Example of dropping a high-cardinality label before it is stored.</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>user_id
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>payments-worker
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">file_sd_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">files</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>targets/payments-worker.yml
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>node
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">file_sd_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">files</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>targets/node.yml
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>postgres
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">file_sd_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">files</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>targets/postgres.yml
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>blackbox-http
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">metrics_path</span>:<span style="color: #bbbbbb"> </span>/probe
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">params</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">module</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">http_2xx</span>]
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">static_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">targets</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>https://www.larkspur.example/
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>https://orders.larkspur.example/healthz
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>https://status.larkspur.example/
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service_src</span>:<span style="color: #bbbbbb"> </span>blackbox
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team_src</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">__address__</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>__param_target
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">__param_target</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>instance
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>__address__
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">replacement</span>:<span style="color: #bbbbbb"> </span>blackbox.larkspur.example:9115
+
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">job_name</span>:<span style="color: #bbbbbb"> </span>blackbox-tls
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">metrics_path</span>:<span style="color: #bbbbbb"> </span>/probe
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">params</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">module</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">tls_expiry</span>]
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">static_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">targets</span>:
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>www.larkspur.example:443
+<span style="color: #bbbbbb">          </span>-<span style="color: #bbbbbb"> </span>orders.larkspur.example:443
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service_src</span>:<span style="color: #bbbbbb"> </span>blackbox
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team_src</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">relabel_configs</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>service
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">team_src</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>team
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">action</span>:<span style="color: #bbbbbb"> </span>labeldrop
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">regex</span>:<span style="color: #bbbbbb"> </span>service_src|team_src
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">__address__</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>__param_target
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">source_labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">__param_target</span>]
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>instance
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">target_label</span>:<span style="color: #bbbbbb"> </span>__address__
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">replacement</span>:<span style="color: #bbbbbb"> </span>blackbox.larkspur.example:9115
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

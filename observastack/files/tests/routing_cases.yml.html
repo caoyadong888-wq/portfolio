@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tests/routing_cases.yml</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>tests/routing_cases.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># amtool config routes test assertions.</span>
+<span style="color: #3D7B7B; font-style: italic"># Alertmanager v0.34.1 does not evaluate active_time_intervals in</span>
+<span style="color: #3D7B7B; font-style: italic"># `amtool config routes test`. warning+platform therefore resolves to</span>
+<span style="color: #3D7B7B; font-style: italic"># slack-platform even outside business-hours. See policies/pint-exceptions.md.</span>
+<span style="color: #008000; font-weight: bold">cases</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>critical_platform_instance_down
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>InstanceDown
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>node
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">instance</span>:<span style="color: #bbbbbb"> </span>node-a.larkspur.example:9100
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">pagerduty-oncall</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">slack-incidents</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>critical_orders_fast_burn
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>OrdersApiErrorBudgetBurnFast
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>orders
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>orders-api
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">pagerduty-oncall</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">slack-incidents</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">email-oncall</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>critical_payments
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>PaymentsDown
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>payments
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>payments-worker
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">pagerduty-oncall</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">slack-incidents</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">slack-payments</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>warning_orders_slow_burn
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>OrdersApiErrorBudgetBurnSlow
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>orders
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>orders-api
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">email-oncall</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>warning_payments_queue
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>PaymentsQueueBacklog
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>payments
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>payments-worker
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">slack-payments</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>warning_platform_memory
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>NodeMemoryHigh
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">service</span>:<span style="color: #bbbbbb"> </span>node
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">instance</span>:<span style="color: #bbbbbb"> </span>node-a.larkspur.example:9100
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">slack-platform</span>]
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">note</span>:<span style="color: #bbbbbb"> </span>amtool ignores active_time_intervals and mute_time_intervals
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>info_discarded
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>Notice
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>info
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;null&quot;</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>watchdog_deadman
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>Watchdog
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>info
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">deadman-webhook</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>unclassified_default
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">alertname</span>:<span style="color: #bbbbbb"> </span>Unclassified
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">receivers</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">default</span>]
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

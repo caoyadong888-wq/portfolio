@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SiteAtlas — case study</title>
+  <meta name="description" content="Website SEO audit crawler, also packaged as an Apify Actor.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/siteatlas/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. Books to Scrape is a public practice site, not a client.</p>
+    <article class="readme">
+      <h1>SiteAtlas SEO Audit: Broken Links, Hreflang &amp; llms.txt</h1>
+      <p>SiteAtlas crawls a public website and audits on-page SEO: title, meta description, headings, canonical, robots meta, image alt text, hreflang, broken links, duplicate titles and descriptions, and response time. It also checks AI readability once per start domain (robots rules for GPTBot, ClaudeBot, PerplexityBot, Google-Extended, and CCBot, plus <code>/llms.txt</code>, <code>/llms-full.txt</code>, and <code>/sitemap.xml</code>). Each page gets a 0–100 score. The run writes a site score and an HTML report and a Markdown report.</p>
+      <p>It does not run a browser and it does not collect personal data. Fix text is a fixed sentence from the deduction table. The crawler does not call a language model.</p>
+      <p>The same <code>core/</code> package runs this portfolio demo and the Apify Actor <code>siteatlas-seo-crawler</code>. The Actor is ready to publish with limited permissions. It is not on the Store yet, and this page does not link to a Store listing.</p>
+      <p>Store title: <code>SiteAtlas SEO Audit: Broken Links, Hreflang &amp; llms.txt</code>. The Store description is the <code>description</code> field in <code>.actor/actor.json</code>.</p>
+      <p>Books to Scrape (<code>https://books.toscrape.com/</code>) is a public crawler practice site, not a client.</p>
+      <h2>Problem → Solution → Result</h2>
+      <h3>Problem</h3>
+      <ul><li>A small portfolio of API and operations demos had no example of fetching public pages and turning them into rows.</li><li>SEO checks are easy to describe and tedious to repeat by hand: missing titles, long descriptions, more than one <code>h1</code>, <code>noindex</code>, slow responses, images without alt text, one-way hreflang, and duplicate snippets.</li></ul>
+      <h3>Solution</h3>
+      <ul><li>An async crawler (<code>httpx</code>, <code>selectolax</code>, no browser) stays on the start hostname, honors <code>robots.txt</code> when asked, and limits each hostname to 5 requests per second.</li><li>Each fetched page becomes one record with a fixed list of issue codes and a page score. A <code>SUMMARY</code> record counts those issues, the average response time, the five slowest pages, the site score, site-level findings, and the AI readiness result.</li><li>The same summary builds <code>REPORT.html</code> (one file, inline CSS, no external resources) and <code>REPORT.md</code>. The demo downloads those two files from the same function.</li><li>The Apify Actor charges <code>page-audited</code> once per stored dataset row, as the row is written, and stops when the run hits the caller&#x27;s charge limit. When AI readiness is on, it also records <code>ai-readiness-check</code> once per start domain. The platform events <code>apify-actor-start</code> and <code>apify-default-dataset-item</code> stay in place. At listing, price only <code>page-audited</code>. Leave <code>apify-default-dataset-item</code> unpriced so the same page is not charged twice. Leave <code>apify-actor-start</code> at the platform default. Do not put a price for <code>ai-readiness-check</code> in this repository.</li><li>The demo on this host only accepts <code>books.toscrape.com</code>, <code>quotes.toscrape.com</code>, and <code>https://3.1.79.63/portfolio/</code>. It allows at most 50 pages, one audit at a time, and 3 audits per address every 10 minutes.</li></ul>
+      <h3>Result</h3>
+      <ul><li>The live page runs an audit, shows the score, filters the table by issue code, and downloads CSV, JSON, Markdown, or HTML. Recent audits are kept in SQLite.</li><li>A local Actor run with the prefill input finishes inside a minute and writes at least 20 dataset rows plus <code>SUMMARY</code>, <code>REPORT.html</code>, and <code>REPORT.md</code>.</li></ul>
+      <p>These are capabilities of this project, not claims about a client engagement.</p>
+      <h2>Features</h2>
+      <ul><li>Page score from 0 to 100, starting at 100, with one subtraction per page-level issue code. The points are the table below.</li><li>Site score: the average of the page scores, then one subtraction per site-level finding. Copying a finding onto several pages does not subtract it again. Category scores are on-page, links, international, and AI readiness.</li><li>Each issue has a severity (<code>error</code>, <code>warning</code>, or <code>notice</code>) and a fixed English <code>fix</code>.</li><li>Site-level hreflang checks: return link when the target was crawled, <code>x-default</code>, self reference, a simple BCP 47 tag, and a target that is not HTTP 200 or is <code>noindex</code>.</li><li>Duplicate title groups and duplicate meta description groups, for values used by two or more URLs.</li><li>Canonical target not HTTP 200, canonical chain (A to B to C), and several URLs canonicalizing to one <code>noindex</code> page.</li><li>AI readability once per start domain. <code>checkAiReadiness</code> defaults to true.</li><li>HTML and Markdown reports in the key-value store and on the demo.</li></ul>
+      <p>PageSpeed, Core Web Vitals, and orphan-page detection are not in this version.</p>
+      <h2>Input</h2>
+      <table><thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>startUrls</td><td>array of URLs</td><td><code>[&quot;https://books.toscrape.com/&quot;]</code></td><td>Pages to start from. The crawler stays on the same hostname.</td></tr><tr><td>maxPages</td><td>integer</td><td>20 (maximum 5000; the demo maximum is 50)</td><td>How many pages to audit. One dataset row each.</td></tr><tr><td>maxDepth</td><td>integer</td><td>2</td><td>Link hops from a start URL. 0 audits only the start URLs.</td></tr><tr><td>checkExternalLinks</td><td>boolean</td><td>false</td><td>HEAD external links (up to 20 per page) and list failures in <code>brokenLinks</code>.</td></tr><tr><td>respectRobotsTxt</td><td>boolean</td><td>true</td><td>Skip URLs disallowed by <code>robots.txt</code>. A missing file allows crawling.</td></tr><tr><td>concurrency</td><td>integer</td><td>5 (maximum 20)</td><td>Parallel fetches. Each hostname is still limited to 5 requests per second.</td></tr><tr><td>checkAiReadiness</td><td>boolean</td><td>true</td><td>Check AI crawlers, <code>/llms.txt</code>, <code>/llms-full.txt</code>, and <code>/sitemap.xml</code> once per start domain.</td></tr></tbody></table>
+      <pre><code class="language-json">{
+        &quot;startUrls&quot;: [&quot;https://books.toscrape.com/&quot;],
+        &quot;maxPages&quot;: 20,
+        &quot;maxDepth&quot;: 2,
+        &quot;checkExternalLinks&quot;: false,
+        &quot;respectRobotsTxt&quot;: true,
+        &quot;concurrency&quot;: 5,
+        &quot;checkAiReadiness&quot;: true
+      }</code></pre>
+      <h2>Output</h2>
+      <p>One dataset item per audited page:</p>
+      <p><code>url</code>, <code>finalUrl</code>, <code>statusCode</code>, <code>responseMs</code>, <code>contentType</code>, <code>title</code>, <code>titleLength</code>, <code>metaDescription</code>, <code>metaDescriptionLength</code>, <code>canonical</code>, <code>robotsMeta</code> (<code>noindex</code> / <code>nofollow</code>), <code>h1Count</code>, <code>h1First</code>, <code>wordCount</code>, <code>imagesWithoutAlt</code>, <code>internalLinks</code>, <code>externalLinks</code>, <code>brokenLinks</code>, <code>ogTitle</code>, <code>ogImage</code>, <code>hreflang</code> (language codes), <code>hreflangLinks</code> (<code>lang</code> and <code>href</code>), <code>issues</code> (code strings), <code>issueDetails</code> (<code>code</code>, <code>severity</code>, <code>fix</code>), <code>score</code>, <code>crawledAt</code>.</p>
+      <p>The key-value record <code>SUMMARY</code> has <code>pages</code>, <code>issueCounts</code>, <code>averageResponseMs</code>, <code>slowestPages</code> (up to five), <code>siteScore</code>, <code>scores</code> (<code>onPage</code>, <code>links</code>, <code>international</code>, <code>aiReadiness</code>), <code>siteIssues</code>, <code>duplicateTitles</code>, <code>duplicateDescriptions</code>, <code>topIssuePages</code> (up to ten), <code>aiReadiness</code>, and <code>charges</code>.</p>
+      <p><code>siteScore</code> is the average page score minus each site-level finding once, clamped to 0–100. <code>scores.aiReadiness</code> is null when the check did not run. International starts at 100 when the crawled pages have no international findings. A page with no hreflang is not, by itself, an international finding.</p>
+      <p><code>REPORT.html</code> and <code>REPORT.md</code> are built from that summary. The HTML file uses a <code>&lt;style&gt;</code> block and does not load a script, a stylesheet link, or a remote image.</p>
+      <p>The dataset view <strong>Overview</strong> shows <code>url</code>, <code>statusCode</code>, <code>title</code>, <code>issues</code>, and <code>responseMs</code>. The <strong>Scores</strong> view shows <code>url</code>, <code>score</code>, <code>statusCode</code>, <code>issues</code>, and <code>responseMs</code>.</p>
+      <h3>Sample output</h3>
+      <p>Local prefill run on 2026-10-03 against Books to Scrape (<code>maxPages</code> 20, <code>maxDepth</code> 2, <code>checkAiReadiness</code> true). The run stored 20 pages in 5.3 seconds. Every page had <code>MISSING_META_DESC</code> and <code>score</code> 85. <code>SUMMARY</code> reported <code>averageResponseMs</code> 95.8, <code>siteScore</code> 62, and <code>charges</code> of 20 <code>page-audited</code> plus 1 <code>ai-readiness-check</code>. The homepage and <code>/index.html</code> share one title, so the run reported one <code>DUPLICATE_TITLE</code>. <code>robots.txt</code> returned 404, so all five AI crawlers are <code>unspecified</code> and that status is not deducted. <code>/llms.txt</code>, <code>/llms-full.txt</code>, and <code>/sitemap.xml</code> returned 404. <code>responseMs</code> is the HTTP time only.</p>
+      <p>First dataset row:</p>
+      <pre><code class="language-json">{
+        &quot;url&quot;: &quot;https://books.toscrape.com/&quot;,
+        &quot;finalUrl&quot;: &quot;https://books.toscrape.com/&quot;,
+        &quot;statusCode&quot;: 200,
+        &quot;responseMs&quot;: 233,
+        &quot;contentType&quot;: &quot;text/html&quot;,
+        &quot;title&quot;: &quot;All products | Books to Scrape - Sandbox&quot;,
+        &quot;titleLength&quot;: 40,
+        &quot;metaDescription&quot;: null,
+        &quot;metaDescriptionLength&quot;: 0,
+        &quot;canonical&quot;: null,
+        &quot;robotsMeta&quot;: {&quot;noindex&quot;: false, &quot;nofollow&quot;: false},
+        &quot;h1Count&quot;: 1,
+        &quot;h1First&quot;: &quot;All products&quot;,
+        &quot;wordCount&quot;: 309,
+        &quot;imagesWithoutAlt&quot;: 0,
+        &quot;internalLinks&quot;: 73,
+        &quot;externalLinks&quot;: 0,
+        &quot;brokenLinks&quot;: [],
+        &quot;ogTitle&quot;: null,
+        &quot;ogImage&quot;: null,
+        &quot;hreflang&quot;: [],
+        &quot;hreflangLinks&quot;: [],
+        &quot;issues&quot;: [&quot;MISSING_META_DESC&quot;, &quot;DUPLICATE_TITLE&quot;, &quot;LLMS_TXT_MISSING&quot;, &quot;SITEMAP_UNREACHABLE&quot;, &quot;SITEMAP_NOT_DECLARED&quot;, &quot;LLMS_FULL_TXT_MISSING&quot;],
+        &quot;issueDetails&quot;: [
+          {&quot;code&quot;: &quot;MISSING_META_DESC&quot;, &quot;severity&quot;: &quot;error&quot;, &quot;fix&quot;: &quot;Add a meta description that summarizes this page.&quot;},
+          {&quot;code&quot;: &quot;DUPLICATE_TITLE&quot;, &quot;severity&quot;: &quot;warning&quot;, &quot;fix&quot;: &quot;Give each URL its own title.&quot;},
+          {&quot;code&quot;: &quot;LLMS_TXT_MISSING&quot;, &quot;severity&quot;: &quot;warning&quot;, &quot;fix&quot;: &quot;Publish /llms.txt with an H1 title and a markdown list of links.&quot;},
+          {&quot;code&quot;: &quot;SITEMAP_UNREACHABLE&quot;, &quot;severity&quot;: &quot;warning&quot;, &quot;fix&quot;: &quot;Serve /sitemap.xml with HTTP 200.&quot;},
+          {&quot;code&quot;: &quot;SITEMAP_NOT_DECLARED&quot;, &quot;severity&quot;: &quot;notice&quot;, &quot;fix&quot;: &quot;Declare the sitemap URL in robots.txt.&quot;},
+          {&quot;code&quot;: &quot;LLMS_FULL_TXT_MISSING&quot;, &quot;severity&quot;: &quot;notice&quot;, &quot;fix&quot;: &quot;Publish /llms-full.txt if you want a full-text companion file.&quot;}
+        ],
+        &quot;score&quot;: 85,
+        &quot;crawledAt&quot;: &quot;2026-10-03T07:24:58Z&quot;
+      }</code></pre>
+      <p><code>SUMMARY</code> from the same run:</p>
+      <pre><code class="language-json">{
+        &quot;pages&quot;: 20,
+        &quot;averageResponseMs&quot;: 95.8,
+        &quot;siteScore&quot;: 62,
+        &quot;scores&quot;: {&quot;onPage&quot;: 79, &quot;links&quot;: 100, &quot;international&quot;: 100, &quot;aiReadiness&quot;: 83},
+        &quot;issueCounts&quot;: {&quot;MISSING_META_DESC&quot;: 20},
+        &quot;duplicateTitles&quot;: [
+          {
+            &quot;value&quot;: &quot;All products | Books to Scrape - Sandbox&quot;,
+            &quot;urls&quot;: [&quot;https://books.toscrape.com/&quot;, &quot;https://books.toscrape.com/index.html&quot;]
+          }
+        ],
+        &quot;duplicateDescriptions&quot;: [],
+        &quot;charges&quot;: {&quot;page-audited&quot;: 20, &quot;ai-readiness-check&quot;: 1},
+        &quot;aiReadiness&quot;: {
+          &quot;checked&quot;: true,
+          &quot;domains&quot;: [
+            {
+              &quot;domain&quot;: &quot;books.toscrape.com&quot;,
+              &quot;robotsFound&quot;: false,
+              &quot;robotsStatus&quot;: 404,
+              &quot;bots&quot;: {
+                &quot;GPTBot&quot;: &quot;unspecified&quot;,
+                &quot;ClaudeBot&quot;: &quot;unspecified&quot;,
+                &quot;PerplexityBot&quot;: &quot;unspecified&quot;,
+                &quot;Google-Extended&quot;: &quot;unspecified&quot;,
+                &quot;CCBot&quot;: &quot;unspecified&quot;
+              },
+              &quot;llmsTxt&quot;: {&quot;exists&quot;: false, &quot;statusCode&quot;: 404, &quot;contentType&quot;: &quot;text/html&quot;, &quot;startsWithH1&quot;: false, &quot;hasMarkdownLinkList&quot;: false, &quot;bytes&quot;: 153},
+              &quot;llmsFullTxt&quot;: {&quot;exists&quot;: false, &quot;statusCode&quot;: 404},
+              &quot;sitemap&quot;: {&quot;declaredInRobots&quot;: false, &quot;declaredUrls&quot;: [], &quot;sitemapXml&quot;: {&quot;accessible&quot;: false, &quot;statusCode&quot;: 404}}
+            }
+          ]
+        }
+      }</code></pre>
+      <p>The <code>issueCounts</code> object in the stored <code>SUMMARY</code> also includes the other page-level codes with a count of 0. The excerpt above shows the non-zero count.</p>
+      <h2>Issue codes</h2>
+      <p>Page-level codes are the only codes in <code>issueCounts</code>. Site-level codes are listed in <code>siteIssues</code> and copied onto the related pages. A page score does not subtract site-level codes.</p>
+      <table><thead><tr><th>Code</th><th>When it is set</th></tr></thead><tbody><tr><td>MISSING_TITLE</td><td>The HTML page has no title text.</td></tr><tr><td>TITLE_TOO_LONG</td><td>The collapsed title is longer than 60 characters.</td></tr><tr><td>MISSING_META_DESC</td><td>The HTML page has no meta description text.</td></tr><tr><td>META_DESC_TOO_LONG</td><td>The collapsed meta description is longer than 160 characters.</td></tr><tr><td>MULTIPLE_H1</td><td>The page has more than one <code>h1</code>.</td></tr><tr><td>MISSING_H1</td><td>The HTML page has no <code>h1</code>.</td></tr><tr><td>NOINDEX</td><td>The robots meta tag or <code>X-Robots-Tag</code> contains <code>noindex</code> (or <code>none</code>).</td></tr><tr><td>BROKEN_LINK</td><td>At least one checked external link failed.</td></tr><tr><td>SLOW_PAGE</td><td>The fetch took longer than 2000 ms.</td></tr><tr><td>IMG_NO_ALT</td><td>At least one image has a missing or blank <code>alt</code>.</td></tr><tr><td>NON_200</td><td>The final HTTP status is not 200. A failed request is status 0.</td></tr></tbody></table>
+      <p><code>TITLE_TOO_LONG</code> is not added when the title is missing. The same is true for the meta description and for <code>MISSING_H1</code> versus <code>MULTIPLE_H1</code>. A length of 60 or 160 is allowed. A response of 2000 ms is allowed.</p>
+      <h2>Deduction table</h2>
+      <p>A page starts at 100. Each page-level code subtracts its own points once. Severity is a label. It does not add a second penalty. Points differ inside one severity because the effect differs: a missing title removes the snippet, and a long title only risks truncation.</p>
+      <p>The site score is <code>clamp(average(page scores) − site findings)</code>. The average is an integer, half up. Each finding subtracts once, even when the code is written onto more than one page. Two different findings that share a code (two one-way hreflang edges, or two disallowed AI crawlers) each subtract once. The result is clamped to 0–100.</p>
+      <p>Category scores use the same points. On-page and links average the per-page scores in that category, then subtract site findings in that category. International and AI readiness start at 100 and subtract only their findings. The site score is not the average of the four category scores.</p>
+      <h3>Page rules</h3>
+      <table><thead><tr><th>Code</th><th>Severity</th><th>Points</th><th>Category</th><th>Why</th><th>Fix</th></tr></thead><tbody><tr><td>NON_200</td><td>error</td><td>30</td><td>on-page</td><td>The URL did not return 200, so it cannot rank as a normal page.</td><td>Return HTTP 200 for this URL or link to the working page.</td></tr><tr><td>MISSING_TITLE</td><td>error</td><td>20</td><td>on-page</td><td>The snippet has no title.</td><td>Add a unique title element that describes this page.</td></tr><tr><td>MISSING_META_DESC</td><td>error</td><td>15</td><td>on-page</td><td>The snippet has no description.</td><td>Add a meta description that summarizes this page.</td></tr><tr><td>NOINDEX</td><td>error</td><td>15</td><td>on-page</td><td>The page asks crawlers not to index it.</td><td>Remove noindex if this page should be indexed.</td></tr><tr><td>BROKEN_LINK</td><td>error</td><td>12</td><td>links</td><td>At least one checked external link failed.</td><td>Fix or remove the external link that did not resolve.</td></tr><tr><td>MISSING_H1</td><td>warning</td><td>8</td><td>on-page</td><td>The page has no primary heading.</td><td>Add one h1 that states the page topic.</td></tr><tr><td>MULTIPLE_H1</td><td>warning</td><td>6</td><td>on-page</td><td>More than one h1 makes the outline ambiguous.</td><td>Keep a single h1 on the page.</td></tr><tr><td>TITLE_TOO_LONG</td><td>warning</td><td>5</td><td>on-page</td><td>The title is present but longer than 60 characters and may be cut off.</td><td>Shorten the title to 60 characters or fewer.</td></tr><tr><td>SLOW_PAGE</td><td>warning</td><td>5</td><td>on-page</td><td>The response took longer than 2000 ms.</td><td>Reduce the server response time to 2000 ms or less.</td></tr><tr><td>META_DESC_TOO_LONG</td><td>warning</td><td>4</td><td>on-page</td><td>The description is present but longer than 160 characters and may be cut off.</td><td>Shorten the meta description to 160 characters or fewer.</td></tr><tr><td>IMG_NO_ALT</td><td>notice</td><td>3</td><td>on-page</td><td>At least one image has a missing or blank alt.</td><td>Give every image a descriptive alt attribute.</td></tr></tbody></table>
+      <h3>Site rules</h3>
+      <table><thead><tr><th>Code</th><th>Severity</th><th>Points</th><th>Category</th><th>Why</th><th>Fix</th></tr></thead><tbody><tr><td>HREFLANG_NOT_RECIPROCAL</td><td>error</td><td>8</td><td>international</td><td>The other language page does not point back, so the cluster is one-way.</td><td>Add a return hreflang link so the target page points back.</td></tr><tr><td>HREFLANG_TARGET_BAD</td><td>error</td><td>8</td><td>international</td><td>The alternate URL is not a 200 indexable page.</td><td>Point hreflang at a page that returns 200 and is indexable.</td></tr><tr><td>HREFLANG_INVALID_LANG</td><td>error</td><td>6</td><td>international</td><td>The language tag is not a simple BCP 47 tag or x-default.</td><td>Use a valid BCP 47 language tag, or x-default.</td></tr><tr><td>HREFLANG_MISSING_SELF</td><td>warning</td><td>5</td><td>international</td><td>The page lists alternates but does not list itself.</td><td>Add an hreflang link that points at this page.</td></tr><tr><td>HREFLANG_MISSING_XDEFAULT</td><td>warning</td><td>4</td><td>international</td><td>The page lists alternates but has no x-default.</td><td>Add an x-default hreflang link for this page.</td></tr><tr><td>CANONICAL_TARGET_NOT_200</td><td>error</td><td>8</td><td>on-page</td><td>The canonical URL was crawled and did not return 200.</td><td>Point canonical at a URL that returns HTTP 200.</td></tr><tr><td>CANONICAL_TO_NOINDEX</td><td>error</td><td>8</td><td>on-page</td><td>Several URLs canonicalize to a page marked noindex.</td><td>Do not canonicalize several URLs to a noindex page.</td></tr><tr><td>DUPLICATE_TITLE</td><td>warning</td><td>6</td><td>on-page</td><td>The same title is used by more than one URL.</td><td>Give each URL its own title.</td></tr><tr><td>CANONICAL_CHAIN</td><td>warning</td><td>5</td><td>on-page</td><td>The canonical target has a different canonical of its own (A to B to C).</td><td>Point canonical directly at the final URL instead of another canonical.</td></tr><tr><td>DUPLICATE_META_DESC</td><td>warning</td><td>4</td><td>on-page</td><td>The same meta description is used by more than one URL.</td><td>Give each URL its own meta description.</td></tr><tr><td>LLMS_TXT_MISSING</td><td>warning</td><td>8</td><td>ai-readiness</td><td>/llms.txt did not return 200.</td><td>Publish /llms.txt with an H1 title and a markdown list of links.</td></tr><tr><td>LLMS_TXT_MALFORMED</td><td>warning</td><td>5</td><td>ai-readiness</td><td>/llms.txt returned 200 but is not a <code># </code> title plus a markdown link list.</td><td>Start /llms.txt with a <code># </code> title and include a markdown link list.</td></tr><tr><td>SITEMAP_UNREACHABLE</td><td>warning</td><td>5</td><td>ai-readiness</td><td>/sitemap.xml did not return 200.</td><td>Serve /sitemap.xml with HTTP 200.</td></tr><tr><td>AI_BOT_DISALLOWED</td><td>warning</td><td>4</td><td>ai-readiness</td><td>robots.txt disallows this AI crawler.</td><td>Allow this AI crawler in robots.txt if the content should be readable.</td></tr><tr><td>SITEMAP_NOT_DECLARED</td><td>notice</td><td>2</td><td>ai-readiness</td><td>robots.txt does not declare a sitemap.</td><td>Declare the sitemap URL in robots.txt.</td></tr><tr><td>LLMS_FULL_TXT_MISSING</td><td>notice</td><td>2</td><td>ai-readiness</td><td>/llms-full.txt did not return 200.</td><td>Publish /llms-full.txt if you want a full-text companion file.</td></tr></tbody></table>
+      <p>An AI crawler that is not named in <code>robots.txt</code> is <code>unspecified</code>. That status is reported and does not subtract points. <code>User-agent: *</code> is not a named decision for these five crawlers. A missing <code>/llms.txt</code> is <code>LLMS_TXT_MISSING</code>. A file that returns 200 but has no <code># </code> title or no markdown link list is <code>LLMS_TXT_MALFORMED</code>, not both. <code>/llms-full.txt</code> is only an existence check.</p>
+      <p>Hreflang findings are raised only on pages that list at least one alternate. The return-link and bad-target checks run only when the target URL was crawled. A canonical chain is three or more URLs (A to B to C), including a cycle. One hop is not a chain. <code>CANONICAL_TO_NOINDEX</code> requires two or more source URLs. Empty titles and empty descriptions are not grouped.</p>
+      <h2>Pricing</h2>
+      <p>Pay per event. The primary event is <code>page-audited</code> at a suggested <strong>$1.00 per 1,000 pages</strong> (<strong>$0.001 per page</strong>). At listing, price only <code>page-audited</code>. Keep the event names <code>apify-actor-start</code> and <code>apify-default-dataset-item</code>, but do not set a price on <code>apify-default-dataset-item</code> (the same page would be charged twice). <code>apify-actor-start</code> stays the platform default. <code>ai-readiness-check</code> is recorded once per start domain and has no price in this code. Charge each dataset row as it is written, and stop when <code>eventChargeLimitReached</code> is true. See <code>PRICING.md</code>. The account owner sets the final price after measuring a free-tier run. Publish with limited permissions.</p>
+      <h2>Limits</h2>
+      <ul><li>No browser and no JavaScript rendering. Content that appears only after a script runs is invisible to this crawler.</li><li>The crawler stays on the start hostname. It does not log in.</li><li><code>robots.txt</code> is honored when <code>respectRobotsTxt</code> is true. A 404 or an HTML body is treated as &quot;no rules&quot;.</li><li>It does not collect email addresses, phone numbers, or personal names. Those strings are not fields in the output.</li><li>Requests to loopback, link-local, and private IP addresses are refused.</li><li>External link checks are off by default and, when on, stop after 20 URLs on a page.</li><li>Each hostname is limited to 5 requests per second. Concurrency does not raise that cap.</li><li>The demo is a smaller door onto the same core: allow-listed hosts, 50 pages, one audit at a time, 3 audits per address every 10 minutes.</li><li>PageSpeed, Core Web Vitals, and orphan pages (a sitemap diff) are left for a later version.</li></ul>
+      <h2>Run the Actor locally</h2>
+      <p>From this directory, with the demo virtualenv (Python 3.9 or newer):</p>
+      <pre><code class="language-bash">.venv/bin/python -m actor</code></pre>
+      <p>With no <code>INPUT.json</code>, the run uses the input schema prefill. It writes <code>storage/datasets/default/*.json</code>, <code>storage/key_value_stores/default/SUMMARY.json</code>, <code>REPORT.html</code>, and <code>REPORT.md</code>, then prints <code>SUCCEEDED</code>. On Apify the image is <code>apify/actor-python:3.12</code> and <code>APIFY_IS_AT_HOME=1</code> uses the SDK. Do not <code>push</code> this Actor until the account owner says to.</p>
+      <h2>Run the demo</h2>
+      <pre><code class="language-bash">./run.sh</code></pre>
+      <p>The process listens on <code>127.0.0.1:18806</code>. Open <code>http://127.0.0.1:18806/</code>. The public URL is <code>https://3.1.79.63/portfolio/siteatlas/</code>. Links are relative, so the same page works at the process root and under that prefix.</p>
+      <pre><code class="language-bash">curl -fsS http://127.0.0.1:18806/healthz</code></pre>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/siteatlas/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

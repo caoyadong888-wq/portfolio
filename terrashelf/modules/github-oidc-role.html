@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>github-oidc-role</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · CI/CD · v1.0.0</p>
+<h1>github-oidc-role</h1>
+<p>GitHub Actions role whose trust policy allows one branch or one environment.</p>
+<p>Tests passed <span data-metric="modules.github-oidc-role.passed">6</span> of <span data-metric="modules.github-oidc-role.runs">6</span>. Failed <span data-metric="modules.github-oidc-role.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>create_oidc_provider</td><td><code>bool</code></td><td>no</td><td>Create the GitHub OIDC provider. Set false and pass existing_oidc_provider_arn when the account already has one.</td></tr><tr><td>existing_oidc_provider_arn</td><td><code>string</code></td><td>no</td><td>ARN of an existing GitHub OIDC provider. Required when create_oidc_provider is false.</td></tr><tr><td>github_org</td><td><code>string</code></td><td>yes</td><td>GitHub organization or user that may assume the role. Wildcards are rejected.</td></tr><tr><td>github_repo</td><td><code>string</code></td><td>yes</td><td>Single GitHub repository name that may assume the role. Wildcards are rejected.</td></tr><tr><td>inline_policy_json</td><td><code>string</code></td><td>no</td><td>Optional inline policy JSON. Null skips the inline policy. A bare star action is rejected.</td></tr><tr><td>managed_policy_arns</td><td><code>list(string)</code></td><td>no</td><td>Managed policy ARNs to attach to the role.</td></tr><tr><td>max_session_duration</td><td><code>number</code></td><td>no</td><td>Maximum role session duration in seconds.</td></tr><tr><td>name</td><td><code>string</code></td><td>yes</td><td>IAM role name. Do not encode an environment into this name.</td></tr><tr><td>oidc_thumbprints</td><td><code>list(string)</code></td><td>no</td><td>SHA-1 thumbprints for the GitHub OIDC provider. The provider resource requires at least one.</td></tr><tr><td>subject_ref</td><td><code>string</code></td><td>yes</td><td>Branch name when subject_type is branch, or environment name when subject_type is environment. Wildcards are rejected.</td></tr><tr><td>subject_type</td><td><code>string</code></td><td>yes</td><td>Whether the trust subject pins a branch or a GitHub environment.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources.</td></tr><tr><td>inline_policy_count</td><td>Number of inline policies. Zero when inline_policy_json is null.</td></tr><tr><td>managed_policy_count</td><td>Number of managed policy attachments.</td></tr><tr><td>max_session_duration</td><td>Role max session duration in seconds.</td></tr><tr><td>oidc_provider_created</td><td>True when this module creates the GitHub OIDC provider.</td></tr><tr><td>role_arn</td><td>ARN of the IAM role.</td></tr><tr><td>role_name</td><td>Name of the IAM role.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr><tr><td>trust_audience</td><td>Exact token.actions.githubusercontent.com:aud value written into the trust policy.</td></tr><tr><td>trust_subject</td><td>Exact token.actions.githubusercontent.com:sub value written into the trust policy.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;gha&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">name</span><span style="color: #bbbbbb">         </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;gha-demo-role&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">github_org</span><span style="color: #bbbbbb">   </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;example-org&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">github_repo</span><span style="color: #bbbbbb">  </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;example-repo&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">subject_type</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;branch&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">subject_ref</span><span style="color: #bbbbbb">  </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;main&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>branch_subject passed</li><li>environment_subject passed</li><li>existing_provider_and_policies passed</li><li>short_session_rejected passed</li><li>reject_wildcard_repo passed</li><li>reject_wildcard_org passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\github-oidc-role.tftest.hcl... in progress
+  run &quot;branch_subject&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_iam_openid_connect_provider.github[0] will be created
+  + resource &quot;aws_iam_openid_connect_provider&quot; &quot;github&quot; {
+      + arn             = (known after apply)
+      + client_id_list  = [
+          + &quot;sts.amazonaws.com&quot;,
+        ]
+      + id              = (known after apply)
+      + tags            = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;github-oidc-role&quot;
+          + &quot;Owner&quot;     = &quot;platform&quot;
+        }
+      + tags_all        = (known after apply)
+      + thumbprint_list = [
+          + &quot;6938fd4d98bab03faadb97b34396831e3780aea1&quot;,
+        ]
+      + url             = &quot;https://token.actions.githubusercontent.com&quot;
+    }
+
+  # aws_iam_role.this will be created
+  + resource &quot;aws_iam_role&quot; &quot;this&quot; {
+      + arn                  = (known after apply)
+      + assume_role_policy   = (known after apply)
+      + create_date          = (known after apply)
+      + description          = &quot;GitHub Actions role for repo:example-org/example-repo:ref:refs/heads/main in partition aws.&quot;
+      + id                   = (known after apply)
+      + managed_policy_arns  = (known after apply)
+      + max_session_duration = 3600
+      + name                 = &quot;gha-demo-role&quot;</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/github-oidc-role.svg" alt="Resource list for github-oidc-role">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Optional GitHub OIDC provider and a role trust policy pinned to one branch or one environment.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>No separate billable service</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

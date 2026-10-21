@@ -1,0 +1,129 @@
+{
+  "clean_examples": [],
+  "dq": {
+    "blocking_failed": [],
+    "checks": [
+      {
+        "detail": "source=0 loaded=0 quarantined=0 deduped=0",
+        "id": "row_reconciliation",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "dup_sales=0 dup_current=0",
+        "id": "primary_key_unique",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "missing=0",
+        "id": "foreign_keys",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "null_rows=0",
+        "id": "required_not_null",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "bad_enum=0",
+        "id": "value_enums",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "mismatched_store_days=0",
+        "id": "amount_reconciliation",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "max=2026-09-30 as_of=2026-09-10 gap_days=-20",
+        "id": "freshness",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "files=0",
+        "id": "no_schema_drift",
+        "level": "warning",
+        "passed": true
+      }
+    ],
+    "status": "PASS",
+    "warnings": []
+  },
+  "elapsed_ms": 1663,
+  "files_skipped": 18,
+  "finished_at": "2026-10-04T08:42:23+00:00",
+  "params": {
+    "as_of": "2026-09-10",
+    "date_from": "2026-09-10",
+    "date_to": "2026-09-10",
+    "dry_run": false,
+    "full_refresh": false
+  },
+  "published": true,
+  "quarantine_counts": {},
+  "reconciliation": {
+    "deduped_rows": 0,
+    "loaded_rows": 0,
+    "quarantined_rows": 0,
+    "source_rows": 0
+  },
+  "rows_added": 0,
+  "run_id": "rerun-2026-09-10",
+  "schema_drift_files": [],
+  "stages": {
+    "dq": {
+      "ms": 18,
+      "rows": 8
+    },
+    "extract": {
+      "ms": 229,
+      "rows": 0
+    },
+    "land": {
+      "ms": 0,
+      "rows": 0
+    },
+    "load": {
+      "ms": 5,
+      "rows": 0
+    },
+    "manifest": {
+      "ms": 1,
+      "rows": 1
+    },
+    "publish": {
+      "ms": 1374,
+      "rows": 1309
+    },
+    "quarantine": {
+      "ms": 0,
+      "rows": 0
+    },
+    "transform": {
+      "ms": 0,
+      "rows": 0
+    },
+    "validate": {
+      "ms": 0,
+      "rows": 0
+    }
+  },
+  "started_at": "2026-10-04T08:42:21+00:00",
+  "status": "SUCCESS",
+  "versions": {
+    "PyYAML": "6.0.2",
+    "SQLAlchemy": "2.0.36",
+    "httpx": "0.27.2",
+    "openpyxl": "3.1.5",
+    "pandas": "2.2.3",
+    "pandera": "0.20.4",
+    "pyarrow": "17.0.0",
+    "python": "3.9.9"
+  }
+}

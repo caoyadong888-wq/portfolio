@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ObservaStack 告警</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="index.html">概览</a>
+<a href="alerts.html">告警</a>
+<a href="slo.html">SLO</a>
+<a href="routing.html">路由</a>
+<a href="files/index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<h1>告警目录</h1>
+<p class="note">每一条都有 firing 的 promtool 用例。除 Watchdog 外，每一条还有 exp_alerts 为空的用例。数字来自构建时记录。</p>
+<table>
+<thead><tr><th>告警</th><th>severity</th><th>team</th><th>for</th><th>firing</th><th>non-firing</th><th>passed</th></tr></thead>
+<tbody>
+<tr><td><a href="runbooks/OrdersApiErrorBudgetBurnFast.html"><span data-metric="alerts.0.name">OrdersApiErrorBudgetBurnFast</span></a></td><td><span data-metric="alerts.0.severity">critical</span></td><td><span data-metric="alerts.0.team">orders</span></td><td><span data-metric="alerts.0.for">2m</span></td><td><span data-metric="alerts.0.firing_tests">1</span></td><td><span data-metric="alerts.0.nonfiring_tests">3</span></td><td><span data-metric="alerts.0.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="OrdersApiErrorBudgetBurnFast">(
+  slo:sli_error:ratio_rate1h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (14.4 * 0.001)
+  and
+  slo:sli_error:ratio_rate5m{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (14.4 * 0.001)
+)
+or
+(
+  slo:sli_error:ratio_rate6h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (6 * 0.001)
+  and
+  slo:sli_error:ratio_rate30m{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (6 * 0.001)
+)</pre></td></tr>
+<tr><td><a href="runbooks/OrdersApiErrorBudgetBurnSlow.html"><span data-metric="alerts.1.name">OrdersApiErrorBudgetBurnSlow</span></a></td><td><span data-metric="alerts.1.severity">warning</span></td><td><span data-metric="alerts.1.team">orders</span></td><td><span data-metric="alerts.1.for">2m</span></td><td><span data-metric="alerts.1.firing_tests">3</span></td><td><span data-metric="alerts.1.nonfiring_tests">2</span></td><td><span data-metric="alerts.1.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="OrdersApiErrorBudgetBurnSlow">(
+  slo:sli_error:ratio_rate1d{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (3 * 0.001)
+  and
+  slo:sli_error:ratio_rate2h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (3 * 0.001)
+)
+or
+(
+  slo:sli_error:ratio_rate3d{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (1 * 0.001)
+  and
+  slo:sli_error:ratio_rate6h{service=&quot;orders-api&quot;,slo=&quot;availability&quot;} &gt; (1 * 0.001)
+)</pre></td></tr>
+<tr><td><a href="runbooks/OrdersApiLatencySLOBurn.html"><span data-metric="alerts.2.name">OrdersApiLatencySLOBurn</span></a></td><td><span data-metric="alerts.2.severity">warning</span></td><td><span data-metric="alerts.2.team">orders</span></td><td><span data-metric="alerts.2.for">2m</span></td><td><span data-metric="alerts.2.firing_tests">1</span></td><td><span data-metric="alerts.2.nonfiring_tests">1</span></td><td><span data-metric="alerts.2.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="OrdersApiLatencySLOBurn">(
+  slo:sli_latency_error:ratio_rate1h{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (14.4 * 0.01)
+  and
+  slo:sli_latency_error:ratio_rate5m{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (14.4 * 0.01)
+)
+or
+(
+  slo:sli_latency_error:ratio_rate6h{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (6 * 0.01)
+  and
+  slo:sli_latency_error:ratio_rate30m{service=&quot;orders-api&quot;,slo=&quot;latency&quot;} &gt; (6 * 0.01)
+)</pre></td></tr>
+<tr><td><a href="runbooks/PaymentsQueueBacklog.html"><span data-metric="alerts.3.name">PaymentsQueueBacklog</span></a></td><td><span data-metric="alerts.3.severity">warning</span></td><td><span data-metric="alerts.3.team">payments</span></td><td><span data-metric="alerts.3.for">5m</span></td><td><span data-metric="alerts.3.firing_tests">1</span></td><td><span data-metric="alerts.3.nonfiring_tests">1</span></td><td><span data-metric="alerts.3.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="PaymentsQueueBacklog">service:payments_queue_oldest_age_seconds:max &gt; 300
+and
+max by (service) (deriv(payments_queue_depth[10m])) &gt; 0</pre></td></tr>
+<tr><td><a href="runbooks/ServiceHighErrorRate.html"><span data-metric="alerts.4.name">ServiceHighErrorRate</span></a></td><td><span data-metric="alerts.4.severity">warning</span></td><td><span data-metric="alerts.4.team">platform</span></td><td><span data-metric="alerts.4.for">10m</span></td><td><span data-metric="alerts.4.firing_tests">1</span></td><td><span data-metric="alerts.4.nonfiring_tests">1</span></td><td><span data-metric="alerts.4.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="ServiceHighErrorRate">service:http_requests:rate5m &gt; 0
+and
+(
+  service:http_requests_errors:rate5m
+  /
+  service:http_requests:rate5m
+) &gt; 0.05</pre></td></tr>
+<tr><td><a href="runbooks/ServiceLatencyP95High.html"><span data-metric="alerts.5.name">ServiceLatencyP95High</span></a></td><td><span data-metric="alerts.5.severity">warning</span></td><td><span data-metric="alerts.5.team">platform</span></td><td><span data-metric="alerts.5.for">10m</span></td><td><span data-metric="alerts.5.firing_tests">1</span></td><td><span data-metric="alerts.5.nonfiring_tests">1</span></td><td><span data-metric="alerts.5.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="ServiceLatencyP95High">max by (service) (service_route:http_request_duration_seconds:p95_5m)
+&gt; on (service)
+service:http_latency_p95_threshold_seconds:constant</pre></td></tr>
+<tr><td><a href="runbooks/BlackboxProbeFailed.html"><span data-metric="alerts.6.name">BlackboxProbeFailed</span></a></td><td><span data-metric="alerts.6.severity">critical</span></td><td><span data-metric="alerts.6.team">platform</span></td><td><span data-metric="alerts.6.for">5m</span></td><td><span data-metric="alerts.6.firing_tests">1</span></td><td><span data-metric="alerts.6.nonfiring_tests">1</span></td><td><span data-metric="alerts.6.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="BlackboxProbeFailed">probe_success == 0</pre></td></tr>
+<tr><td><a href="runbooks/InstanceDown.html"><span data-metric="alerts.7.name">InstanceDown</span></a></td><td><span data-metric="alerts.7.severity">critical</span></td><td><span data-metric="alerts.7.team">platform</span></td><td><span data-metric="alerts.7.for">2m</span></td><td><span data-metric="alerts.7.firing_tests">1</span></td><td><span data-metric="alerts.7.nonfiring_tests">1</span></td><td><span data-metric="alerts.7.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="InstanceDown">up == 0</pre></td></tr>
+<tr><td><a href="runbooks/NodeFilesystemFillingUp.html"><span data-metric="alerts.8.name">NodeFilesystemFillingUp</span></a></td><td><span data-metric="alerts.8.severity">warning</span></td><td><span data-metric="alerts.8.team">platform</span></td><td><span data-metric="alerts.8.for">30m</span></td><td><span data-metric="alerts.8.firing_tests">1</span></td><td><span data-metric="alerts.8.nonfiring_tests">1</span></td><td><span data-metric="alerts.8.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="NodeFilesystemFillingUp">instance:node_filesystem_avail:ratio &lt; 0.2
+and
+predict_linear(node_filesystem_avail_bytes{fstype!~&quot;tmpfs|overlay&quot;}[6h], 4 * 3600) &lt; 0</pre></td></tr>
+<tr><td><a href="runbooks/NodeMemoryHigh.html"><span data-metric="alerts.9.name">NodeMemoryHigh</span></a></td><td><span data-metric="alerts.9.severity">warning</span></td><td><span data-metric="alerts.9.team">platform</span></td><td><span data-metric="alerts.9.for">15m</span></td><td><span data-metric="alerts.9.firing_tests">1</span></td><td><span data-metric="alerts.9.nonfiring_tests">1</span></td><td><span data-metric="alerts.9.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="NodeMemoryHigh">instance:node_memory_utilisation:ratio &gt; 0.90</pre></td></tr>
+<tr><td><a href="runbooks/PostgresConnectionsNearLimit.html"><span data-metric="alerts.10.name">PostgresConnectionsNearLimit</span></a></td><td><span data-metric="alerts.10.severity">warning</span></td><td><span data-metric="alerts.10.team">platform</span></td><td><span data-metric="alerts.10.for">10m</span></td><td><span data-metric="alerts.10.firing_tests">1</span></td><td><span data-metric="alerts.10.nonfiring_tests">1</span></td><td><span data-metric="alerts.10.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="PostgresConnectionsNearLimit">pg_stat_activity_connections / pg_settings_max_connections &gt; 0.85</pre></td></tr>
+<tr><td><a href="runbooks/PostgresDown.html"><span data-metric="alerts.11.name">PostgresDown</span></a></td><td><span data-metric="alerts.11.severity">critical</span></td><td><span data-metric="alerts.11.team">platform</span></td><td><span data-metric="alerts.11.for">2m</span></td><td><span data-metric="alerts.11.firing_tests">1</span></td><td><span data-metric="alerts.11.nonfiring_tests">1</span></td><td><span data-metric="alerts.11.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="PostgresDown">pg_up == 0</pre></td></tr>
+<tr><td><a href="runbooks/ScrapeTargetMissing.html"><span data-metric="alerts.12.name">ScrapeTargetMissing</span></a></td><td><span data-metric="alerts.12.severity">critical</span></td><td><span data-metric="alerts.12.team">platform</span></td><td><span data-metric="alerts.12.for">5m</span></td><td><span data-metric="alerts.12.firing_tests">1</span></td><td><span data-metric="alerts.12.nonfiring_tests">1</span></td><td><span data-metric="alerts.12.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="ScrapeTargetMissing">absent(up{job=&quot;storefront&quot;})</pre></td></tr>
+<tr><td><a href="runbooks/TLSCertExpiringSoon.html"><span data-metric="alerts.13.name">TLSCertExpiringSoon</span></a></td><td><span data-metric="alerts.13.severity">warning</span></td><td><span data-metric="alerts.13.team">platform</span></td><td><span data-metric="alerts.13.for">1h</span></td><td><span data-metric="alerts.13.firing_tests">1</span></td><td><span data-metric="alerts.13.nonfiring_tests">1</span></td><td><span data-metric="alerts.13.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="TLSCertExpiringSoon">(probe_ssl_earliest_cert_expiry - time()) &lt; (14 * 24 * 3600)</pre></td></tr>
+<tr><td><a href="runbooks/AlertmanagerNotificationsFailing.html"><span data-metric="alerts.14.name">AlertmanagerNotificationsFailing</span></a></td><td><span data-metric="alerts.14.severity">critical</span></td><td><span data-metric="alerts.14.team">platform</span></td><td><span data-metric="alerts.14.for">15m</span></td><td><span data-metric="alerts.14.firing_tests">1</span></td><td><span data-metric="alerts.14.nonfiring_tests">1</span></td><td><span data-metric="alerts.14.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="AlertmanagerNotificationsFailing">(
+  sum by (service) (rate(alertmanager_notifications_failed_total[5m]))
+  /
+  sum by (service) (rate(alertmanager_notifications_total[5m]))
+) &gt; 0.10
+and
+sum by (service) (rate(alertmanager_notifications_total[5m])) &gt; 0</pre></td></tr>
+<tr><td><a href="runbooks/PrometheusRuleEvaluationFailures.html"><span data-metric="alerts.15.name">PrometheusRuleEvaluationFailures</span></a></td><td><span data-metric="alerts.15.severity">warning</span></td><td><span data-metric="alerts.15.team">platform</span></td><td><span data-metric="alerts.15.for">10m</span></td><td><span data-metric="alerts.15.firing_tests">1</span></td><td><span data-metric="alerts.15.nonfiring_tests">1</span></td><td><span data-metric="alerts.15.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="PrometheusRuleEvaluationFailures">increase(prometheus_rule_evaluation_failures_total[5m]) &gt; 0</pre></td></tr>
+<tr><td><a href="runbooks/Watchdog.html"><span data-metric="alerts.16.name">Watchdog</span></a></td><td><span data-metric="alerts.16.severity">info</span></td><td><span data-metric="alerts.16.team">platform</span></td><td><span data-metric="alerts.16.for">none</span></td><td><span data-metric="alerts.16.firing_tests">1</span></td><td><span data-metric="alerts.16.nonfiring_tests">0</span></td><td><span data-metric="alerts.16.passed">true</span></td></tr>
+<tr><td colspan="7"><pre id="Watchdog">vector(1)</pre></td></tr>
+</tbody>
+</table>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "DEMO Mara Chen",
+    "email": "mara.chen@example.com",
+    "company": "Northwind Outfitters",
+    "message": "Please send a price quote for 20 seats of the annual plan."
+  },
+  {
+    "name": "DEMO Luis Ortega",
+    "email": "luis.ortega@example.com",
+    "company": "Fabrikam Studio",
+    "message": "We want to place an order for the starter package this week."
+  },
+  {
+    "name": "DEMO Priya Shah",
+    "email": "priya.shah@example.com",
+    "company": "Contoso Labs",
+    "message": "The export button is broken and shows an error after login."
+  },
+  {
+    "name": "DEMO Owen Blake",
+    "email": "owen.blake@example.com",
+    "company": "Adventure Works",
+    "message": "I need help with a refund for invoice 1042."
+  },
+  {
+    "name": "DEMO Casino Promo",
+    "email": "casino.promo@example.com",
+    "company": "Lucky Fields",
+    "message": "Play at our casino tonight and claim a welcome bonus."
+  },
+  {
+    "name": "DEMO Link Farm",
+    "email": "links.farm@example.com",
+    "company": "SEO Partners",
+    "message": "Buy crypto signals and seo backlinks. See https://example.com/a https://example.com/b https://example.com/c"
+  },
+  {
+    "name": "DEMO Pill Ads",
+    "email": "pills.ads@example.com",
+    "company": "Health Noise",
+    "message": "Cheap viagra shipped overnight, no questions asked."
+  },
+  {
+    "name": "DEMO Nina Park",
+    "email": "nina.park@example.com",
+    "company": "Alpine Books",
+    "message": "Hello, we read the company page and the catalog looks clear."
+  }
+]

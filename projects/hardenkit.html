@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HardenKit — case study</title>
+  <meta name="description" content="Linux VPS hardening playbook and before/after audit reports for fictional hosts.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/hardenkit/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. The demo uses fictional data.</p>
+    <article class="readme">
+      <h1>HardenKit</h1>
+      <p>A Linux VPS hardening toolkit and a before/after audit report. The playbook and the bash fallback lock down SSH, the firewall, fail2ban, unattended security updates, sysctl, auditd, accounts, and time sync. The web page is the thing a client can click: six fictional hosts, each with a weak image and the same host after the playbook. The public demo does not audit the machine it runs on. Run <code>scripts/audit.sh</code> on a host you administer.</p>
+      <h2>Overview</h2>
+      <p>HardenKit is a portfolio piece for the work of taking a fresh Linux VPS and leaving it with a written baseline. The Ansible playbook is the source of the change. <code>scripts/audit.sh</code> only reads. The FastAPI page renders the fictional before/after reports. A live audit of the process host is off unless <code>HARDENKIT_LIVE_AUDIT=1</code>, so a public copy does not publish that machine&#x27;s name, kernel, or addresses.</p>
+      <h2>Problem → Solution → Result</h2>
+      <h3>Problem</h3>
+      <ul><li>A fresh VPS image still has password SSH, no firewall, and no story for security updates. The checklist lives in a ticket, not in a file you can re-run.</li><li>An audit that needs root, or that shells out from a web request, is the wrong shape for a public demo.</li><li>A report that only says &quot;hardened&quot; hides which control moved, which one is still open, and which role is supposed to fix it.</li></ul>
+      <h3>Solution</h3>
+      <ul><li>One playbook (<code>ansible/site.yml</code>) with roles for SSH, firewall (ufw or firewalld), fail2ban, unattended-upgrades or dnf-automatic, sysctl, auditd, accounts, a <code>/tmp</code> mount, and chrony. <code>scripts/harden.sh</code> prints the same baseline and refuses to write unless it is root.</li><li>A read-only audit of about 28 CIS-style checks. Missing tools and root-only probes become <code>unknown</code> instead of a crash. The page runs that script on a fixed argument list, with a timeout, and never takes a path or a command from the request.</li><li>A single page: fleet scores, a host checklist grouped by category, the before/after diff, the role and task that fix each row, a playbook browser limited to a whitelist, and a JSON or print download.</li></ul>
+      <h3>Result</h3>
+      <ul><li><code>GET /api/hosts</code> returns six fictional hosts with before and after scores, the point lift, and the percent lift.</li><li><code>GET /api/live</code> returns <code>{&quot;enabled&quot;: false}</code> unless <code>HARDENKIT_LIVE_AUDIT=1</code>. The public page shows how to run <code>sudo scripts/audit.sh --json</code> and a short JSON example from the fictional host <code>web-01.globex.example</code>. With the flag on, the same route caches a real read-only audit for a host you administer.</li><li><code>pytest</code> checks the score math, that fixture JSON and <code>audit.sh --json</code> share a schema, that playbook ids cannot escape the whitelist, and that the live runner uses a fixed argv with <code>shell=False</code>.</li></ul>
+      <p>These are capabilities of this demo, not claims about a client engagement.</p>
+      <h2>Features</h2>
+      <ul><li>Fleet overview with a before mark and an after bar. Unknown checks are left out of the score. A warning counts as half a pass.</li><li>Host detail grouped into SSH, Network / Firewall, Updates, Logging / Audit, Kernel, Filesystem, and Accounts. Each row has pass, fail, warn, or unknown, the expected value, the remediation, and the Ansible role and task.</li><li>Filters for every control, only the ones that changed, and the ones still open after the playbook.</li><li>Playbook tab with a fixed file list. The request id is a key in a map, not a filesystem path. Snippets are escaped, then highlighted in the page.</li><li>Downloadable JSON and a print-friendly HTML view for each fictional host.</li><li>Optional live audit (<code>HARDENKIT_LIVE_AUDIT=1</code>) on startup and every six hours. The newest eight snapshots are kept in SQLite. The audit does not install packages and does not write configuration. The public unit leaves this flag at <code>0</code>.</li><li><code>scripts/harden.sh</code> defaults to <code>--dry-run</code>. <code>--apply</code> exits immediately when it is not root.</li></ul>
+      <h2>Architecture</h2>
+      <p>Live demo (what the public page is):</p>
+      <pre><code>Browser
+         |
+         |  relative URLs (api/..., static/..., ../)
+         v
+      edge nginx, prefix stripped
+         |
+         v
+      systemd: python -m app  127.0.0.1:18804
+         |
+         +--&gt; data_seed/fleet.json          fictional before/after reports
+         +--&gt; scripts/audit.sh --json       only if HARDENKIT_LIVE_AUDIT=1
+         +--&gt; SQLite DATA_DIR/hardenkit.db  newest 8 live snapshots
+         +--&gt; ansible/                      whitelist read for the Playbook tab</code></pre>
+      <pre><code class="language-mermaid">flowchart LR
+        browser[Browser] --&gt; nginx[nginx prefix stripped]
+        nginx --&gt; app[FastAPI]
+        app --&gt; seed[fleet.json]
+        app --&gt; audit[audit.sh]
+        app --&gt; db[SQLite]
+        app --&gt; playbook[ansible whitelist]</code></pre>
+      <p>The playbook is not applied by the web process. Applying it is an operator step, on a host you already have Ansible access to, or <code>harden.sh --apply</code> as root on that host.</p>
+      <h2>Tech stack</h2>
+      <ul><li>Python 3.9+ (developed and tested on newer 3.x as well), FastAPI, uvicorn, stdlib sqlite3.</li><li>Ansible (ansible-core) for the playbook. Roles use <code>ansible.builtin</code> only.</li><li>Bash for the read-only audit and the dry-run hardening script.</li><li>One HTML page, vanilla JS, and one CSS file. Charts are inline SVG. No CDN, no web font, no tracker.</li></ul>
+      <h2>Run locally</h2>
+      <pre><code class="language-sh">cd hardenkit
+      python3 -m venv .venv
+      .venv/bin/pip install -r requirements.txt
+      .venv/bin/python -m app</code></pre>
+      <p><code>run.sh</code> creates the venv if it is missing and starts the same module. Open <code>http://127.0.0.1:18804/</code>. Live audit is off by default, so the process does not read this machine. Set <code>HARDENKIT_LIVE_AUDIT=1</code> only on a host you administer. The first request then waits until that audit finishes (usually under a minute).</p>
+      <p>The audit and the playbook syntax check:</p>
+      <pre><code class="language-sh">bash scripts/audit.sh --json
+      bash scripts/harden.sh --dry-run
+      .venv/bin/pip install -r requirements-dev.txt ansible-core ansible-lint
+      .venv/bin/ansible-playbook --syntax-check -i ansible/inventory.example.ini ansible/site.yml
+      .venv/bin/ansible-lint ansible/site.yml
+      .venv/bin/python -m pytest</code></pre>
+      <h3>Docker Compose</h3>
+      <p>Docker is optional. The public demo does not use it.</p>
+      <pre><code class="language-sh">docker compose up --build</code></pre>
+      <p>The container listens on <code>127.0.0.1:18804</code>, runs as uid 10001, and keeps SQLite on the <code>hardenkit_data</code> volume. The root filesystem is read-only. <code>/tmp</code> is a tmpfs. <code>HARDENKIT_LIVE_AUDIT</code> defaults to <code>0</code> in the image and in Compose, matching the public unit.</p>
+      <p>The <code>dnf_automatic</code> role configures the <code>dnf-automatic</code> package on Red Hat family hosts. Debian hosts use <code>unattended_upgrades</code> instead.</p>
+      <h2>Configuration</h2>
+      <table><thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td>Bind address. Set <code>0.0.0.0</code> only inside a container.</td></tr><tr><td><code>PORT</code></td><td><code>18804</code></td><td>Listen port.</td></tr><tr><td><code>DATA_DIR</code></td><td><code>./data</code></td><td>SQLite directory for live audit snapshots. Created on first write.</td></tr><tr><td><code>HARDENKIT_LIVE_AUDIT</code></td><td><code>0</code></td><td><code>1</code>/<code>true</code>/<code>yes</code>/<code>on</code> runs <code>scripts/audit.sh</code> and publishes that report. Anything else, including unset, leaves it off. The public page then returns <code>{&quot;enabled&quot;: false}</code> from <code>/api/live</code> and does not include a host name, kernel, or address from the machine serving the page.</td></tr><tr><td><code>LIVE_AUDIT_INTERVAL_SECONDS</code></td><td><code>21600</code></td><td>Seconds between live audits when the flag is on. Values below 60 are raised to 60.</td></tr></tbody></table>
+      <p>There is no write API, no admin token, and no URL the process will fetch on behalf of a caller.</p>
+      <h2>API endpoints</h2>
+      <table><thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/</code></td><td>Fleet page.</td></tr><tr><td><code>GET</code></td><td><code>/healthz</code></td><td><code>{&quot;status&quot;:&quot;ok&quot;,...}</code>. Does not run the audit.</td></tr><tr><td><code>GET</code></td><td><code>/api/hosts</code></td><td>Fleet summary and per-host scores.</td></tr><tr><td><code>GET</code></td><td><code>/api/hosts/{id}</code></td><td>One fictional host, before and after.</td></tr><tr><td><code>GET</code></td><td><code>/api/hosts/{id}/report.json</code></td><td>Same document as a download.</td></tr><tr><td><code>GET</code></td><td><code>/api/hosts/{id}/report.html</code></td><td>Print view.</td></tr><tr><td><code>GET</code></td><td><code>/api/live</code></td><td><code>{&quot;enabled&quot;: false}</code> by default. A cached audit only when <code>HARDENKIT_LIVE_AUDIT=1</code>.</td></tr><tr><td><code>GET</code></td><td><code>/api/playbook</code></td><td>Whitelisted playbook files and their text.</td></tr><tr><td><code>GET</code></td><td><code>/api/playbook/{id}</code></td><td>One whitelisted file. Unknown ids are 404.</td></tr><tr><td><code>GET</code></td><td><code>/metrics</code></td><td>Prometheus text.</td></tr></tbody></table>
+      <p><code>{id}</code> for hosts is a short name such as <code>web-01</code>. <code>{id}</code> for the playbook is a key such as <code>site</code> or <code>ssh-tasks</code>. A path, a <code>..</code> segment, or a leading dot is rejected before any file is opened.</p>
+      <h2>Tests</h2>
+      <pre><code class="language-sh">.venv/bin/python -m pytest</code></pre>
+      <p>Coverage includes score rounding, fixture schema against a real <code>audit.sh --json</code> run, playbook whitelist and path traversal, the live runner with a mocked subprocess, relative URLs, the 8 KB body cap, metrics, <code>bash -n</code>, and a non-root <code>--apply</code> refusal. Ansible YAML is parsed in pytest. <code>ansible-playbook --syntax-check</code> and <code>ansible-lint</code> run when those tools are installed (they are also a CI job).</p>
+      <h2>Deployment notes</h2>
+      <p>The live demo is a systemd service on a small VPS, behind nginx. The public URL is <code>https://3.1.79.63/portfolio/hardenkit/</code>. Nginx strips the prefix (<code>proxy_pass http://127.0.0.1:18804/;</code>), so the page uses relative URLs and also works at the bare port.</p>
+      <p>The unit file is <code>deploy/hardenkit.service</code> (<code>User=ec2-user</code>, <code>WorkingDirectory=/opt/portfolio/hardenkit</code>, <code>MemoryMax=150M</code>, <code>NoNewPrivileges=yes</code>, <code>HARDENKIT_LIVE_AUDIT=0</code>). Install the app under <code>/opt/portfolio/hardenkit</code>, create the venv from <code>requirements.txt</code>, and start the unit. The process binds <code>127.0.0.1</code> only. The public page does not run the audit.</p>
+      <p>Do not point this service at a host you do not administer. The page does not apply the playbook. Night or unattended use of <code>harden.sh --apply</code> is an operator decision on that host, and the script will not run it without root.</p>
+      <h2>Screenshots</h2>
+      <p>Fleet overview at desktop width:</p>
+      <p><img alt="Desktop fleet" src="../img/hardenkit-desktop.png"></p>
+      <p>The same page at a phone width:</p>
+      <p><img alt="Mobile fleet" src="../img/hardenkit-mobile.png"></p>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/hardenkit/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

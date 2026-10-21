@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rds-postgres</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · Data · v1.0.0</p>
+<h1>rds-postgres</h1>
+<p>Encrypted Postgres with security-group ingress and a Secrets Manager master password.</p>
+<p>Tests passed <span data-metric="modules.rds-postgres.passed">6</span> of <span data-metric="modules.rds-postgres.runs">6</span>. Failed <span data-metric="modules.rds-postgres.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>allocated_storage</td><td><code>number</code></td><td>no</td><td>Allocated storage in gibibytes.</td></tr><tr><td>allowed_security_group_ids</td><td><code>list(string)</code></td><td>yes</td><td>Security groups allowed to connect on the Postgres port. CIDR blocks, including 0.0.0.0/0, are not accepted.</td></tr><tr><td>backup_retention_days</td><td><code>number</code></td><td>no</td><td>Automated backup retention in days.</td></tr><tr><td>database_name</td><td><code>string</code></td><td>no</td><td>Initial database name.</td></tr><tr><td>engine_version</td><td><code>string</code></td><td>no</td><td>Postgres engine version.</td></tr><tr><td>env</td><td><code>string</code></td><td>yes</td><td>Environment name. prod turns on deletion protection and requires a final snapshot. dev and staging do not.</td></tr><tr><td>instance_class</td><td><code>string</code></td><td>no</td><td>RDS instance class.</td></tr><tr><td>master_username</td><td><code>string</code></td><td>no</td><td>Master username. The password is not set in this module. RDS stores it in Secrets Manager.</td></tr><tr><td>monitoring_interval</td><td><code>number</code></td><td>no</td><td>Enhanced monitoring interval in seconds. Zero disables it.</td></tr><tr><td>multi_az</td><td><code>bool</code></td><td>no</td><td>Enable a Multi-AZ deployment.</td></tr><tr><td>name</td><td><code>string</code></td><td>yes</td><td>Database identifier, subnet group name, and name prefix. Do not encode an environment into this name; use env.</td></tr><tr><td>parameter_group_family</td><td><code>string</code></td><td>no</td><td>Parameter group family. Must match engine_version.</td></tr><tr><td>performance_insights</td><td><code>bool</code></td><td>no</td><td>Enable Performance Insights.</td></tr><tr><td>performance_insights_kms_key_arn</td><td><code>string</code></td><td>no</td><td>Optional customer managed key ARN for Performance Insights. Null uses the AWS managed key when Performance Insights is on.</td></tr><tr><td>port</td><td><code>number</code></td><td>no</td><td>Postgres port.</td></tr><tr><td>subnet_ids</td><td><code>list(string)</code></td><td>yes</td><td>Private subnet ids for the DB subnet group. At least two.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr><tr><td>vpc_id</td><td><code>string</code></td><td>yes</td><td>VPC that holds the database security group.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>backup_retention_days</td><td>Automated backup retention in days.</td></tr><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources.</td></tr><tr><td>deletion_protection</td><td>Whether deletion protection is on. True only when env is prod.</td></tr><tr><td>endpoint</td><td>RDS endpoint address.</td></tr><tr><td>force_ssl</td><td>Value of rds.force_ssl in the parameter group.</td></tr><tr><td>identifier</td><td>RDS instance identifier.</td></tr><tr><td>ingress_cidr_blocks</td><td>CIDR blocks on the database security group. This module always leaves the list empty.</td></tr><tr><td>ingress_security_group_ids</td><td>Security group ids allowed to reach Postgres.</td></tr><tr><td>manage_master_user_password</td><td>True when RDS stores the master password in Secrets Manager. This module never sets a password.</td></tr><tr><td>performance_insights_enabled</td><td>Whether Performance Insights is enabled.</td></tr><tr><td>port</td><td>Postgres port.</td></tr><tr><td>publicly_accessible</td><td>Whether the instance is publicly accessible.</td></tr><tr><td>security_group_id</td><td>Security group id attached to the instance.</td></tr><tr><td>skip_final_snapshot</td><td>Whether a final snapshot is skipped. False when env is prod.</td></tr><tr><td>storage_encrypted</td><td>Whether storage encryption is on.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;db&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">name</span><span style="color: #bbbbbb">                       </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;app-db&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">env</span><span style="color: #bbbbbb">                        </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;dev&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">vpc_id</span><span style="color: #bbbbbb">                     </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;vpc-0abc1234def56789&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">subnet_ids</span><span style="color: #bbbbbb">                 </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;subnet-0abc1234def56789&quot;, &quot;subnet-0abc1234def56780&quot;</span>]
+<span style="color: #bbbbbb">  </span><span style="color: #687822">allowed_security_group_ids</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;sg-0abc1234def56789&quot;</span>]
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>dev_locked_down passed</li><li>prod_deletion_protection passed</li><li>performance_insights passed</li><li>custom_backup passed</li><li>reject_open_cidr passed</li><li>reject_bad_env passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\rds-postgres.tftest.hcl... in progress
+  run &quot;dev_locked_down&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_db_instance.this will be created
+  + resource &quot;aws_db_instance&quot; &quot;this&quot; {
+      + address                               = (known after apply)
+      + allocated_storage                     = 20
+      + apply_immediately                     = false
+      + arn                                   = (known after apply)
+      + auto_minor_version_upgrade            = true
+      + availability_zone                     = (known after apply)
+      + backup_retention_period               = 7
+      + backup_target                         = (known after apply)
+      + backup_window                         = &quot;03:00-04:00&quot;
+      + ca_cert_identifier                    = (known after apply)
+      + character_set_name                    = (known after apply)
+      + copy_tags_to_snapshot                 = true
+      + db_name                               = &quot;appdb&quot;
+      + db_subnet_group_name                  = &quot;app-pg&quot;
+      + deletion_protection                   = false
+      + domain_fqdn                           = (known after apply)
+      + enabled_cloudwatch_logs_exports       = [
+          + &quot;postgresql&quot;,
+          + &quot;upgrade&quot;,
+        ]
+      + endpoint                              = (known after apply)
+      + engine                                = &quot;postgres&quot;
+      + engine_lifecycle_support              = (known after apply)
+      + engine_version                        = &quot;16.4&quot;
+      + engine_version_actual                 = (known after apply)
+      + hosted_zone_id                        = (known after apply)
+      + iam_database_authentication_enabled   = true</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/rds-postgres.svg" alt="Resource list for rds-postgres">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Encrypted Postgres, forced SSL, and ingress limited to caller-supplied security groups.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>Amazon RDS</li><li>Amazon CloudWatch</li><li>AWS Secrets Manager</li><li>Performance Insights</li><li>RDS Enhanced Monitoring</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

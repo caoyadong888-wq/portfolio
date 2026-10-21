@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linux Server Health Check — sample report</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <style>
+    body { font-family: "Noto Sans CJK SC", "Noto Sans CJK TC", "WenQuanYi Zen Hei", "Source Han Sans SC", sans-serif; }
+    .banner { background: #fff6e0; border: 1px solid #ead7a1; border-radius: 12px; padding: 12px 14px; margin: 12px 0 18px; }
+    .counts { display: flex; flex-wrap: wrap; gap: 10px; padding: 0; margin: 8px 0 0; list-style: none; }
+    .counts li { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px; vertical-align: top; }
+    th { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    .badge { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+    .ok { background: #e8f7ee; color: #146c36; }
+    .low { background: #e7f1ff; color: #1d4e89; }
+    .medium { background: #fff6e0; color: #8a5a00; }
+    .high { background: #fdecec; color: #9f1d1d; }
+    .na { background: #eee; color: #555; }
+    pre { white-space: pre-wrap; word-break: break-word; background: #141824; color: #f4f6fb; padding: 12px; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .evidence { margin: 0 0 16px; }
+    .links a { margin-right: 12px; }
+    .boundary { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Portfolio sample</p>
+      <h1>Linux Server Health Check — sample report</h1>
+      <p class="lead links"><a href="zh.html">中文</a> <a href="report-en.pdf">report-en.pdf</a> <a href="report-zh.pdf">report-zh.pdf</a> <a href="healthcheck.sh">healthcheck.sh</a></p>
+      <p class="banner">Sample report — hostnames, IPs and users anonymized.</p>
+      <p class="value">The figures below come from one real read-only run. Hostnames, IP addresses, and users were replaced with placeholders. Command output is the evidence excerpt captured on that run.</p>
+    </div>
+  </header>
+  <main>
+    <section class="section">
+      <div class="wrap">
+        <h2>Summary</h2>
+        <ul class="counts"><li><span class="badge high">High</span> 0</li><li><span class="badge medium">Medium</span> 0</li><li><span class="badge low">Low</span> 2</li><li><span class="badge ok">OK</span> 7</li><li><span class="badge na">N/A</span> 4</li></ul>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>Check items</h2>
+        <table>
+          <thead><tr><th>Item</th><th>Risk</th><th>Recommendation</th></tr></thead>
+          <tbody>
+            <tr><td>OS, kernel, uptime, and load</td><td><span class="badge ok">OK</span></td><td>OS, kernel, uptime, and load were readable. Keep this snapshot with the rest of the report.</td></tr><tr><td>Disk usage</td><td><span class="badge ok">OK</span></td><td>Eligible filesystems are at or below 70 percent. Flag filesystems above 85 percent as High and above 70 percent as Medium. Plan cleanup or growth before either band is reached. Pseudo filesystems are skipped.</td></tr><tr><td>Inode usage</td><td><span class="badge ok">OK</span></td><td>Eligible filesystems are at or below 70 percent. Inode pressure uses the same bands: above 85 percent High, above 70 percent Medium. A full inode table blocks new files even when bytes remain.</td></tr><tr><td>Memory and swap</td><td><span class="badge low">Low</span></td><td>Memory used above 90 percent is High and above 80 percent is Medium. Swap used above 80 percent is High and above 50 percent is Medium. No swap is Low when memory itself is fine, because a spike has nowhere to go.</td></tr><tr><td>Failed systemd units</td><td><span class="badge na">N/A</span></td><td>systemd is not the running init here, so failed units cannot be listed.</td></tr><tr><td>Listening TCP ports</td><td><span class="badge low">Low</span></td><td>At least one TCP port listens on a wildcard address. Confirm each listener is intentional and firewalled.</td></tr><tr><td>SSH root login and password authentication</td><td><span class="badge na">N/A</span></td><td>SSH settings could not be read. Skip this item or provide the files from the agreed account.</td></tr><tr><td>Pending package updates</td><td><span class="badge ok">OK</span></td><td>Lines that mention the security pocket are counted apart from other upgradable packages. More than 20 security lines is High, any security line is Medium, other pending packages are Low. Applying updates is outside this read-only check.</td></tr><tr><td>Time synchronization</td><td><span class="badge na">N/A</span></td><td>timedatectl cannot query this environment because systemd is not available.</td></tr><tr><td>Recent OOM and kernel errors</td><td><span class="badge ok">OK</span></td><td>No OOM, panic, or matched kernel error in the excerpt. This is only the recent excerpt, not a full history.</td></tr><tr><td>World-writable files in /etc</td><td><span class="badge ok">OK</span></td><td>No world-writable regular files were found under /etc on this filesystem.</td></tr><tr><td>Accounts with UID 0</td><td><span class="badge ok">OK</span></td><td>root is the only UID 0 account in /etc/passwd.</td></tr><tr><td>Local certificate expiry</td><td><span class="badge na">N/A</span></td><td>No local server certificate was found under nginx, apache, letsencrypt, haproxy, or the private SSL directory. Public CA stores were not treated as server certificates.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>Prioritized recommendations</h2>
+        <ul><li><strong>Low.</strong> Memory and swap: Memory used above 90 percent is High and above 80 percent is Medium. Swap used above 80 percent is High and above 50 percent is Medium. No swap is Low when memory itself is fine, because a spike has nowhere to go.</li><li><strong>Low.</strong> Listening TCP ports: At least one TCP port listens on a wildcard address. Confirm each listener is intentional and firewalled.</li></ul>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>Evidence</h2>
+        <section class="evidence"><h3>OS, kernel, uptime, and load</h3><p><code>uname -srmv; uptime; cat /proc/loadavg; awk /etc/os-release</code></p><pre>os-release:
+PRETTY_NAME=&quot;Debian GNU/Linux 13 (trixie)&quot;
+NAME=&quot;Debian GNU/Linux&quot;
+VERSION=&quot;13 (trixie)&quot;
+uname: Linux 6.12.94+ #1 SMP PREEMPT_DYNAMIC Fri Oct 16 00:53:04 UTC 2026 x86_64
+uptime:  10:04:34 up  5:04,  0 users,  load average: 4.09, 3.83, 3.19
+loadavg: 4.09 3.83 3.19 3/2709 314901</pre></section><section class="evidence"><h3>Disk usage</h3><p><code>df -PT</code></p><pre>Filesystem     Type     1024-blocks     Used Available Capacity Mounted on
+/dev/vdb       ext4       131063268 81159004  49887880      62% /
+devtmpfs       devtmpfs     8191116        0   8191116       0% /dev
+shm            tmpfs        8193184        0   8193184       0% /dev/shm</pre></section><section class="evidence"><h3>Inode usage</h3><p><code>df -PiT</code></p><pre>Filesystem     Type      Inodes   IUsed   IFree IUse% Mounted on
+/dev/vdb       ext4     8388608 1820810 6567798   22% /
+devtmpfs       devtmpfs 2047779     322 2047457    1% /dev
+shm            tmpfs    2048296       1 2048295    1% /dev/shm</pre></section><section class="evidence"><h3>Memory and swap</h3><p><code>awk /proc/meminfo</code></p><pre>MemTotal_kB 16386368
+MemAvailable_kB 5684008
+SwapTotal_kB 0
+SwapFree_kB 0
+mem_used_pct 65
+swap_used_pct none</pre></section><section class="evidence"><h3>Failed systemd units</h3><p><code>systemctl list-units --state=failed --no-legend --plain --no-pager</code></p><pre>System has not been booted with systemd as init system (PID 1). Can&#x27;t operate.
+Failed to connect to system scope bus via local transport: Host is down</pre></section><section class="evidence"><h3>Listening TCP ports</h3><p><code>ss -tlnp</code></p><pre>State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                   
+LISTEN 0      4096       127.0.0.1:5678       0.0.0.0:*                                             
+LISTEN 0      32         127.0.0.1:5905       0.0.0.0:*    users:((&quot;x11vnc&quot;,pid=243352,fd=8))       
+LISTEN 0      32         127.0.0.1:5907       0.0.0.0:*    users:((&quot;x11vnc&quot;,pid=232272,fd=8))       
+LISTEN 0      32         127.0.0.1:5906       0.0.0.0:*    users:((&quot;x11vnc&quot;,pid=233641,fd=8))       
+LISTEN 0      32         127.0.0.1:5900       0.0.0.0:*    users:((&quot;x11vnc&quot;,pid=2813,fd=8))         
+LISTEN 0      32         127.0.0.1:5903       0.0.0.0:*    users:((&quot;x11vnc&quot;,pid=307563,fd=8))       
+LISTEN 0      32         127.0.0.1:5902       0.0.0.0:*    users:((&quot;x11vnc&quot;,pid=84169,fd=8))        
+LISTEN 0      100          0.0.0.0:6081       0.0.0.0:*    users:((&quot;websockify&quot;,pid=204,fd=3))      
+LISTEN 0      100          0.0.0.0:6080       0.0.0.0:*    users:((&quot;websockify&quot;,pid=2840,fd=3))     
+LISTEN 0      4096       127.0.0.1:8088       0.0.0.0:*                                             
+LISTEN 0      4096       127.0.0.1:18081      0.0.0.0:*                                             
+LISTEN 0      10         127.0.0.1:9224       0.0.0.0:*    users:((&quot;chrome&quot;,pid=91348,fd=84))       
+LISTEN 0      10         127.0.0.1:9227       0.0.0.0:*    users:((&quot;chrome&quot;,pid=244382,fd=78))      
+LISTEN 0      10         127.0.0.1:9228       0.0.0.0:*    users:((&quot;chrome&quot;,pid=244823,fd=87))      
+LISTEN 0      128          0.0.0.0:8790       0.0.0.0:*    users:((&quot;sand-egress-tun&quot;,pid=348,fd=9)) 
+LISTEN 0      128          0.0.0.0:50052      0.0.0.0:*                                             
+LISTEN 0      5          127.0.0.1:8766       0.0.0.0:*    users:((&quot;python3&quot;,pid=104294,fd=5))      
+LISTEN 0      2048       127.0.0.1:8787       0.0.0.0:*    users:((&quot;python&quot;,pid=5417,fd=9))         
+LISTEN 0      128        127.0.0.1:8791       0.0.0.0:*    users:((&quot;sand-egress-tun&quot;,pid=348,fd=10))
+LISTEN 0      511          0.0.0.0:1340       0.0.0.0:*    users:((&quot;node&quot;,pid=9579,fd=79))          
+LISTEN 0      511          0.0.0.0:1339       0.0.0.0:*    users:((&quot;node&quot;,pid=227,fd=21))           
+LISTEN 0      128          0.0.0.0:26500      0.0.0.0:*                                             
+LISTEN 0      5            0.0.0.0:2375       0.0.0.0:*                                             
+... truncated ...</pre></section><section class="evidence"><h3>SSH root login and password authentication</h3><p><code>sshd -T || read /etc/ssh/sshd_config</code></p><pre>sshd and sshd_config not available</pre></section><section class="evidence"><h3>Pending package updates</h3><p><code>apt list --upgradable</code></p><pre>upgradable_count 0
+security_mentions 0
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Listing...</pre></section><section class="evidence"><h3>Time synchronization</h3><p><code>timedatectl status</code></p><pre>System has not been booted with systemd as init system (PID 1). Can&#x27;t operate.
+Failed to connect to system scope bus via local transport: Host is down</pre></section><section class="evidence"><h3>Recent OOM and kernel errors</h3><p><code>dmesg</code></p><pre>source: dmesg
+[Tue Oct 20 05:00:26 2026] Linux version 6.12.94+ (root@0a07c1601064) (gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Fri Oct 16 00:53:04 UTC 2026
+[Tue Oct 20 05:00:26 2026] Command line: console=ttyS0 root=/dev/vda random.trust_cpu=on ip=192.0.2.1::192.0.2.2:255.255.255.0::eth0:off rw loglevel=7 earlyprintk=ttyS0 print-fatal-signals=1 systemd.unified_cgroup_hierarchy=1 systemd.setenv=SWAP_SIZE_MB=0 reboot=k panic=1 nomodule i8042.noaux=1 i8042.nomux=1 i8042.dumbkbd=1 clocksource=kvm-clock tsc=unstable nosoftlockup root=/dev/vda rw
+[Tue Oct 20 05:00:26 2026] KASLR disabled
+[Tue Oct 20 05:00:26 2026] x86/split lock detection: #DB: warning on user-space bus_locks
+[Tue Oct 20 05:00:26 2026] BIOS-provided physical RAM map:
+[Tue Oct 20 05:00:26 2026] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+[Tue Oct 20 05:00:26 2026] BIOS-e820: [mem 0x000000000009fc00-0x00000000000fffff] reserved
+[Tue Oct 20 05:00:26 2026] BIOS-e820: [mem 0x0000000000100000-0x00000000bfffffff] usable
+[Tue Oct 20 05:00:26 2026] BIOS-e820: [mem 0x00000000eec00000-0x00000000febfffff] reserved
+[Tue Oct 20 05:00:26 2026] BIOS-e820: [mem 0x0000000100000000-0x000000043fffffff] usable
+[Tue Oct 20 05:00:26 2026] printk: legacy bootconsole [earlyser0] enabled
+[Tue Oct 20 05:00:26 2026] NX (Execute Disable) protection: active
+[Tue Oct 20 05:00:26 2026] APIC: Static calls initialized
+[Tue Oct 20 05:00:26 2026] DMI not present or invalid.
+[Tue Oct 20 05:00:26 2026] Hypervisor detected: KVM
+[Tue Oct 20 05:00:26 2026] last_pfn = 0xc0000 max_arch_pfn = 0x400000000
+[Tue Oct 20 05:00:26 2026] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[Tue Oct 20 05:00:26 2026] kvm-clock: using sched offset of 51153483 cycles
+[Tue Oct 20 05:00:26 2026] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+[Tue Oct 20 05:00:26 2026] tsc: Detected 2400.000 MHz processor
+[Tue Oct 20 05:00:26 2026] e820: update [mem 0x00000000-0x00000fff] usable ==&gt; reserved
+[Tue Oct 20 05:00:26 2026] e820: remove [mem 0x000a0000-0x000fffff] usable
+[Tue Oct 20 05:00:26 2026] last_pfn = 0x440000 max_arch_pfn = 0x400000000
+... truncated ...</pre></section><section class="evidence"><h3>World-writable files in /etc</h3><p><code>find /etc -xdev -type f -perm -0002 -print</code></p><pre>count 0
+(none)</pre></section><section class="evidence"><h3>Accounts with UID 0</h3><p><code>awk -F: &#x27;$3==0 {print $1}&#x27; /etc/passwd</code></p><pre>root</pre></section><section class="evidence"><h3>Local certificate expiry</h3><p><code>openssl x509 -noout -enddate -in CERT</code></p><pre>no local leaf certificates found under the usual server paths</pre></section>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap boundary">
+        <h2>Service boundary</h2>
+        <h3>Included</h3>
+        <ul><li>The read-only checks listed in this report</li><li>This written report</li><li>Prioritized recommendations</li></ul>
+        <h3>Not included</h3>
+        <ul><li>Any change to the system</li><li>Fixes, package installs, or service restarts</li><li>Access beyond the agreed read-only account</li></ul>
+        <p><strong>Read-only. No changes are made to your system without written approval.</strong></p>
+        <p><strong>只读检查，未经书面批准不对系统做任何改动。</strong></p>
+        <p class="value">Chinese text uses Noto Sans CJK SC, which fc-list :lang=zh shows on the machine that rendered this PDF.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

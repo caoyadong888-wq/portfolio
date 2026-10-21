@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>metrics/catalog.yml</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>metrics/catalog.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Single source of metric names for rules, dashboards, and demo-app.</span>
+<span style="color: #3D7B7B; font-style: italic"># Larkspur Grocers is fictional. demo-app emits this catalog, including</span>
+<span style="color: #3D7B7B; font-style: italic"># exporter-shaped and engine-shaped series, so `promtool check metrics`</span>
+<span style="color: #3D7B7B; font-style: italic"># covers every name the rules use. It is a fixture, not a claim that the</span>
+<span style="color: #3D7B7B; font-style: italic"># process is node_exporter, postgres_exporter, or the Prometheus engine.</span>
+<span style="color: #3D7B7B; font-style: italic">#</span>
+<span style="color: #3D7B7B; font-style: italic"># Names that promtool check metrics rejects are not used:</span>
+<span style="color: #3D7B7B; font-style: italic"># node_exporter&#39;s camelCase MemAvailable/MemTotal, and a `_count` suffix</span>
+<span style="color: #3D7B7B; font-style: italic"># on a non-histogram (pg_stat_activity_count). See README.md.</span>
+<span style="color: #008000; font-weight: bold">metrics</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>http_requests_total
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>counter
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>HTTP requests received by a Larkspur service.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">code</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">route</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">slo</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>http_request_duration_seconds
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>histogram
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>HTTP request duration in seconds.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">route</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">slo</span>]
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">buckets</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;0.05&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;0.1&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;0.2&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;0.3&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;0.5&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;1&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;2.5&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;5&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;+Inf&quot;</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>payments_queue_oldest_age_seconds
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Age of the oldest message on the payments queue, in seconds.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>payments_queue_depth
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Number of messages on the payments queue.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>up
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Whether the scrape target is up.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">job</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>node_cpu_seconds_total
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>counter
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Seconds the CPUs spent in each mode.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">instance</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">cpu</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">mode</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>node_memory_available_bytes
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Memory available to the host, in bytes.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>node_memory_total_bytes
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Total host memory, in bytes.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>node_filesystem_avail_bytes
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Filesystem space available to non-root users, in bytes.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">instance</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">mountpoint</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">fstype</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">device</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>node_filesystem_size_bytes
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Filesystem size in bytes.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">instance</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">mountpoint</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">fstype</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">device</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>pg_up
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Whether the Postgres exporter can reach the database.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">job</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>pg_stat_activity_connections
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Postgres connections in use. Fixture name; not pg_stat_activity_count.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">job</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>pg_settings_max_connections
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Postgres max_connections setting.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">job</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>probe_success
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Whether the blackbox probe succeeded.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">job</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>probe_ssl_earliest_cert_expiry
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Unix time when the earliest presented certificate expires.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">job</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>prometheus_rule_evaluation_failures_total
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>counter
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Rule evaluation failures. Emitted by the fixture so the name is checked.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">job</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">instance</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>alertmanager_notifications_failed_total
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>counter
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Failed Alertmanager notifications. Fixture series, not a live Alertmanager.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>alertmanager_notifications_total
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>counter
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Alertmanager notifications attempted. Fixture series, not a live Alertmanager.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">service</span>]
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>ALERTS
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">type</span>:<span style="color: #bbbbbb"> </span>gauge
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">help</span>:<span style="color: #bbbbbb"> </span>Alert state gauge. The fixture emits it so dashboards and check metrics can see the name. The demo process does not evaluate alerting rules.
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">labels</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">alertname</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">alertstate</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">severity</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">service</span>,<span style="color: #bbbbbb"> </span><span style="color: #19177C">team</span>]
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

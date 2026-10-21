@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>app/insights_api/main.py</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>app/insights_api/main.py</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;HTTP surface for insights-api. No outbound calls.&quot;&quot;&quot;</span>
+
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">time</span>
+
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">fastapi</span> <span style="color: #008000; font-weight: bold">import</span> FastAPI, HTTPException
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">fastapi.responses</span> <span style="color: #008000; font-weight: bold">import</span> Response
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">pydantic</span> <span style="color: #008000; font-weight: bold">import</span> BaseModel, Field
+
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">insights_api.buffer</span> <span style="color: #008000; font-weight: bold">import</span> RingBuffer
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">insights_api.metrics</span> <span style="color: #008000; font-weight: bold">import</span> render_metrics
+
+app <span style="color: #666666">=</span> FastAPI(title<span style="color: #666666">=</span><span style="color: #BA2121">&quot;insights-api&quot;</span>, version<span style="color: #666666">=</span><span style="color: #BA2121">&quot;0.1.0&quot;</span>)
+_started <span style="color: #666666">=</span> time<span style="color: #666666">.</span>time()
+_accepted <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+_buffer <span style="color: #666666">=</span> RingBuffer(<span style="color: #666666">1024</span>)
+
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">EventIn</span>(BaseModel):
+    product_id: <span style="color: #008000">str</span> <span style="color: #666666">=</span> Field(min_length<span style="color: #666666">=1</span>, max_length<span style="color: #666666">=64</span>, pattern<span style="color: #666666">=</span><span style="color: #BA2121">r&quot;^[A-Za-z0-9_-]+$&quot;</span>)
+    event_type: <span style="color: #008000">str</span> <span style="color: #666666">=</span> Field(min_length<span style="color: #666666">=1</span>, max_length<span style="color: #666666">=64</span>, pattern<span style="color: #666666">=</span><span style="color: #BA2121">r&quot;^[A-Za-z0-9_-]+$&quot;</span>)
+    ts: <span style="color: #008000">int</span> <span style="color: #666666">=</span> Field(ge<span style="color: #666666">=0</span>)
+
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">reset_state</span>(capacity<span style="color: #666666">=1024</span>):
+    <span style="color: #008000; font-weight: bold">global</span> _accepted, _buffer, _started
+    _accepted <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+    _buffer <span style="color: #666666">=</span> RingBuffer(capacity)
+    _started <span style="color: #666666">=</span> time<span style="color: #666666">.</span>time()
+
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">_valid_product_id</span>(product_id):
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> product_id <span style="color: #AA22FF; font-weight: bold">or</span> <span style="color: #008000">len</span>(product_id) <span style="color: #666666">&gt;</span> <span style="color: #666666">64</span>:
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">False</span>
+    allowed <span style="color: #666666">=</span> <span style="color: #008000">set</span>(<span style="color: #BA2121">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">all</span>(char <span style="color: #AA22FF; font-weight: bold">in</span> allowed <span style="color: #008000; font-weight: bold">for</span> char <span style="color: #AA22FF; font-weight: bold">in</span> product_id)
+
+
+<span style="color: #AA22FF">@app</span><span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;/healthz&quot;</span>)
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">healthz</span>():
+    <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;ok&quot;</span>}
+
+
+<span style="color: #AA22FF">@app</span><span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;/readyz&quot;</span>)
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">readyz</span>():
+    <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;ready&quot;</span>}
+
+
+<span style="color: #AA22FF">@app</span><span style="color: #666666">.</span>post(<span style="color: #BA2121">&quot;/v1/events&quot;</span>, status_code<span style="color: #666666">=202</span>)
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">post_event</span>(body: EventIn):
+    <span style="color: #008000; font-weight: bold">global</span> _accepted
+    _buffer<span style="color: #666666">.</span>add(body<span style="color: #666666">.</span>model_dump())
+    _accepted <span style="color: #666666">+=</span> <span style="color: #666666">1</span>
+    <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&quot;accepted&quot;</span>: <span style="color: #008000; font-weight: bold">True</span>}
+
+
+<span style="color: #AA22FF">@app</span><span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;/v1/insights/</span><span style="color: #A45A77; font-weight: bold">{product_id}</span><span style="color: #BA2121">&quot;</span>)
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">insights</span>(product_id: <span style="color: #008000">str</span>):
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> _valid_product_id(product_id):
+        <span style="color: #008000; font-weight: bold">raise</span> HTTPException(status_code<span style="color: #666666">=400</span>, detail<span style="color: #666666">=</span><span style="color: #BA2121">&quot;invalid product_id&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> _buffer<span style="color: #666666">.</span>counts_for(product_id)
+
+
+<span style="color: #AA22FF">@app</span><span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;/metrics&quot;</span>)
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">metrics</span>():
+    body <span style="color: #666666">=</span> render_metrics(<span style="color: #008000">len</span>(_buffer), _accepted, time<span style="color: #666666">.</span>time() <span style="color: #666666">-</span> _started)
+    <span style="color: #008000; font-weight: bold">return</span> Response(content<span style="color: #666666">=</span>body, media_type<span style="color: #666666">=</span><span style="color: #BA2121">&quot;text/plain; version=0.0.4; charset=utf-8&quot;</span>)
+</code></pre></div>
+
+</main>
+</body>
+</html>

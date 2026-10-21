@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>policies/.pint.hcl</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>policies/.pint.hcl</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">parser</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">include</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;(.*/)?rules/.*\\.yml&quot;</span>]
+<span style="color: #bbbbbb">  </span><span style="color: #687822">schema</span><span style="color: #bbbbbb">  </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>
+}
+
+<span style="border: 1px solid #FF0000">prometheus</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;larkspur&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">uri</span><span style="color: #bbbbbb">      </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;http://127.0.0.1:19090&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">timeout</span><span style="color: #bbbbbb">  </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;5s&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">required</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #880000">false</span>
+}
+
+<span style="color: #008000">rule</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #008000">match</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">kind</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;alerting&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+
+<span style="color: #bbbbbb">  </span><span style="border: 1px solid #FF0000">annotation</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;summary&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">required</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #880000">true</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">severity</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bug&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+
+<span style="color: #bbbbbb">  </span><span style="border: 1px solid #FF0000">annotation</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;description&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">required</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #880000">true</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">severity</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bug&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+
+<span style="color: #bbbbbb">  </span><span style="border: 1px solid #FF0000">annotation</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;runbook_url&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">required</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #880000">true</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">severity</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bug&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">value</span><span style="color: #bbbbbb">    </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;https://runbooks\\.larkspur\\.example/[A-Za-z0-9]+&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+
+<span style="color: #bbbbbb">  </span><span style="border: 1px solid #FF0000">label</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;severity&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">required</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #880000">true</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">severity</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bug&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">value</span><span style="color: #bbbbbb">    </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;critical|warning|info&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+
+<span style="color: #bbbbbb">  </span><span style="border: 1px solid #FF0000">label</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;team&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">required</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #880000">true</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">severity</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bug&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #687822">value</span><span style="color: #bbbbbb">    </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;orders|payments|platform&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lambda-function</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · Compute · v1.0.0</p>
+<h1>lambda-function</h1>
+<p>Zip-packaged function, retained log group, and a least-privilege execution role.</p>
+<p>Tests passed <span data-metric="modules.lambda-function.passed">7</span> of <span data-metric="modules.lambda-function.runs">7</span>. Failed <span data-metric="modules.lambda-function.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>additional_policy_json</td><td><code>string</code></td><td>no</td><td>Optional extra inline policy JSON. A bare star action is rejected.</td></tr><tr><td>environment</td><td><code>map(string)</code></td><td>no</td><td>Optional plain environment variables. Empty skips the environment block.</td></tr><tr><td>function_name</td><td><code>string</code></td><td>yes</td><td>Lambda function name. Also used for the execution role and log group.</td></tr><tr><td>handler</td><td><code>string</code></td><td>no</td><td>Function handler.</td></tr><tr><td>log_retention_days</td><td><code>number</code></td><td>no</td><td>CloudWatch log retention in days. Must be a value CloudWatch accepts.</td></tr><tr><td>memory_size</td><td><code>number</code></td><td>no</td><td>Function memory in megabytes.</td></tr><tr><td>reserved_concurrency</td><td><code>number</code></td><td>no</td><td>Reserved concurrent executions. Null leaves the account default unreserved.</td></tr><tr><td>runtime</td><td><code>string</code></td><td>no</td><td>Lambda runtime identifier.</td></tr><tr><td>source_dir</td><td><code>string</code></td><td>yes</td><td>Directory archived into the Lambda deployment package. The archive provider runs locally.</td></tr><tr><td>sqs_batch_size</td><td><code>number</code></td><td>no</td><td>Batch size for the optional SQS event source mapping.</td></tr><tr><td>sqs_queue_arn</td><td><code>string</code></td><td>no</td><td>Optional SQS queue ARN. When set, the module creates an event source mapping and queue permissions.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr><tr><td>timeout</td><td><code>number</code></td><td>no</td><td>Function timeout in seconds.</td></tr><tr><td>xray_enabled</td><td><code>bool</code></td><td>no</td><td>Turn on active X-Ray tracing and the matching write permissions.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources.</td></tr><tr><td>event_source_mapping_count</td><td>Number of SQS event source mappings. Zero unless sqs_queue_arn is set.</td></tr><tr><td>function_arn</td><td>Lambda function ARN.</td></tr><tr><td>function_name</td><td>Lambda function name.</td></tr><tr><td>log_group_name</td><td>CloudWatch log group name.</td></tr><tr><td>log_retention_days</td><td>Retention in days on the function log group.</td></tr><tr><td>policy_actions</td><td>IAM actions granted to the execution role. The module rejects a bare star action.</td></tr><tr><td>reserved_concurrency</td><td>Reserved concurrency, or null when unset.</td></tr><tr><td>role_arn</td><td>Execution role ARN.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr><tr><td>xray_enabled</td><td>Whether active X-Ray tracing is on.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;fn&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">function_name</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;demo-fn&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source_dir</span><span style="color: #bbbbbb">    </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;&#36;{path.module}/src&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>default_retention passed</li><li>custom_retention passed</li><li>sqs_mapping passed</li><li>xray_on passed</li><li>reserved_concurrency passed</li><li>reject_bad_retention passed</li><li>reject_star_action passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\lambda-function.tftest.hcl... in progress
+  run &quot;default_retention&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_cloudwatch_log_group.this will be created
+  + resource &quot;aws_cloudwatch_log_group&quot; &quot;this&quot; {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = &quot;/aws/lambda/demo-fn&quot;
+      + name_prefix       = (known after apply)
+      + retention_in_days = 14
+      + tags              = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;lambda-function&quot;
+          + &quot;Owner&quot;     = &quot;platform&quot;
+        }
+      + tags_all          = (known after apply)
+    }
+
+  # aws_iam_role.this will be created
+  + resource &quot;aws_iam_role&quot; &quot;this&quot; {
+      + arn                 = (known after apply)
+      + assume_role_policy  = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = &quot;sts:AssumeRole&quot;
+                      + Effect    = &quot;Allow&quot;
+                      + Principal = {
+                          + Service = &quot;lambda.amazonaws.com&quot;
+                        }
+                    },</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/lambda-function.svg" alt="Resource list for lambda-function">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Zip packaging, a retained log group, an execution role, and an optional SQS event source.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>AWS Lambda</li><li>Amazon CloudWatch Logs</li><li>AWS X-Ray</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

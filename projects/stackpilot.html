@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StackPilot — case study</title>
+  <meta name="description" content="Reference production stack and a live status page for a fictional inventory API.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/stackpilot/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. The demo uses fictional data.</p>
+    <article class="readme">
+      <h1>StackPilot</h1>
+      <p>Reference production stack and live status page for a small inventory API. The fictional tenant is Acme Logistics. The page you can click is a real process: SQLite, host metrics from <code>/proc</code>, and gzipped snapshots on a timer. <code>docker-compose.yml</code> is the shape you would run on a VPS when you want Postgres, nginx, and a backup sidecar.</p>
+      <h2>Overview</h2>
+      <p>StackPilot is a portfolio piece for shipping a small SaaS API onto one machine without pretending the demo container is the production container. The same FastAPI app speaks Postgres when <code>DATABASE_URL</code> is set and SQLite otherwise. The status page shows which mode you are in, how fresh the backups are, and whether the request came through a reverse proxy.</p>
+      <h2>Problem → Solution → Result</h2>
+      <h3>Problem</h3>
+      <ul><li>A one-process API has no honest story for health, backups, or rollback. The usual answer is &quot;SSH in and look at logs.&quot;</li><li>Status pages that only return <code>{ &quot;status&quot;: &quot;ok&quot; }</code> hide a down database and a backup that has not run in weeks.</li><li>A public demo on a 2 vCPU VPS cannot afford a full Compose stack, but the write-up still has to show the production shape.</li></ul>
+      <h3>Solution</h3>
+      <ul><li>A Compose file with four services on a private network: nginx (<code>proxy</code>), the API, Postgres 16, and a <code>pg_dump</code> sidecar. Every service has a healthcheck, <code>restart: unless-stopped</code>, a memory and CPU cap, and json-file log rotation.</li><li>The same app runs natively for the live demo. It uses SQLite, an in-process snapshot scheduler (sqlite3 backup API, gzip, keep 12), and a status page that reads <code>/proc</code>.</li><li>One read-only inventory API (items and warehouses) plus a single rate-limited write: &quot;run a backup now.&quot; No admin surface, no shell, no URL fetching.</li></ul>
+      <h3>Result</h3>
+      <ul><li><code>GET /api/status</code> returns component health, check latency, row counts, backup age, proxy-header flags, host metrics, a 60-slot uptime history, and the seeded deploy list.</li><li><code>GET /metrics</code> exposes Prometheus text for process up, request count, and backup age in seconds.</li><li><code>pytest</code> covers health, the status document, inventory, backup retention, both rate-limit windows, and relative URLs. The Compose file is checked by parsing it. Docker is not required to run the demo.</li></ul>
+      <p>These are capabilities of this demo, not claims about a client engagement.</p>
+      <h2>Features</h2>
+      <ul><li>Status page with auto-refresh every 10 seconds, an uptime bar (inline SVG), and a read-only API explorer.</li><li>Component cards for <code>api</code>, <code>database</code>, <code>backup</code>, and <code>proxy</code>, each with status, latency, and details.</li><li>Host strip: load average, memory used percent, disk used percent of the data directory&#x27;s filesystem, process uptime.</li><li>SQLite backups every 15 minutes in demo mode, on demand from the button, retention of the newest 12.</li><li>Backup writes limited to one per minute per address and one every two minutes for all addresses. The address is <code>X-Real-IP</code> when the proxy set it.</li><li>Request body cap of 8 KB. Inventory responses are escaped in the page (<code>textContent</code> in the browser, HTML escaping on the server).</li><li>Fictional seed data so the first paint is not an empty table. Companies and people are made up (Acme Logistics, Jane Doe).</li><li>Reference proxy config: gzip, security headers, rate limits, passive upstream health (<code>max_fails</code>), HTTP and TLS listeners.</li><li>Runbook for deploy, a short-blip rollout, rollback, a restore drill, and a host hardening checklist.</li></ul>
+      <h2>Architecture</h2>
+      <p>Live demo (what the public page is):</p>
+      <pre><code>Browser
+         |
+         |  relative URLs (api/..., static/..., ../)
+         v
+      edge nginx, prefix stripped
+         |
+         v
+      systemd: python -m app  127.0.0.1:18801
+         |
+         +--&gt; SQLite   DATA_DIR/inventory.db
+         +--&gt; snapshots DATA_DIR/backups/*.db.gz   (15 min, keep 12)</code></pre>
+      <p>Reference Compose stack (<code>docker-compose.yml</code>):</p>
+      <pre><code>Browser
+         |
+         v
+      proxy (nginx) :8080 and :8443
+         |   gzip, security headers, rate limit, X-Real-IP / X-Forwarded-For
+         v
+      api (FastAPI, uid 10001) ----&gt; db (postgres:16-alpine, volume pgdata)
+                                       ^
+                                       |
+                                  backup sidecar
+                                  pg_dump | gzip
+                                  7 daily + 4 weekly  (volume backupdata)</code></pre>
+      <pre><code class="language-mermaid">flowchart LR
+        browser[Browser] --&gt; proxy[nginx proxy]
+        proxy --&gt; api[FastAPI api]
+        api --&gt; db[(Postgres 16)]
+        backup[backup sidecar] --&gt; db
+        backup --&gt; vol[(backup volume)]
+        api -. read only .-&gt; vol</code></pre>
+      <p>The API does not shell out to <code>pg_dump</code>. In Compose mode it only stats the files the sidecar wrote. In demo mode it writes SQLite snapshots itself. Operations steps, including the restore drill and the hardening checklist, are in <span class="repo-path">docs/runbook.md</span>.</p>
+      <p>Notes:</p>
+      <ul><li><code>depends_on</code> uses <code>condition: service_healthy</code>, so the proxy waits for the API and the API waits for Postgres.</li><li>Postgres has no published port. The backup container is the only writer of the dump volume. The API mounts it read-only.</li><li><code>/healthz</code> is liveness. It does not query the database. A database outage shows on the status page instead of crash-looping the process.</li><li>Resource caps are sized for a small VPS: proxy 64M, API 150M, Postgres 256M with <code>shared_buffers=64MB</code>, backup 128M.</li></ul>
+      <h2>Tech stack</h2>
+      <ul><li>Python 3.9+ (tested style for 3.9 and 3.11), FastAPI, uvicorn, stdlib <code>sqlite3</code>.</li><li>Optional <code>psycopg</code> when <code>DATABASE_URL</code> is a Postgres URL. The import is inside the Postgres path. A missing driver is an error, not a silent switch to SQLite.</li><li>Postgres 16 and nginx 1.27 in the reference images.</li><li>Vanilla HTML, CSS, and JS. No CDN, no web font, no tracker. The uptime chart is an inline SVG.</li><li>Prometheus text on <code>/metrics</code>. pytest, ruff, and a Compose file parse in CI.</li></ul>
+      <h2>Run locally</h2>
+      <h3>venv</h3>
+      <pre><code class="language-sh">python3 -m venv .venv
+      .venv/bin/pip install -r requirements-dev.txt
+      .venv/bin/python -m app</code></pre>
+      <p>Or <code>./run.sh</code>, which creates <code>.venv</code> if needed and listens on <code>127.0.0.1:18801</code>. Open <code>http://127.0.0.1:18801/</code>.</p>
+      <p>The banner on that page should read: live demo mode, native process, Compose file is the reference deployment.</p>
+      <h3>Docker Compose</h3>
+      <p>Docker is the reference deployment. It is not required to view the demo.</p>
+      <pre><code class="language-sh">cp .env.example .env
+      # edit POSTGRES_PASSWORD; keep it URL-safe
+      docker compose up -d --build
+      curl -fsS http://127.0.0.1:8080/healthz</code></pre>
+      <p><code>Makefile</code> targets: <code>up</code>, <code>down</code>, <code>logs</code>, <code>backup</code>, <code>restore</code>, <code>test</code>, <code>venv</code>.</p>
+      <pre><code class="language-sh">make up
+      make backup
+      make restore FILE=backups/daily-YYYYMMDDTHHMMSSZ.sql.gz CONFIRM=yes</code></pre>
+      <p><code>make restore</code> will refuse until <code>CONFIRM=yes</code>. Prefer the scratch-database drill in the runbook before you point it at the primary database.</p>
+      <h2>Configuration</h2>
+      <table><thead><tr><th>Variable</th><th>Default</th><th>Role</th></tr></thead><tbody><tr><td><code>PORT</code></td><td><code>18801</code></td><td>Listen port</td></tr><tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td>Bind address. Compose sets <code>0.0.0.0</code> so the proxy can reach the API</td></tr><tr><td><code>DATA_DIR</code></td><td><code>./data</code></td><td>SQLite file and, in demo mode, the backup directory parent</td></tr><tr><td><code>BACKUP_DIR</code></td><td><code>$DATA_DIR/backups</code></td><td>Snapshot directory. Compose sets <code>/backups</code></td></tr><tr><td><code>DATABASE_URL</code></td><td>empty</td><td>Empty or <code>sqlite</code> uses SQLite. <code>postgresql://...</code> uses Postgres</td></tr><tr><td><code>BACKUP_INTERVAL_SECONDS</code></td><td><code>900</code> (minimum 60)</td><td>Demo scheduler period, and the sidecar period in Compose (Compose example uses <code>86400</code>)</td></tr><tr><td><code>GIT_COMMIT</code></td><td><code>c4e1a91</code></td><td>Displayed commit, 7–40 hex characters. Anything else is ignored</td></tr><tr><td><code>POSTGRES_USER</code></td><td><code>stackpilot</code></td><td>Compose only</td></tr><tr><td><code>POSTGRES_PASSWORD</code></td><td><code>change-me-demo-only</code></td><td>Compose only. Placeholder, change it before a real deploy</td></tr><tr><td><code>POSTGRES_DB</code></td><td><code>stackpilot</code></td><td>Compose only</td></tr></tbody></table>
+      <p>SQLite demo retention is fixed at the newest 12 files so the directory cannot grow without a bound. The sidecar keeps 7 daily dumps and 4 weekly dumps.</p>
+      <h2>API endpoints</h2>
+      <table><thead><tr><th>Method</th><th>Path</th><th>Notes</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/</code></td><td>Status page</td></tr><tr><td><code>GET</code></td><td><code>/healthz</code></td><td><code>{&quot;status&quot;:&quot;ok&quot;,...}</code>. No database work</td></tr><tr><td><code>GET</code></td><td><code>/api/status</code></td><td>Components, host, backups, uptime history, deployments</td></tr><tr><td><code>GET</code></td><td><code>/api/items</code></td><td>Fictional Acme Logistics items</td></tr><tr><td><code>GET</code></td><td><code>/api/warehouses</code></td><td>Fictional warehouses</td></tr><tr><td><code>GET</code></td><td><code>/api/backups</code></td><td>Snapshot list, retention, next run</td></tr><tr><td><code>POST</code></td><td><code>/api/backups/run</code></td><td>SQLite demo only. 429 when rate limited, 409 on Postgres, 413 above 8 KB</td></tr><tr><td><code>GET</code></td><td><code>/metrics</code></td><td>Prometheus text: <code>stackpilot_up</code>, <code>stackpilot_http_requests_total</code>, <code>stackpilot_backup_age_seconds</code></td></tr></tbody></table>
+      <p>Paths in the browser are relative (<code>api/items</code>, not <code>/api/items</code>) so the page works both at the bare port and behind a stripped prefix.</p>
+      <h2>Tests</h2>
+      <pre><code class="language-sh">.venv/bin/python -m pytest
+      .venv/bin/ruff check app tests</code></pre>
+      <p>The suite checks health, the status JSON, inventory, a real gzipped SQLite snapshot (via the backup API) and the keep-12 cap, both rate-limit scopes, the body cap, relative URLs, Prometheus text, the Compose file, the nginx tokens, the shell scripts, the systemd unit, and the Dockerfile <code>USER</code> / <code>HEALTHCHECK</code>.</p>
+      <p>CI (<code>.github/workflows/ci.yml</code>) runs that lint and test matrix on Python 3.9 and 3.11, then <code>docker build</code> of the API image. The workflow lives with this project. If the git root is the parent monorepo, the job still finds <code>stackpilot/requirements-dev.txt</code>.</p>
+      <h2>Deployment notes</h2>
+      <p>The live demo is a systemd service behind nginx on a small VPS, not a container. The unit is <code>deploy/stackpilot.service</code> (<code>User=ec2-user</code>, <code>WorkingDirectory=/opt/portfolio/stackpilot</code>, <code>PORT=18801</code>, <code>DATA_DIR=/opt/portfolio/stackpilot/data</code>, <code>Restart=always</code>, <code>MemoryMax=150M</code>, <code>NoNewPrivileges=yes</code>). Install steps are in <span class="repo-path">docs/runbook.md</span>.</p>
+      <p>Intended public URL: <code>https://3.1.79.63/portfolio/stackpilot/</code> with the prefix stripped by nginx (<code>proxy_pass http://127.0.0.1:18801/;</code>). The page links back to the portfolio with <code>../</code>. This repository does not install the unit or edit the edge proxy; that is a later step.</p>
+      <p>The Compose file remains the reference for a single-VPS production shape: private database network, TLS-ready proxy, healthchecks, log rotation, and a restore drill. Honest limit: one API replica, so a deploy is a short blip masked by the proxy, not a rolling update across a fleet.</p>
+      <h2>Screenshots</h2>
+      <p>Desktop, 1440×1000:</p>
+      <p><img alt="Desktop status page" src="../img/stackpilot-desktop.png"></p>
+      <p>Mobile, 390×844:</p>
+      <p><img alt="Mobile status page" src="../img/stackpilot-mobile.png"></p>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/stackpilot/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

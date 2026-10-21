@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rules/recording/slo.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../alerts.html">告警</a>
+<a href="../../../slo.html">SLO</a>
+<a href="../../../routing.html">路由</a>
+<a href="../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>rules/recording/slo.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># orders-api availability objective is 99.9% (error budget 0.001) over 30 days.</span>
+<span style="color: #3D7B7B; font-style: italic"># Latency SLI is the share of requests faster than 300ms; objective is 99% (budget 0.01).</span>
+<span style="color: #008000; font-weight: bold">groups</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>slo.availability
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">rules</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_error:ratio_rate5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[5m]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[5m]))</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_error:ratio_rate30m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[30m]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[30m]))</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_error:ratio_rate1h
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[1h]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[1h]))</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_error:ratio_rate2h
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[2h]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[2h]))</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_error:ratio_rate6h
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[6h]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[6h]))</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_error:ratio_rate1d
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[1d]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[1d]))</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_error:ratio_rate3d
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[3d]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[3d]))</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:error_budget_remaining:ratio
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">1 - (</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">(</span>
+<span style="color: #bbbbbb">              </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total{code=~&quot;5..&quot;}[30d]))</span>
+<span style="color: #bbbbbb">              </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">              </span><span style="color: #880000">sum by (service, slo) (rate(http_requests_total[30d]))</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">/ 0.001</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>slo.latency
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">rules</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_latency_error:ratio_rate5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">1 - (</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_bucket{le=&quot;0.3&quot;}[5m]))</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_count[5m]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_latency_error:ratio_rate30m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">1 - (</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_bucket{le=&quot;0.3&quot;}[30m]))</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_count[30m]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_latency_error:ratio_rate1h
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">1 - (</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_bucket{le=&quot;0.3&quot;}[1h]))</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_count[1h]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>slo:sli_latency_error:ratio_rate6h
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">1 - (</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_bucket{le=&quot;0.3&quot;}[6h]))</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">/</span>
+<span style="color: #bbbbbb">            </span><span style="color: #880000">sum by (service, slo) (rate(http_request_duration_seconds_count[6h]))</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">)</span>
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

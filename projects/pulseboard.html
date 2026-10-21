@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PulseBoard — case study</title>
+  <meta name="description" content="Uptime, latency, and error-budget dashboard for a fixed set of services.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/pulseboard/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. The demo uses fictional data.</p>
+    <article class="readme">
+      <h1>PulseBoard</h1>
+      <p>Uptime, latency, and error-budget dashboard for a small platform team. PulseBoard probes a fixed catalog, keeps a week of samples in SQLite, and runs a small alert state machine with a simulated notification log.</p>
+      <p>The live view is a single self-contained page (no CDN fonts, charts, or trackers). Charts are drawn as inline SVG.</p>
+      <h2>Overview</h2>
+      <p>Globex Cloud, a fictional company in this demo, wants the same answers a status page and a tiny Grafana give a larger team: what is up, how slow it is, how much error budget is left, and which incidents are open. PulseBoard is that view, small enough to run on one VPS process.</p>
+      <p>Four targets are <strong>simulated</strong> and labelled in the UI (<code>payments-api</code>, <code>eu-edge-cdn</code>, <code>auth-service</code>, <code>search-cluster</code>). Their latency follows a seeded daily pattern plus a fixed weekly incident script, so the same timestamp always produces the same sample. Six targets are <strong>real</strong> HTTP checks against local health endpoints and are never invented:</p>
+      <ul><li>StackPilot <code>http://127.0.0.1:18801/healthz</code></li><li>FlowRelay <code>http://127.0.0.1:18802/healthz</code></li><li>PulseBoard <code>http://127.0.0.1:18803/healthz</code></li><li>SiteAtlas <code>http://127.0.0.1:18806/healthz</code></li><li>SkyForge <code>http://127.0.0.1:18807/healthz</code></li><li>LedgerLite <code>http://127.0.0.1:18809/healthz</code></li></ul>
+      <p>If a real target is down, the card shows DOWN. That is expected when the sibling demo is not running.</p>
+      <p><strong>Backfill.</strong> On first start, simulated targets receive 7 days of history at a 60-second step. Those rows are stored with <code>backfilled=1</code>. They are synthetic, not archived probe results. Real targets are not backfilled. After that, the prober runs every 30 seconds and only inserts new samples. Restarting does not backfill again.</p>
+      <h2>Problem → Solution → Result</h2>
+      <p><strong>Problem</strong></p>
+      <ul><li>A handful of services had no single place to see uptime, latency, and remaining error budget.</li><li>Alert noise and a missing incident history made it hard to tell a blip from an outage.</li><li>A full Prometheus stack is more machinery than a small team wants on day one.</li></ul>
+      <p><strong>Solution</strong></p>
+      <ul><li>A fixed-target prober (real HTTP checks plus clearly labelled simulated services) writes samples to SQLite.</li><li>Built-in rules move alerts from pending to firing to resolved, and record incidents plus a simulated notification log.</li><li><code>/metrics</code> plus the files in <code>ops/</code> show the same signals in Prometheus, Alertmanager, and Grafana when the team outgrows the built-in page.</li></ul>
+      <p><strong>Result</strong></p>
+      <ul><li>The demo opens on a populated 7-day status bar, a latency chart, and an incident timeline.</li><li>Down, latency, and SLO-burn rules are visible as pending, firing, and resolved, with durations.</li><li>A Prometheus scrape config, alert rules, and a Grafana dashboard JSON ship with the project.</li></ul>
+      <p>These are demo capabilities, not claims about a production client.</p>
+      <h2>Features</h2>
+      <ul><li>30-second probe loop. URLs come only from <code>config/targets.yml</code>. The API cannot add targets.</li><li>SQLite samples (<code>ts</code>, <code>ok</code>, <code>status_code</code>, <code>latency_ms</code>, <code>error</code>) with a 7-day retention cap.</li><li>5-minute buckets for 24h and 7d charts; 1-minute buckets for the 1h chart.</li><li>Rules: down for 2 consecutive checks (critical); p95 over the target threshold for the 5-minute window, confirmed on the next check (warning); 1-hour availability under 99.5% (warning).</li><li>SLO widget: 7-day availability against a 99.9% target, plus error budget remaining.</li><li>Read API, Prometheus text exposition, and a 15-second dashboard refresh.</li><li>Request body cap (8 KB) and a per-IP limit on non-GET methods. There is no public write API.</li></ul>
+      <h2>Architecture</h2>
+      <pre><code>config/targets.yml
+              |
+              v
+       probe loop (30s) ---- real HTTP GET /healthz (fixed URLs only)
+              |               simulated seeded series (Globex Cloud)
+              v
+       SQLite samples, alerts, incidents, notifications
+              |            retention: 7 days, notification cap
+              +--&gt; read API --&gt; dashboard (vanilla JS, inline SVG)
+              +--&gt; /metrics --&gt; Prometheus --&gt; Alertmanager / Grafana</code></pre>
+      <pre><code class="language-mermaid">flowchart LR
+        cfg[&quot;config/targets.yml&quot;] --&gt; loop[&quot;Probe loop&quot;]
+        loop --&gt; http[&quot;Real health checks&quot;]
+        loop --&gt; sim[&quot;Simulated series&quot;]
+        loop --&gt; db[&quot;SQLite&quot;]
+        db --&gt; api[&quot;FastAPI read API&quot;]
+        api --&gt; ui[&quot;Dashboard&quot;]
+        api --&gt; prom[&quot;/metrics&quot;]
+        prom --&gt; graf[&quot;Prometheus and Grafana&quot;]</code></pre>
+      <p>The prober and the backfill call the same <code>sample_point</code> function, so live dots and history agree. Alert evaluation runs after each sample. A firing alert opens an incident and appends lines such as <code>webhook to #ops-alerts</code> and <code>email to oncall@example.com</code>. Those deliveries are simulated; nothing is sent.</p>
+      <h2>From PulseBoard to Prometheus, Alertmanager, and Grafana</h2>
+      <p>The built-in engine is enough for one team and one process. The same ideas map onto a standard stack:</p>
+      <table><thead><tr><th>PulseBoard</th><th>Larger stack</th></tr></thead><tbody><tr><td><code>probe_success</code> gauge</td><td>Prometheus scrape of <code>GET /metrics</code> (<code>ops/prometheus.yml</code>)</td></tr><tr><td><code>probe_latency_seconds</code> histogram (last 5 minutes)</td><td><code>histogram_quantile</code> in Grafana</td></tr><tr><td><code>probe_latency_threshold_seconds</code></td><td>Per-target threshold the latency rule compares against</td></tr><tr><td><code>alerts_firing{severity=...}</code></td><td>Grafana stat, or Alertmanager routing</td></tr><tr><td>Down / p95 / 1h SLO rules</td><td><code>ops/alert.rules.yml</code> (<code>TargetDown</code>, <code>TargetLatencyP95High</code>, <code>SLOBurn</code>)</td></tr><tr><td>Dashboard</td><td><code>ops/grafana-dashboard.json</code> (import, pick a Prometheus datasource)</td></tr></tbody></table>
+      <p>Load the rule file into Prometheus and point Alertmanager at the receivers you actually use. PulseBoard&#x27;s own notification log stays a demo of the message shape (<code>#ops-alerts</code>, <code>oncall@example.com</code>) and does not call a webhook.</p>
+      <p>The built-in latency rule treats 5 minutes as the p95 window and confirms on the following probe (about 30 seconds) so a single slow sample stays pending. The Prometheus example uses <code>for: 5m</code> on the 5-minute quantile, which is the usual way to express that same intent in Alertmanager.</p>
+      <h2>Tech stack</h2>
+      <ul><li>Python 3.9+ (developed to run on 3.9 and 3.11)</li><li>FastAPI 0.115 and Uvicorn 0.30</li><li>SQLite via the standard library</li><li>PyYAML for the fixed catalog</li><li>Vanilla HTML, CSS, and JavaScript</li></ul>
+      <h2>Run locally</h2>
+      <pre><code class="language-bash">cd pulseboard
+      python3 -m venv .venv
+      .venv/bin/pip install -r requirements.txt
+      ./run.sh</code></pre>
+      <p>Open <code>http://127.0.0.1:18803/</code>. <code>run.sh</code> creates the venv if needed and listens on <code>127.0.0.1:18803</code>.</p>
+      <p>Install <code>requirements-dev.txt</code> before running tests.</p>
+      <h2>Docker Compose</h2>
+      <p>Docker is optional. The image runs as a non-root user and health-checks <code>/healthz</code>.</p>
+      <pre><code class="language-bash">docker compose up --build</code></pre>
+      <p>The service listens on port 18803. A named volume stores SQLite. If the volume is not writable by uid 10001, point <code>DATA_DIR</code> at a directory that is.</p>
+      <h2>Configuration</h2>
+      <table><thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>PORT</code></td><td><code>18803</code></td><td>HTTP port</td></tr><tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td>Bind address. Compose sets <code>0.0.0.0</code>.</td></tr><tr><td><code>DATA_DIR</code></td><td><code>./data</code></td><td>SQLite directory</td></tr><tr><td><code>PULSEBOARD_CONFIG</code></td><td><code>config/targets.yml</code></td><td>Catalog path</td></tr><tr><td><code>PULSEBOARD_PROBER</code></td><td><code>1</code></td><td>Set <code>0</code> to disable the background loop</td></tr><tr><td><code>PULSEBOARD_BACKFILL</code></td><td><code>1</code></td><td>Set <code>0</code> to skip simulated history</td></tr></tbody></table>
+      <p>Probe URLs, thresholds, SLO targets, and notification channel labels live in <code>config/targets.yml</code>. Simulated entries must not set a URL. Real entries must be <code>http</code> or <code>https</code> and must not carry credentials.</p>
+      <h2>API endpoints</h2>
+      <p>All UI calls are relative (<code>api/...</code>, <code>static/...</code>) so the app works at the process root and behind a prefix that nginx strips.</p>
+      <table><thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/</code></td><td>Dashboard</td></tr><tr><td>GET</td><td><code>/healthz</code></td><td><code>{&quot;status&quot;:&quot;ok&quot;,...}</code> with no database work</td></tr><tr><td>GET</td><td><code>/api/summary</code></td><td>Overall status, uptime, p95, SLO, open alerts</td></tr><tr><td>GET</td><td><code>/api/targets</code></td><td>Cards: status, uptime, percentiles, sparkline, 90-segment bar</td></tr><tr><td>GET</td><td>`/api/targets/{id}/series?range=1h\</td><td>24h\</td><td>7d`</td><td>Downsampled latency series</td></tr><tr><td>GET</td><td><code>/api/alerts</code></td><td>Pending and firing alerts</td></tr><tr><td>GET</td><td><code>/api/incidents</code></td><td>Last 20 incidents</td></tr><tr><td>GET</td><td><code>/api/notifications</code></td><td>Simulated notification log</td></tr><tr><td>GET</td><td><code>/metrics</code></td><td>Prometheus text exposition</td></tr></tbody></table>
+      <p>There is no write endpoint. Non-GET requests are rate limited (30 per minute per IP, using <code>X-Real-IP</code> when present) and bodies over 8 KB are rejected.</p>
+      <h2>Tests</h2>
+      <pre><code class="language-bash">.venv/bin/pip install -r requirements-dev.txt
+      .venv/bin/pytest
+      .venv/bin/ruff check app tests</code></pre>
+      <p>Coverage includes percentiles and uptime, 5-minute downsampling, the alert state machine, retention, simulated determinism, a mocked HTTP probe, metrics format, and the read API.</p>
+      <h2>Deployment notes</h2>
+      <p>The intended layout on a small VPS is a systemd service behind nginx. The unit file is <code>deploy/pulseboard.service</code> (<code>User=ec2-user</code>, <code>WorkingDirectory=/opt/portfolio/pulseboard</code>, <code>MemoryMax=150M</code>, <code>NoNewPrivileges=yes</code>). Nginx should proxy <code>https://3.1.79.63/portfolio/pulseboard/</code> to <code>http://127.0.0.1:18803/</code> and strip the prefix (<code>proxy_pass http://127.0.0.1:18803/;</code>). The page uses relative URLs so it does not care about the prefix.</p>
+      <p>Keep the process bound to localhost and let nginx terminate TLS. Do not point the prober at user-supplied hosts. Memory stays modest: one SQLite file, a 7-day cap, and a notification cap of 400 rows.</p>
+      <h2>Screenshots</h2>
+      <p><img alt="Desktop dashboard" src="../img/pulseboard-desktop.png"></p>
+      <p><img alt="Mobile dashboard" src="../img/pulseboard-mobile.png"></p>
+      <h2>License</h2>
+      <p>Demo project. Fictional data only.</p>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/pulseboard/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

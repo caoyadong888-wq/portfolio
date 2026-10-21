@@ -1,0 +1,256 @@
+{
+  "clean_examples": [
+    {
+      "clean": {
+        "amount_cents": 475,
+        "business_date": "2026-09-05",
+        "is_return": false,
+        "qty": 1,
+        "sku": "CAP-001",
+        "sold_at_utc": "2026-09-05T15:00:00+00:00",
+        "store_id": "01"
+      },
+      "raw": {
+        "amount": "4.75",
+        "business_date": "2026-09-05",
+        "qty": "1",
+        "sku": " cap-001 ",
+        "sold_at": "2026-09-05 08:00:00",
+        "store_id": "01"
+      },
+      "source_file": "pos/01/2026-09-05.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 1050,
+        "business_date": "2026-09-05",
+        "is_return": false,
+        "qty": 2,
+        "sku": "MOC-001",
+        "sold_at_utc": "2026-09-05T15:07:00+00:00",
+        "store_id": "01"
+      },
+      "raw": {
+        "amount": "$10.50",
+        "business_date": "09/05/2026",
+        "qty": "2",
+        "sku": "MOC-001",
+        "sold_at": "09/05/2026 08:07:00",
+        "store_id": "01"
+      },
+      "source_file": "pos/01/2026-09-05.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 525,
+        "business_date": "2026-09-05",
+        "is_return": false,
+        "qty": 1,
+        "sku": "MOC-001",
+        "sold_at_utc": "2026-09-05T13:00:00+00:00",
+        "store_id": "02"
+      },
+      "raw": {
+        "amount": "5.25",
+        "business_date": "2026-09-05",
+        "qty": "1",
+        "sku": " moc-001 ",
+        "sold_at": "2026-09-05 08:00:00",
+        "store_id": "02"
+      },
+      "source_file": "pos/02/2026-09-05.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 600,
+        "business_date": "2026-09-05",
+        "is_return": false,
+        "qty": 2,
+        "sku": "TEA-001",
+        "sold_at_utc": "2026-09-05T13:07:00+00:00",
+        "store_id": "02"
+      },
+      "raw": {
+        "amount": "$6.00",
+        "business_date": "09/05/2026",
+        "qty": "2",
+        "sku": "TEA-001",
+        "sold_at": "09/05/2026 08:07:00",
+        "store_id": "02"
+      },
+      "source_file": "pos/02/2026-09-05.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 300,
+        "business_date": "2026-09-05",
+        "is_return": false,
+        "qty": 1,
+        "sku": "TEA-001",
+        "sold_at_utc": "2026-09-05T12:00:00+00:00",
+        "store_id": "03"
+      },
+      "raw": {
+        "amount": "3.00",
+        "business_date": "2026-09-05",
+        "qty": "1",
+        "sku": " tea-001 ",
+        "sold_at": "2026-09-05 08:00:00",
+        "store_id": "03"
+      },
+      "source_file": "pos/03/2026-09-05.csv"
+    },
+    {
+      "clean": {
+        "amount_cents": 950,
+        "business_date": "2026-09-05",
+        "is_return": false,
+        "qty": 2,
+        "sku": "TEA-002",
+        "sold_at_utc": "2026-09-05T12:07:00+00:00",
+        "store_id": "03"
+      },
+      "raw": {
+        "amount": "$9.50",
+        "business_date": "09/05/2026",
+        "qty": "2",
+        "sku": "TEA-002",
+        "sold_at": "09/05/2026 08:07:00",
+        "store_id": "03"
+      },
+      "source_file": "pos/03/2026-09-05.csv"
+    }
+  ],
+  "dq": {
+    "blocking_failed": [],
+    "checks": [
+      {
+        "detail": "source=75 loaded=60 quarantined=15 deduped=0",
+        "id": "row_reconciliation",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "dup_sales=0 dup_current=0",
+        "id": "primary_key_unique",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "missing=0",
+        "id": "foreign_keys",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "null_rows=0",
+        "id": "required_not_null",
+        "level": "blocking",
+        "passed": true
+      },
+      {
+        "detail": "bad_enum=0",
+        "id": "value_enums",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "mismatched_store_days=0",
+        "id": "amount_reconciliation",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "max=2026-09-05 as_of=2026-09-05 gap_days=0",
+        "id": "freshness",
+        "level": "warning",
+        "passed": true
+      },
+      {
+        "detail": "files=0",
+        "id": "no_schema_drift",
+        "level": "warning",
+        "passed": true
+      }
+    ],
+    "status": "PASS",
+    "warnings": []
+  },
+  "elapsed_ms": 782,
+  "files_skipped": 1,
+  "finished_at": "2026-10-04T08:41:48+00:00",
+  "params": {
+    "as_of": "2026-09-05",
+    "date_from": "2026-09-05",
+    "date_to": "2026-09-05",
+    "dry_run": false,
+    "full_refresh": false
+  },
+  "published": true,
+  "quarantine_counts": {
+    "BAD_AMOUNT": 1,
+    "BAD_DATE": 1,
+    "DUPLICATE_ROW": 12,
+    "ENCODING_FIXED": 1,
+    "MISSING_STORE": 1
+  },
+  "reconciliation": {
+    "deduped_rows": 0,
+    "loaded_rows": 60,
+    "quarantined_rows": 15,
+    "source_rows": 75
+  },
+  "rows_added": 60,
+  "run_id": "2026-09-05",
+  "schema_drift_files": [],
+  "stages": {
+    "dq": {
+      "ms": 3,
+      "rows": 8
+    },
+    "extract": {
+      "ms": 166,
+      "rows": 75
+    },
+    "land": {
+      "ms": 27,
+      "rows": 75
+    },
+    "load": {
+      "ms": 47,
+      "rows": 60
+    },
+    "manifest": {
+      "ms": 1,
+      "rows": 1
+    },
+    "publish": {
+      "ms": 83,
+      "rows": 70
+    },
+    "quarantine": {
+      "ms": 0,
+      "rows": 15
+    },
+    "transform": {
+      "ms": 0,
+      "rows": 60
+    },
+    "validate": {
+      "ms": 420,
+      "rows": 75
+    }
+  },
+  "started_at": "2026-10-04T08:41:47+00:00",
+  "status": "SUCCESS",
+  "versions": {
+    "PyYAML": "6.0.2",
+    "SQLAlchemy": "2.0.36",
+    "httpx": "0.27.2",
+    "openpyxl": "3.1.5",
+    "pandas": "2.2.3",
+    "pandera": "0.20.4",
+    "pyarrow": "17.0.0",
+    "python": "3.9.9"
+  }
+}

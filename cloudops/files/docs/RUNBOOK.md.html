@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>docs/RUNBOOK.md</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../aws/index.html">AWS 次要</a>
+<a href="../index.html">文件</a>
+<a href="../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>docs/RUNBOOK.md</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold"># CloudOps runbook</span>
+
+Next steps if someone deploys the fictional Thistle Analytics <span style="color: #BA2121">`insights-api`</span> for real. This repository does not run those commands. <span style="color: #BA2121">`make check`</span> does not submit a build, exchange a token, or create a resource.
+
+Configs here are real and offline-validated. They are not deployed to any cloud account. Project id <span style="color: #BA2121">`thistle-analytics-demo`</span> and project number <span style="color: #BA2121">`000000000000`</span> are placeholders. The AWS account id <span style="color: #BA2121">`000000000000`</span> is a placeholder. Thistle Analytics is fictional.
+
+<span style="color: #800080; font-weight: bold">## Before a real GCP deploy</span>
+
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>A GCP project you are allowed to change, plus billing enabled on that project.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Workload Identity Federation for the GitHub repository that will ship the code. The pool in <span style="color: #BA2121">`gcp/wif/github-pool.yaml`</span> uses a placeholder project number and the repository <span style="color: #BA2121">`example.invalid/thistle-analytics/insights-api`</span>.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>A dedicated runtime service account. Do not use the default compute service account.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Secret Manager secret <span style="color: #BA2121">`insights-api-signing-key`</span> created out of band. Pin a version. Do not commit the value.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Replace the placeholder CMEK name before <span style="color: #BA2121">`terraform apply`</span>. This module does not create key material.
+
+The Cloud Build file and the GitHub workflow are the two ways in. The workflow uses <span style="color: #BA2121">`google-github-actions/auth`</span> with a full commit SHA and <span style="color: #BA2121">`id-token: write`</span>. It does not read a JSON key.
+
+Suggested order, on a machine that is allowed to change the project:
+
+<span style="color: #BA2121">```bash</span>
+terraform<span style="color: #bbbbbb"> </span>-chdir<span style="color: #666666">=</span>gcp/terraform<span style="color: #bbbbbb"> </span>init
+terraform<span style="color: #bbbbbb"> </span>-chdir<span style="color: #666666">=</span>gcp/terraform<span style="color: #bbbbbb"> </span>plan
+terraform<span style="color: #bbbbbb"> </span>-chdir<span style="color: #666666">=</span>gcp/terraform<span style="color: #bbbbbb"> </span>apply
+<span style="color: #BA2121">```</span>
+
+Or submit <span style="color: #BA2121">`gcp/build/cloudbuild.yaml`</span> with substitutions <span style="color: #BA2121">`_PROJECT_ID`</span>, <span style="color: #BA2121">`_REGION`</span>, and <span style="color: #BA2121">`_SERVICE`</span>. The portfolio does not do either.
+
+Roll back a Cloud Run revision by sending traffic to the previous revision in the console or with <span style="color: #BA2121">`gcloud run services update-traffic`</span>. That command is not part of <span style="color: #BA2121">`make check`</span>.
+
+<span style="color: #800080; font-weight: bold">## Before a real AWS deploy (secondary)</span>
+
+This path is secondary. GCP is the primary narrative.
+
+The SAM template is <span style="color: #BA2121">`aws/template.yaml`</span>. The GitHub fragment assumes role <span style="color: #BA2121">`insights-api-deploy`</span> with OIDC. The execution role can write one log group and read one Secrets Manager ARN. The deploy role can update function <span style="color: #BA2121">`insights-api-secondary`</span> only.
+
+There is no VPC, no load balancer, and no NAT gateway in this path. Do not copy a network module from another demo into this folder.
+
+<span style="color: #800080; font-weight: bold">## What can show up on the bill</span>
+
+Names only. This page does not estimate a price.
+
+GCP, if you apply the primary path:
+
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Cloud Run
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Artifact Registry
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Secret Manager
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Cloud Monitoring
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Cloud Logging
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Cloud Build
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Workload Identity Federation
+
+AWS, if you apply the secondary path:
+
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Lambda
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>API Gateway
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>CodeBuild
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>CloudWatch
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>IAM
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Secrets Manager
+
+IAM itself is not a separate priced line in the usual case. It is listed because the secondary path creates roles. Workload Identity Federation is listed because the primary path depends on it. No amount belongs in this file.
+</code></pre></div>
+
+</main>
+</body>
+</html>

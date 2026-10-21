@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shift Handover Report Auto-Generator</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --paper: #fffcf6;
+      --ink: #1c2416;
+      --muted: #5c6556;
+      --line: #ddd6c8;
+      --accent: #0e6b45;
+      --accent-soft: #e5f3eb;
+      --red: #a32020;
+      --amber: #8a6a00;
+      --green: #1b7f3a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--accent); }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 64px; }
+    header {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    header .wrap { padding-top: 22px; padding-bottom: 22px; }
+    .back { margin: 0 0 12px; font-size: 14px; }
+    h1 { margin: 0 0 6px; font-size: 32px; letter-spacing: -0.02em; line-height: 1.2; }
+    .zh-title { margin: 0; color: var(--muted); font-size: 18px; }
+    h2 { margin: 0 0 10px; font-size: 22px; }
+    h2 span { color: var(--muted); font-weight: 600; }
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 18px 8px;
+      margin: 16px 0;
+    }
+    p, li { font-size: 16px; }
+    ul, ol { margin-top: 0; padding-left: 1.2em; }
+    .note {
+      background: var(--accent-soft);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    pre {
+      overflow-x: auto;
+      background: #f7f4ec;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: "DejaVu Sans Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #1c2416;
+    }
+    table { border-collapse: collapse; width: 100%; margin: 0 0 12px; }
+    th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { background: #f7f4ec; }
+    .red { color: var(--red); font-weight: 700; }
+    .amber { color: var(--amber); font-weight: 700; }
+    .green { color: var(--green); font-weight: 700; }
+    .chain {
+      font-family: "DejaVu Sans Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #f7f4ec;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    .links a { display: inline-block; margin: 0 16px 8px 0; }
+    footer { color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="back"><a href="/portfolio/">Back to portfolio / 返回作品集</a></p>
+      <h1>Shift Handover Report Auto-Generator</h1>
+      <p class="zh-title">交接班报告自动生成模板</p>
+    </div>
+  </header>
+  <main class="wrap">
+    <section id="problem">
+      <h2>Problem / <span>问题</span></h2>
+      <p>Handovers are verbal and inconsistent. The useful facts live in one person's notes, a chat scroll, and two exports that nobody lines up. Open P1s and uncleared alarms get lost between shifts.</p>
+      <p>交接靠口头，每次写法也不一样。有用的事实散在笔记、聊天记录和两份没人对过的导出里。未关闭的 P1 和还没清除的告警，换班时会丢。</p>
+    </section>
+    <section id="approach">
+      <h2>Approach / <span>做法</span></h2>
+      <p>Structured inputs go in. The generator merges them, paints one RAG status for the whole shift, and writes three files. Samples are a synthetic hall only.</p>
+      <p>结构化输入进去。生成器合并它们，给整班涂一种红黄绿，并写出三份文件。示例机房是合成的。</p>
+      <p class="chain">shift JSON + ticket CSV + alarm CSV + previous report → generator → RAG → MD / HTML / JSON</p>
+      <p class="chain">班次 JSON + 工单 CSV + 告警 CSV + 上一班报告 → 生成器 → 红黄绿 → MD / HTML / JSON</p>
+    </section>
+    <section id="rag">
+      <h2>RAG rules / <span>红黄绿规则</span></h2>
+      <p>Red wins over amber. Amber wins over green. A red report still lists the amber reasons when they are also true. The clock for an open ticket stops at the shift window end, not at the wall clock of the machine.</p>
+      <p>红色压过琥珀色，琥珀色压过绿色。红色报告在琥珀色原因也成立时仍会列出它们。未关闭工单的时钟停在班次窗口结束，不用运行机器的当前时间。</p>
+      <table>
+        <thead>
+          <tr><th>Colour / 颜色</th><th>When / 何时</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="red">Red / 异常</td>
+            <td>Any P1 incident or P1 ticket is still open, or any alarm is critical and not cleared. 仍有未关闭的 P1，或有严重且未清除的告警。</td>
+          </tr>
+          <tr>
+            <td class="amber">Amber / 注意</td>
+            <td>Otherwise, any P2 is still open, any open P1 is older than 4 hours, any open P2 is older than 8 hours, or a task is overdue. Exactly 4 hours and exactly 8 hours are not breaches. 否则是未关闭的 P2、P1 超过 4 小时、P2 超过 8 小时，或任务逾期。刚好 4 小时和刚好 8 小时不算超出。</td>
+          </tr>
+          <tr>
+            <td class="green">Green / 正常</td>
+            <td>None of the above. A false checklist item does not by itself change the colour. 以上都没有。检查单某一项没确认，本身不改变颜色。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="demo">
+      <h2>Demo output / <span>演示输出</span></h2>
+      <p>Stdout of <code>python3 demo.py</code> on the synthetic night shift at DC1 Hall B. Status is red. The generator exits 3. The demo process then exits 0.</p>
+      <p><code>python3 demo.py</code> 对 DC1 Hall B 合成夜班的标准输出。状态是红色。生成器退出码 3。演示进程随后以 0 结束。</p>
+      <pre>Shift handover kit demo
+
+$ python3 scripts/handover_gen.py --input samples/shift_input.json --tickets samples/tickets.csv --alarms samples/alarms.csv --prev samples/prev_handover.json --out out --lang both
+site: DC1 Hall B
+shift: night 2026-10-19
+status: red
+reasons: open_p1, uncleared_critical_alarm, open_p2, sla_breach, overdue_task
+tickets opened: 9 closed: 7 open: 5 sla_breaches: 2
+mttr_minutes: 289.3
+alarms: 15 uncleared_critical: 1
+carried_over: 4
+wrote out/handover.md (10036 bytes)
+wrote out/handover.html (10727 bytes)
+wrote out/handover.json (16528 bytes)
+generator exit 3
+demo complete</pre>
+    </section>
+    <section id="excerpt">
+      <h2>Sample report excerpt / <span>报告摘录</span></h2>
+      <p>The start of <code>out/handover.md</code> on that same run, through the incident tables. The open P1 is both an incident and a ticket. One critical alarm on PDU-B-R4 is still uncleared.</p>
+      <p>同一次运行的 <code>out/handover.md</code> 开头，直到事件表。未关闭的 P1 同时在事件和工单里。PDU-B-R4 上有一条严重告警还没清除。</p>
+      <pre># Shift handover report / 交接班报告
+
+The outgoing lead hands this status to the incoming lead. Figures come from the shift input, the ticket export, and the alarm export.
+
+交班角色把这份状态交给接班角色。数字来自班次输入、工单导出和告警导出。
+
+## Shift information / 班次信息
+
+| Field / 字段 | Value / 值 |
+| --- | --- |
+| Site / 站点 | DC1 Hall B |
+| Shift / 班次 | night |
+| Date / 日期 | 2026-10-19 |
+| Outgoing lead / 交班角色 | Shift A lead |
+| Incoming lead / 接班角色 | Shift B lead |
+| Window start / 窗口开始 | 2026-10-19T20:00:00 |
+| Window end / 窗口结束 | 2026-10-20T08:00:00 |
+
+| Item / 事项 | Recorded / 记录 |
+| --- | --- |
+| Walkdown / 现场巡视 | yes / 是 |
+| Alarms acknowledged / 告警已确认 | no / 否 |
+| Open tickets reviewed / 未关闭工单已复核 | yes / 是 |
+| Change freeze / 变更冻结 | yes / 是 |
+| Spares checked / 备件已核对 | no / 否 |
+| Access log reviewed / 进出记录已复核 | yes / 是 |
+
+## Summary and status / 概述与状态
+
+**Status / 状态:** RED / 异常
+
+Row 4 is on a single feed. INC-118 and TCK-2402 are the same feed event in the incident queue and the ticket queue. Shelf S2 stays degraded until the spare arrives. Zone 4 fire supervisory is still in trouble.
+
+**Reasons / 原因**
+
+- Open P1 / 存在未关闭的 P1: INC-118, TCK-2402
+- Uncleared critical alarm / 存在未清除的严重告警: 2026-10-19T20:12:00 PDU-B-R4
+- Open P2 / 存在未关闭的 P2: INC-141, TCK-2405, TCK-2406
+- SLA breach / 超出时限: TCK-2402, TCK-2406
+- Overdue task / 任务逾期: TASK-55, TASK-71
+
+## Open incidents / 未关闭事件
+
+### Open / 未关闭
+
+| ID / 编号 | Title / 标题 | Severity / 级别 | Status / 状态 | Owner / 负责角色 | Opened / 打开时间 | Carry-over / 承接 |
+| --- | --- | --- | --- | --- | --- | --- |
+| INC-118 | PDU-B feed A still open after the trip | P1 | open | Shift A lead | 2026-10-19T16:40:00 | carried over / 承接 |
+| INC-141 | In-row cooler 3 pump warning | P2 | open | Hall B tech | 2026-10-20T02:12:00 |  |
+| INC-104 | Cracked floor tile at row 6 | P3 | open | Facilities watch | 2026-10-16T11:20:00 | carried over / 承接 |
+
+### Closed this shift / 本班次已关闭
+
+| ID / 编号 | Title / 标题 | Severity / 级别 | Status / 状态 | Owner / 负责角色 | Opened / 打开时间 | Carry-over / 承接 |
+| --- | --- | --- | --- | --- | --- | --- |
+| INC-130 | UPS-2 short battery transfer | P3 | closed | Facilities watch | 2026-10-19T20:20:00 |  |</pre>
+    </section>
+    <section id="deliverables">
+      <h2>Deliverables / <span>交付物</span></h2>
+      <ul>
+        <li>Bilingual handover template. 中英交接模板。</li>
+        <li>Shift JSON schema, checklist, and RAG rules. 班次 JSON 字段、检查单和红黄绿规则。</li>
+        <li>Ticket CSV and alarm CSV layouts. 工单 CSV 和告警 CSV 的列。</li>
+        <li>Generator with Markdown, HTML, and JSON, plus carry-over from the previous report. 生成器写出三份文件，并标记上一班仍未关闭的承接项。</li>
+        <li>Synthetic night-shift sample, demo, tests, and setup notes. 合成夜班样例、演示、测试和安装说明。</li>
+      </ul>
+      <p>The free lite repo keeps the shift JSON, the ticket CSV, the RAG status, and markdown only. Alarm merge, HTML, JSON, and carry-over stay in the full pack. 免费精简仓库只保留班次 JSON、工单 CSV、红黄绿和 Markdown。告警合并、HTML、JSON 和承接留在完整包。</p>
+    </section>
+    <section id="delivery">
+      <h2>Delivery time / <span>交付时间</span></h2>
+      <p class="note">Instant download. Setup about 5 minutes. Adapting the template and fields to your site about 30 minutes.</p>
+      <p class="note">下载即得。安装并跑通大约 5 分钟。把模板和字段改成你的站点大约 30 分钟。</p>
+      <p>Pay what you want, $1 or more. Suggested price is $3. 愿付多少付多少，1 美元起，建议 3 美元。</p>
+    </section>
+    <section id="gumroad">
+      <h2>Links / <span>链接</span></h2>
+      <p class="links"><a href="https://github.com/caoyadong888-wq/shift-handover-kit-lite">GitHub: shift-handover-kit-lite</a> <a href="#gumroad"><!-- GUMROAD_URL -->Gumroad: coming soon</a></p>
+    </section>
+    <footer>
+      <p><a href="/portfolio/">Back to portfolio / 返回作品集</a></p>
+    </footer>
+  </main>
+</body>
+</html>

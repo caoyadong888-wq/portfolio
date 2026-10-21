@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PipeForge — case study</title>
+  <meta name="description" content="Live GitHub Actions CI/CD for a public ratecard-api demo: lint, test matrix, build, SBOM, scan, and release to GHCR">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="../pipeforge/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. Workflows run on the public caoyadong888-wq/pipeforge-demo repository. Kestrel Parcel Co. is fictional, not a client. Nothing is deployed to a server from this pipeline.</p>
+    <article class="readme">
+      <h1>PipeForge (portfolio harness)</h1>
+      <p>Stage B: live public demo repository on <code>caoyadong888-wq/pipeforge-demo</code>. The application and workflows live in <code>/workspace/pipeforge-demo</code>. This directory records runs, snapshots workflows, and builds the static showcase under <code>site/pipeforge/</code>.</p>
+      <h2>Locked decisions</h2>
+      <ol><li>Owner: <strong>caoyadong888-wq</strong> (existing account). Isolation via a separate</li></ol>
+      <p>public repo. <code>repo.env</code> sets <code>GH_OWNER</code>.</p>
+      <ol><li>Public README does not link back to the portfolio host.</li><li>GHCR package is public.</li><li>One demo PR and one intentionally scan-blocked PR.</li><li><code>main</code> requires CI status checks; reviews not required.</li></ol>
+      <h2>Commands</h2>
+      <pre><code class="language-bash">make tools      # install actionlint / shellcheck
+      make check      # offline lint, zizmor, app tests, policy tests
+      make record     # pull live runs/badges/snapshots from GitHub
+      make showcase   # record + rebuild site/pipeforge/
+      make test       # pytest for harness tests</code></pre>
+      <p>No deploy and no VPS steps from this tree.</p>
+    </article>
+    <p class="case-cta"><a class="btn" href="../pipeforge/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

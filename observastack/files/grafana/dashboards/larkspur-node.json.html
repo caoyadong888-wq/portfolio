@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>grafana/dashboards/larkspur-node.json</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../alerts.html">告警</a>
+<a href="../../../slo.html">SLO</a>
+<a href="../../../routing.html">路由</a>
+<a href="../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>grafana/dashboards/larkspur-node.json</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>{
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;annotations&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;list&quot;</span>:<span style="color: #bbbbbb"> </span>[]
+<span style="color: #bbbbbb">  </span>},
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;editable&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;fiscalYearStartMonth&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;graphTooltip&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">null</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;links&quot;</span>:<span style="color: #bbbbbb"> </span>[],
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;liveNow&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;panels&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;timeseries&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;title&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;CPU utilisation&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;gridPos&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;h&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;w&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">12</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;x&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;y&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;targets&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">        </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;refId&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;A&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;expr&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;instance:node_cpu_utilisation:rate5m{instance=~\&quot;$instance\&quot;}&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;legendFormat&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;{{service}}&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>],
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;fieldConfig&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;defaults&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;unit&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;percentunit&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;color&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;palette-classic&quot;</span>
+<span style="color: #bbbbbb">          </span>},
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;custom&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;drawStyle&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;line&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;fillOpacity&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">10</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;spanNulls&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;overrides&quot;</span>:<span style="color: #bbbbbb"> </span>[]
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;options&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;legend&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;displayMode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;list&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;placement&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bottom&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;showLegend&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;tooltip&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;single&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;sort&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;none&quot;</span>
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>},
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">2</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;timeseries&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;title&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Memory utilisation&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;gridPos&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;h&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;w&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">12</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;x&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">12</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;y&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;targets&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">        </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;refId&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;A&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;expr&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;instance:node_memory_utilisation:ratio{instance=~\&quot;$instance\&quot;}&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;legendFormat&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;{{service}}&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>],
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;fieldConfig&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;defaults&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;unit&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;percentunit&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;color&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;palette-classic&quot;</span>
+<span style="color: #bbbbbb">          </span>},
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;custom&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;drawStyle&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;line&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;fillOpacity&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">10</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;spanNulls&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;overrides&quot;</span>:<span style="color: #bbbbbb"> </span>[]
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;options&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;legend&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;displayMode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;list&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;placement&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bottom&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;showLegend&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;tooltip&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;single&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;sort&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;none&quot;</span>
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>},
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">3</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;timeseries&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;title&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Filesystem available ratio&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;gridPos&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;h&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;w&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">12</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;x&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;y&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;targets&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">        </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;refId&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;A&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;expr&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;instance:node_filesystem_avail:ratio{instance=~\&quot;$instance\&quot;}&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;legendFormat&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;{{service}}&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>],
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;fieldConfig&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;defaults&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;unit&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;percentunit&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;color&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;palette-classic&quot;</span>
+<span style="color: #bbbbbb">          </span>},
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;custom&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;drawStyle&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;line&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;fillOpacity&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">10</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;spanNulls&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;overrides&quot;</span>:<span style="color: #bbbbbb"> </span>[]
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;options&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;legend&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;displayMode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;list&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;placement&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bottom&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;showLegend&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;tooltip&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;single&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;sort&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;none&quot;</span>
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>},
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">4</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;timeseries&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;title&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Filesystem available in 4h&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;gridPos&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;h&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;w&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">12</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;x&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">12</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;y&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;targets&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">        </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;refId&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;A&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;expr&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;predict_linear(node_filesystem_avail_bytes{instance=~\&quot;$instance\&quot;,fstype!~\&quot;tmpfs|overlay\&quot;}[$__range], 4 * 3600)&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;legendFormat&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;{{service}}&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>],
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;fieldConfig&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;defaults&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;unit&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bytes&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;color&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;palette-classic&quot;</span>
+<span style="color: #bbbbbb">          </span>},
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;custom&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;drawStyle&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;line&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;fillOpacity&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">10</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;spanNulls&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>
+<span style="color: #bbbbbb">          </span>}
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;overrides&quot;</span>:<span style="color: #bbbbbb"> </span>[]
+<span style="color: #bbbbbb">      </span>},
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;options&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;legend&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;displayMode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;list&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;placement&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;bottom&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;showLegend&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;tooltip&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;mode&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;single&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;sort&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;none&quot;</span>
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>}
+<span style="color: #bbbbbb">  </span>],
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;schemaVersion&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">39</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;tags&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;larkspur&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;observastack&quot;</span>
+<span style="color: #bbbbbb">  </span>],
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;templating&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;list&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">      </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;name&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;instance&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;label&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;instance&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;query&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;datasource&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;${DS_PROMETHEUS}&quot;</span>
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;definition&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;label_values(node_memory_total_bytes, instance)&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;query&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;qryType&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;query&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;label_values(node_memory_total_bytes, instance)&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;refId&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;PrometheusVariableQueryEditor-VariableQuery&quot;</span>
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;refresh&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;regex&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;sort&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;multi&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;includeAll&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;hide&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;skipUrlSync&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;options&quot;</span>:<span style="color: #bbbbbb"> </span>[],
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;current&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;selected&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;text&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;All&quot;</span>,
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;value&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;$__all&quot;</span>
+<span style="color: #bbbbbb">        </span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;allValue&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;.+&quot;</span>
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>]
+<span style="color: #bbbbbb">  </span>},
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;time&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;from&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;now-6h&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;to&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;now&quot;</span>
+<span style="color: #bbbbbb">  </span>},
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;timepicker&quot;</span>:<span style="color: #bbbbbb"> </span>{},
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;timezone&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;utc&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;title&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Larkspur node USE&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;uid&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;larkspur-node&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;version&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;description&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Larkspur Grocers is fictional. Panels read the recording rules and the metric catalog.&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;__inputs&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;name&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;DS_PROMETHEUS&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;label&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Prometheus&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;description&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Prometheus datasource&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;datasource&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;pluginId&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;pluginName&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Prometheus&quot;</span>
+<span style="color: #bbbbbb">    </span>}
+<span style="color: #bbbbbb">  </span>],
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;__requires&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;grafana&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;grafana&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;name&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Grafana&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;version&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;10.0.0&quot;</span>
+<span style="color: #bbbbbb">    </span>},
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;datasource&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;prometheus&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;name&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Prometheus&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;version&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;1.0.0&quot;</span>
+<span style="color: #bbbbbb">    </span>},
+<span style="color: #bbbbbb">    </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;panel&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;timeseries&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;name&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Time series&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;version&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;&quot;</span>
+<span style="color: #bbbbbb">    </span>}
+<span style="color: #bbbbbb">  </span>]
+}
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

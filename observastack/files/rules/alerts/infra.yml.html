@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rules/alerts/infra.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../alerts.html">告警</a>
+<a href="../../../slo.html">SLO</a>
+<a href="../../../routing.html">路由</a>
+<a href="../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>rules/alerts/infra.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">groups</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>infra.alerts
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">rules</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>InstanceDown
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>up == 0
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>2m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>A scrape target is down
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>Prometheus has seen up == 0 for this target for at least 2 minutes. Other alerts on the same instance are inhibited.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/InstanceDown
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>ScrapeTargetMissing
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>absent(up{job=&quot;storefront&quot;})
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">job</span>:<span style="color: #bbbbbb"> </span>storefront
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>The storefront scrape job has no targets
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>absent(up{job=&quot;storefront&quot;}) has been true for 5 minutes, so the whole storefront job is missing rather than a single instance being down.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/ScrapeTargetMissing
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>NodeFilesystemFillingUp
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">instance:node_filesystem_avail:ratio &lt; 0.2</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">and</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">predict_linear(node_filesystem_avail_bytes{fstype!~&quot;tmpfs|overlay&quot;}[6h], 4 * 3600) &lt; 0</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>30m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>A filesystem is predicted to fill within 4 hours
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>Available space is already under 20 percent and predict_linear over 6 hours reaches zero within 4 hours. tmpfs and overlay mounts are excluded.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/NodeFilesystemFillingUp
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>NodeMemoryHigh
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>instance:node_memory_utilisation:ratio &gt; 0.90
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>15m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Host memory utilisation is above 90 percent
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>instance:node_memory_utilisation:ratio has stayed above 0.90 for 15 minutes.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/NodeMemoryHigh
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>PostgresDown
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>pg_up == 0
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>2m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Postgres exporter reports the database is down
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>pg_up has been 0 for at least 2 minutes.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/PostgresDown
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># pg_stat_activity_connections avoids the promtool check-metrics &quot;_count&quot; suffix lint.</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># The catalog is the name the rules match. This is not the postgres_exporter metric name.</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>PostgresConnectionsNearLimit
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>pg_stat_activity_connections / pg_settings_max_connections &gt; 0.85
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>10m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>Postgres connections are above 85 percent of max_connections
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>pg_stat_activity_connections divided by pg_settings_max_connections has stayed above 0.85 for 10 minutes.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/PostgresConnectionsNearLimit
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>BlackboxProbeFailed
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>probe_success == 0
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>critical
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>An external blackbox probe is failing
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>probe_success has been 0 for 5 minutes on a blackbox HTTP or TLS target.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/BlackboxProbeFailed
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">alert</span>:<span style="color: #bbbbbb"> </span>TLSCertExpiringSoon
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>(probe_ssl_earliest_cert_expiry - time()) &lt; (14 * 24 * 3600)
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span>:<span style="color: #bbbbbb"> </span>1h
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">severity</span>:<span style="color: #bbbbbb"> </span>warning
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">team</span>:<span style="color: #bbbbbb"> </span>platform
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">summary</span>:<span style="color: #bbbbbb"> </span>A TLS certificate expires within 14 days
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">description</span>:<span style="color: #bbbbbb"> </span>probe_ssl_earliest_cert_expiry is less than 14 days ahead of the evaluation time, and that has held for 1 hour.
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">runbook_url</span>:<span style="color: #bbbbbb"> </span>https://runbooks.larkspur.example/TLSCertExpiringSoon
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

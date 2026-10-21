@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TerraShelf standards</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="index.html">TerraShelf</a></p>
+<nav>
+<a href="index.html">Catalog</a>
+<a href="standards.html">Standards</a>
+<a href="../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+<h1>Standards</h1><h1>Contributing to TerraShelf</h1>
+<p>TerraShelf is an offline library of reusable AWS modules. A change is ready when <code>scripts/check_all.sh</code> passes with no AWS credentials in the environment.</p>
+<h2>Module layout</h2>
+<p>Each module lives in <code>modules/&lt;name&gt;/</code> and contains <code>main.tf</code>, <code>variables.tf</code>, <code>outputs.tf</code>, <code>versions.tf</code>, <code>README.md</code>, <code>CHANGELOG.md</code>, <code>examples/basic/</code>, and <code>tests/&lt;name&gt;.tftest.hcl</code>. Some modules also have <code>examples/complete/</code>.</p>
+<p>Do not put a <code>provider</code> block in a module. Pin Terraform in <code>versions.tf</code>:</p>
+<pre><code>terraform {
+  required_version = &quot;&gt;= 1.7.0&quot;
+
+  required_providers {
+    aws = {
+      source  = &quot;hashicorp/aws&quot;
+      version = &quot;~&gt; 5.70.0&quot;
+    }
+  }
+}</code></pre>
+<p>Commit <code>.terraform.lock.hcl</code> only under <code>examples/</code>.</p>
+<h2>Inputs, outputs, and tags</h2>
+<p>Every variable has <code>type</code> and <code>description</code>. Add <code>validation</code> when the value is a CIDR, an ARN, an enum, or a bounded number. Every output has <code>description</code>.</p>
+<p>Accept <code>tags</code> as <code>map(string)</code> and merge it onto every taggable resource together with <code>ManagedBy = &quot;terraform&quot;</code> and <code>Module = &quot;&lt;name&gt;&quot;</code>.</p>
+<p>Do not hardcode a region, a 12-digit account id, an AMI id, or the <code>arn:aws:</code> prefix. Read the partition, account, and region from data sources, or take them as variables.</p>
+<p>Defaults stay closed: encryption on, public access off, least privilege, and a finite log retention period. Name resources from <code>name</code> or <code>name_prefix</code>. Do not append an environment inside the module unless the module&#x27;s contract is specifically about <code>env</code>, as <code>rds-postgres</code> is.</p>
+<h2>Tests</h2>
+<p><code>tests/&lt;name&gt;.tftest.hcl</code> uses <code>mock_provider &quot;aws&quot;</code> and at least one <code>override_data</code>. Every run uses <code>command = plan</code>. Include at least five run blocks and at least one <code>expect_failures</code> block. Assert <code>ManagedBy</code> and <code>Module</code> on every taggable resource.</p>
+<p>The archive provider used by <code>lambda-function</code> may run for real, because it only writes a local zip.</p>
+<h2>Semantic versioning</h2>
+<p>Tag a release as <code>&lt;module&gt;/vX.Y.Z</code>. The catalog version matches the newest <code>CHANGELOG.md</code> heading.</p>
+<ul><li><strong>MAJOR</strong> when a caller must change configuration. Renaming or removing a variable or output is breaking. Changing a default so that existing resources are replaced is breaking.</li><li><strong>MINOR</strong> when a caller can upgrade without edits. <code>s3-static-site</code> 1.1.0 adds an optional access-log bucket and leaves the default off.</li><li><strong>PATCH</strong> when behavior and the public contract stay the same.</li></ul>
+<p>Record every release in <code>CHANGELOG.md</code> using Keep a Changelog.</p>
+<h2>Renames</h2>
+<p>When a resource address changes but the object should stay, add a <code>moved</code> block in the same release that changes the address:</p>
+<pre><code>moved {
+  from = aws_s3_bucket.logs
+  to   = aws_s3_bucket.access_logs
+}</code></pre>
+<p>A rename without <code>moved</code> is a breaking change and needs a major version.</p>
+<h2>Documentation</h2>
+<p>Leave the <code>&lt;!-- BEGIN_TF_DOCS --&gt;</code> markers in <code>README.md</code>. <code>terraform-docs</code> fills them. The prose above the marker explains the contract in sentences. Do not claim that a module is published to the Terraform Registry. <code>OWNER</code> in the git source string is a placeholder.</p>
+<h2>What this repository does not do</h2>
+<p>Do not add a real remote backend, do not call the AWS API, and do not submit a change that requires credentials. GuardDuty and Security Hub in <code>account-baseline</code> stay off unless the caller sets the switch, because those services are billable. Example budget amounts are placeholders, not recommendations.</p><h2>test_standards checks</h2><ul><li>Required files are present: <span data-metric="standards.required_files">passed</span></li><li>Variables have types and descriptions, and outputs have descriptions: <span data-metric="standards.documented_variables_and_outputs">passed</span></li><li>No provider block and no hardcoded account, AMI, region, or arn:aws prefix: <span data-metric="standards.no_provider_or_hardcoded_ids">passed</span></li><li>Terraform and the AWS provider pin match the library: <span data-metric="standards.version_pin">passed</span></li><li>catalog.yaml matches the modules and the newest changelog entry: <span data-metric="standards.catalog_matches_changelog">passed</span></li><li>Each module test has five runs and a negative case: <span data-metric="standards.tests_have_negative_case">passed</span></li></ul>
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

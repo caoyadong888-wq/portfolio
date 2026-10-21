@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aws/lambda/handler.py</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>aws/lambda/handler.py</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># SECONDARY — AWS parallel; GCP is the primary narrative of this demo.</span>
+<span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Thin Lambda adapter. Not the Cloud Run process. No outbound HTTP.&quot;&quot;&quot;</span>
+
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
+
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">handler</span>(event, context):
+    payload <span style="color: #666666">=</span> event <span style="color: #AA22FF; font-weight: bold">or</span> {}
+    path <span style="color: #666666">=</span> payload<span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;rawPath&quot;</span>) <span style="color: #AA22FF; font-weight: bold">or</span> <span style="color: #BA2121">&quot;/&quot;</span>
+    method <span style="color: #666666">=</span> ((payload<span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;requestContext&quot;</span>) <span style="color: #AA22FF; font-weight: bold">or</span> {})<span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;http&quot;</span>) <span style="color: #AA22FF; font-weight: bold">or</span> {})<span style="color: #666666">.</span>get(<span style="color: #BA2121">&quot;method&quot;</span>, <span style="color: #BA2121">&quot;GET&quot;</span>)
+    <span style="color: #008000; font-weight: bold">if</span> path <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;/healthz&quot;</span> <span style="color: #AA22FF; font-weight: bold">and</span> method <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;GET&quot;</span>:
+        <span style="color: #008000; font-weight: bold">return</span> _json(<span style="color: #666666">200</span>, {<span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;ok&quot;</span>, <span style="color: #BA2121">&quot;runtime&quot;</span>: <span style="color: #BA2121">&quot;lambda-secondary&quot;</span>})
+    <span style="color: #008000; font-weight: bold">if</span> path <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;/readyz&quot;</span> <span style="color: #AA22FF; font-weight: bold">and</span> method <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;GET&quot;</span>:
+        <span style="color: #008000; font-weight: bold">return</span> _json(<span style="color: #666666">200</span>, {<span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;ready&quot;</span>, <span style="color: #BA2121">&quot;runtime&quot;</span>: <span style="color: #BA2121">&quot;lambda-secondary&quot;</span>})
+    <span style="color: #008000; font-weight: bold">if</span> path <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;/metrics&quot;</span> <span style="color: #AA22FF; font-weight: bold">and</span> method <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;GET&quot;</span>:
+        body <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;</span><span style="color: #AA5D1F; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span><span style="color: #666666">.</span>join(
+            [
+                <span style="color: #BA2121">&quot;# HELP insights_lambda_adapter Secondary adapter process marker.&quot;</span>,
+                <span style="color: #BA2121">&quot;# TYPE insights_lambda_adapter gauge&quot;</span>,
+                <span style="color: #BA2121">&quot;insights_lambda_adapter 1&quot;</span>,
+                <span style="color: #BA2121">&quot;&quot;</span>,
+            ]
+        )
+        <span style="color: #008000; font-weight: bold">return</span> {
+            <span style="color: #BA2121">&quot;statusCode&quot;</span>: <span style="color: #666666">200</span>,
+            <span style="color: #BA2121">&quot;headers&quot;</span>: {<span style="color: #BA2121">&quot;content-type&quot;</span>: <span style="color: #BA2121">&quot;text/plain; version=0.0.4; charset=utf-8&quot;</span>},
+            <span style="color: #BA2121">&quot;body&quot;</span>: body,
+        }
+    <span style="color: #008000; font-weight: bold">return</span> _json(<span style="color: #666666">404</span>, {<span style="color: #BA2121">&quot;error&quot;</span>: <span style="color: #BA2121">&quot;not_found&quot;</span>, <span style="color: #BA2121">&quot;method&quot;</span>: method, <span style="color: #BA2121">&quot;path&quot;</span>: path})
+
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">_json</span>(status, body):
+    <span style="color: #008000; font-weight: bold">return</span> {
+        <span style="color: #BA2121">&quot;statusCode&quot;</span>: status,
+        <span style="color: #BA2121">&quot;headers&quot;</span>: {<span style="color: #BA2121">&quot;content-type&quot;</span>: <span style="color: #BA2121">&quot;application/json&quot;</span>},
+        <span style="color: #BA2121">&quot;body&quot;</span>: json<span style="color: #666666">.</span>dumps(body),
+    }
+</code></pre></div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TerraShelf</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="index.html">TerraShelf</a></p>
+<nav>
+<a href="index.html">Catalog</a>
+<a href="standards.html">Standards</a>
+<a href="../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<h1>TerraShelf</h1>
+<p class="lede">Reusable, versioned AWS Terraform modules with offline tests and generated docs. This is a module library reference implementation. It was not deployed to any AWS account, and it is not published to the Terraform Registry.</p>
+<section class="summary">
+<h2>Checks recorded at build time</h2>
+<ul>
+<li>Terraform <span data-metric="tools.terraform">Terraform v1.9.8</span></li>
+<li>tflint <span data-metric="tools.tflint">TFLint version 0.55.1</span></li>
+<li>terraform-docs <span data-metric="tools.terraform_docs">terraform-docs version v0.19.0 af31cc6 windows/amd64</span></li>
+<li>checkov <span data-metric="tools.checkov">3.2.449</span></li>
+<li>Recorded at <span data-metric="recorded_at">2026-10-04T08:58:38+00:00</span></li>
+<li>terraform test passed <span data-metric="terraform_test.passed">48</span></li>
+<li>checkov failed <span data-metric="checkov.failed">0</span></li>
+<li>pytest passed <span data-metric="pytest.passed">11</span></li>
+<li>AWS access key empty <span data-metric="aws_access_key_id_was_empty">true</span></li>
+<li>Credentials used <span data-metric="credentials_used">false</span></li>
+<li>Graph mode <span data-metric="graph.mode">python-hcl2-resource-list</span></li>
+</ul>
+</section>
+<section>
+<h2>SkyForge and TerraShelf</h2>
+<p>SkyForge is one product reference architecture. TerraShelf is the module library. SkyForge could later call these modules. This task does not change SkyForge, and it does not copy SkyForge's network, ecr, ecs_service, alb, ec2_docker_host, or state_backend modules.</p>
+</section>
+<section>
+<label for="q">Search</label>
+<input id="q" type="search">
+<label for="category">Category</label>
+<select id="category"><option value="all">All categories</option><option value="CI/CD">CI/CD</option><option value="Compute">Compute</option><option value="Cost">Cost</option><option value="Data">Data</option><option value="Messaging">Messaging</option><option value="Observability">Observability</option><option value="Security">Security</option><option value="Web">Web</option></select>
+<div class="grid"><article class="card" data-module="s3-static-site" data-category="Web">
+<h2><a href="modules/s3-static-site.html">s3-static-site</a></h2>
+<p class="meta">Web · v1.1.0</p>
+<p>Private S3 origin, CloudFront origin access control, and optional access logs.</p>
+<p class="count">Tests passed <span data-metric="modules.s3-static-site.passed">6</span></p>
+</article>
+<article class="card" data-module="github-oidc-role" data-category="CI/CD">
+<h2><a href="modules/github-oidc-role.html">github-oidc-role</a></h2>
+<p class="meta">CI/CD · v1.0.0</p>
+<p>GitHub Actions role whose trust policy allows one branch or one environment.</p>
+<p class="count">Tests passed <span data-metric="modules.github-oidc-role.passed">6</span></p>
+</article>
+<article class="card" data-module="rds-postgres" data-category="Data">
+<h2><a href="modules/rds-postgres.html">rds-postgres</a></h2>
+<p class="meta">Data · v1.0.0</p>
+<p>Encrypted Postgres with security-group ingress and a Secrets Manager master password.</p>
+<p class="count">Tests passed <span data-metric="modules.rds-postgres.passed">6</span></p>
+</article>
+<article class="card" data-module="sqs-queue" data-category="Messaging">
+<h2><a href="modules/sqs-queue.html">sqs-queue</a></h2>
+<p class="meta">Messaging · v1.0.0</p>
+<p>Queue, dead-letter queue, redrive policy, and server-side encryption.</p>
+<p class="count">Tests passed <span data-metric="modules.sqs-queue.passed">6</span></p>
+</article>
+<article class="card" data-module="lambda-function" data-category="Compute">
+<h2><a href="modules/lambda-function.html">lambda-function</a></h2>
+<p class="meta">Compute · v1.0.0</p>
+<p>Zip-packaged function, retained log group, and a least-privilege execution role.</p>
+<p class="count">Tests passed <span data-metric="modules.lambda-function.passed">7</span></p>
+</article>
+<article class="card" data-module="cloudwatch-alarms" data-category="Observability">
+<h2><a href="modules/cloudwatch-alarms.html">cloudwatch-alarms</a></h2>
+<p class="meta">Observability · v1.0.0</p>
+<p>Map-driven alarms that publish to an encrypted SNS topic.</p>
+<p class="count">Tests passed <span data-metric="modules.cloudwatch-alarms.passed">6</span></p>
+</article>
+<article class="card" data-module="budget-guard" data-category="Cost">
+<h2><a href="modules/budget-guard.html">budget-guard</a></h2>
+<p class="meta">Cost · v1.0.0</p>
+<p>Monthly cost budget that notifies at 50, 80, and 100 percent.</p>
+<p class="count">Tests passed <span data-metric="modules.budget-guard.passed">5</span></p>
+</article>
+<article class="card" data-module="account-baseline" data-category="Security">
+<h2><a href="modules/account-baseline.html">account-baseline</a></h2>
+<p class="meta">Security · v1.0.0</p>
+<p>Password policy, public access block, EBS encryption, Access Analyzer, and multi-region CloudTrail.</p>
+<p class="count">Tests passed <span data-metric="modules.account-baseline.passed">6</span></p>
+</article></div>
+</section>
+<script id="catalog-data" type="application/json">{"modules": [{"name": "s3-static-site", "version": "1.1.0", "category": "Web", "summary": "Private S3 origin, CloudFront origin access control, and optional access logs.", "aws_services": ["Amazon S3", "Amazon CloudFront", "Amazon Route 53", "AWS Certificate Manager", "AWS WAF", "AWS Key Management Service"], "billable_items": ["Amazon S3", "Amazon CloudFront", "Amazon Route 53", "AWS WAF", "AWS Key Management Service"], "min_terraform": "1.7.0"}, {"name": "github-oidc-role", "version": "1.0.0", "category": "CI/CD", "summary": "GitHub Actions role whose trust policy allows one branch or one environment.", "aws_services": ["AWS Identity and Access Management"], "billable_items": [], "min_terraform": "1.7.0"}, {"name": "rds-postgres", "version": "1.0.0", "category": "Data", "summary": "Encrypted Postgres with security-group ingress and a Secrets Manager master password.", "aws_services": ["Amazon RDS", "Amazon CloudWatch", "AWS Secrets Manager", "AWS Key Management Service"], "billable_items": ["Amazon RDS", "Amazon CloudWatch", "AWS Secrets Manager", "Performance Insights", "RDS Enhanced Monitoring"], "min_terraform": "1.7.0"}, {"name": "sqs-queue", "version": "1.0.0", "category": "Messaging", "summary": "Queue, dead-letter queue, redrive policy, and server-side encryption.", "aws_services": ["Amazon SQS", "AWS Key Management Service"], "billable_items": ["Amazon SQS", "AWS Key Management Service"], "min_terraform": "1.7.0"}, {"name": "lambda-function", "version": "1.0.0", "category": "Compute", "summary": "Zip-packaged function, retained log group, and a least-privilege execution role.", "aws_services": ["AWS Lambda", "Amazon CloudWatch Logs", "AWS X-Ray", "Amazon SQS"], "billable_items": ["AWS Lambda", "Amazon CloudWatch Logs", "AWS X-Ray"], "min_terraform": "1.7.0"}, {"name": "cloudwatch-alarms", "version": "1.0.0", "category": "Observability", "summary": "Map-driven alarms that publish to an encrypted SNS topic.", "aws_services": ["Amazon CloudWatch", "Amazon SNS", "AWS Key Management Service"], "billable_items": ["Amazon CloudWatch", "Amazon SNS", "AWS Key Management Service"], "min_terraform": "1.7.0"}, {"name": "budget-guard", "version": "1.0.0", "category": "Cost", "summary": "Monthly cost budget that notifies at 50, 80, and 100 percent.", "aws_services": ["AWS Budgets", "Amazon SNS", "AWS Key Management Service"], "billable_items": ["AWS Budgets", "Amazon SNS", "AWS Key Management Service"], "min_terraform": "1.7.0"}, {"name": "account-baseline", "version": "1.0.0", "category": "Security", "summary": "Password policy, public access block, EBS encryption, Access Analyzer, and multi-region CloudTrail.", "aws_services": ["AWS CloudTrail", "Amazon S3", "AWS Key Management Service", "IAM Access Analyzer", "Amazon GuardDuty", "AWS Security Hub", "Amazon EBS"], "billable_items": ["AWS CloudTrail", "Amazon S3", "AWS Key Management Service", "IAM Access Analyzer", "Amazon GuardDuty", "AWS Security Hub"], "min_terraform": "1.7.0"}]}</script>
+<script src="app.js"></script>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

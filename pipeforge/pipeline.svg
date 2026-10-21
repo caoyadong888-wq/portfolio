@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 720" role="img">
+  <title>PipeForge pipeline: lint and test, then build, then SBOM and scan, then summary. Release publish follows a tag.</title>
+  <rect width="760" height="720" fill="#f7f8fb"/>
+  <g font-family="ui-monospace,monospace" font-size="16" fill="#141824">
+    <rect x="270" y="24" width="220" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="380" y="54" text-anchor="middle">lint</text>
+    <rect x="40" y="110" width="150" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="115" y="140" text-anchor="middle">test 3.10</text>
+    <rect x="210" y="110" width="150" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="285" y="140" text-anchor="middle">test 3.11</text>
+    <rect x="380" y="110" width="150" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="455" y="140" text-anchor="middle">test 3.12</text>
+    <rect x="550" y="110" width="150" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="625" y="140" text-anchor="middle">test 3.13</text>
+    <rect x="270" y="200" width="220" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="380" y="230" text-anchor="middle">build</text>
+    <rect x="120" y="290" width="220" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="230" y="320" text-anchor="middle">sbom</text>
+    <rect x="420" y="290" width="220" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="530" y="320" text-anchor="middle">scan</text>
+    <rect x="270" y="380" width="220" height="48" rx="10" fill="#ffffff" stroke="#4f46e5"/>
+    <text x="380" y="410" text-anchor="middle">summary</text>
+    <rect x="230" y="500" width="300" height="64" rx="10" fill="#eef0ff" stroke="#3730a3"/>
+    <text x="380" y="528" text-anchor="middle">release publish</text>
+    <text x="380" y="548" text-anchor="middle" font-size="13" fill="#5c6578">tag only, no latest tag</text>
+  </g>
+  <g stroke="#4f46e5" stroke-width="2" fill="none">
+    <path d="M380 72 V110"/>
+    <path d="M115 158 V180 H380 V200"/>
+    <path d="M285 158 V180 H380"/>
+    <path d="M455 158 V180 H380"/>
+    <path d="M625 158 V180 H380"/>
+    <path d="M380 248 V270 H230 V290"/>
+    <path d="M380 270 H530 V290"/>
+    <path d="M230 338 V360 H380 V380"/>
+    <path d="M530 338 V360 H380"/>
+    <path d="M380 428 V500"/>
+  </g>
+  <text x="380" y="690" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#5c6578">Job URLs are omitted until runs.json has real jobs. Stage B pending.</text>
+</svg>

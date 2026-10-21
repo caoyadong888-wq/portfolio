@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2092" height="744" viewBox="216 16 2092 744" role="img">
+<title>Workflow canvas</title>
+<style>text{font-family:system-ui,sans-serif}</style>
+<rect x="240" y="40" width="560" height="280" rx="12" fill="#fef3c7" stroke="#f5d98a"/>
+<text x="254" y="68" font-size="14" font-weight="700" fill="#92400e">How Uptime Watcher Works</text>
+<rect x="860" y="40" width="420" height="240" rx="12" fill="#fef3c7" stroke="#f5d98a"/>
+<text x="874" y="68" font-size="14" font-weight="700" fill="#92400e">Alert Rule</text>
+<path d="M 480 440 C 520 440, 480 436.0, 520 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 760 440 C 800 440, 780 436.0, 820 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1060 440 C 1100 440, 1080 436.0, 1120 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1360 440 C 1400 440, 1380 436.0, 1420 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1660 424 C 1700 424, 1680 436.0, 1720 436.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1660 452 C 1780.0 452, 1300.0 676.0, 1420 676.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1960 424 C 2000 424, 1980 316.0, 2020 316.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<path d="M 1960 452 C 2000 452, 1980 556.0, 2020 556.0" fill="none" stroke="#4f46e5" stroke-width="2"/>
+<rect x="240" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="252" y="428" font-size="13" font-weight="700" fill="#141824">Every Ten Minutes</text>
+<text x="252" y="450" font-size="11" fill="#5c6578">scheduleTrigger</text>
+<rect x="520" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="532" y="428" font-size="13" font-weight="700" fill="#141824">List Watched URLs</text>
+<text x="532" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="820" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="832" y="428" font-size="13" font-weight="700" fill="#141824">Fetch Watched URL</text>
+<text x="832" y="450" font-size="11" fill="#5c6578">httpRequest</text>
+<rect x="1120" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1132" y="428" font-size="13" font-weight="700" fill="#141824">Update Check State</text>
+<text x="1132" y="450" font-size="11" fill="#5c6578">code</text>
+<rect x="1420" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1432" y="428" font-size="13" font-weight="700" fill="#141824">Should Notify</text>
+<text x="1432" y="450" font-size="11" fill="#5c6578">if</text>
+<rect x="1420" y="640" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1432" y="668" font-size="13" font-weight="700" fill="#141824">Record Quiet Check</text>
+<text x="1432" y="690" font-size="11" fill="#5c6578">noOp</text>
+<rect x="1720" y="400" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="1732" y="428" font-size="13" font-weight="700" fill="#141824">Notice Is Recovery</text>
+<text x="1732" y="450" font-size="11" fill="#5c6578">if</text>
+<rect x="2020" y="280" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2032" y="308" font-size="13" font-weight="700" fill="#141824">Send Recovery Notice</text>
+<text x="2032" y="330" font-size="11" fill="#5c6578">emailSend</text>
+<rect x="2020" y="520" width="240" height="72" rx="10" fill="#ffffff" stroke="#d9dcea"/>
+<text x="2032" y="548" font-size="13" font-weight="700" fill="#141824">Send Down Alert</text>
+<text x="2032" y="570" font-size="11" fill="#5c6578">emailSend</text>
+</svg>

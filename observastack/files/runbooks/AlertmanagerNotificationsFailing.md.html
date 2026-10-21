@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>runbooks/AlertmanagerNotificationsFailing.md</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../alerts.html">告警</a>
+<a href="../../slo.html">SLO</a>
+<a href="../../routing.html">路由</a>
+<a href="../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>runbooks/AlertmanagerNotificationsFailing.md</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold"># AlertmanagerNotificationsFailing</span>
+
+Larkspur Grocers is fictional. This note explains the alert. It is not an incident report. It does not record a page, a customer impact, or an MTTR.
+
+<span style="color: #800080; font-weight: bold">## Signal</span>
+
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Severity: <span style="color: #BA2121">`critical`</span>
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Team: <span style="color: #BA2121">`platform`</span>
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span>Pending duration (<span style="color: #BA2121">`for`</span>): 15m
+
+<span style="color: #BA2121">```promql</span>
+<span style="color: #666666">(</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">sum</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">by</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #19177C">service</span><span style="color: #666666">)</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #008000; font-weight: bold">rate</span><span style="color: #666666">(</span><span style="color: #19177C">alertmanager_notifications_failed_total</span>[<span style="color: #BA2121">5m</span>]<span style="color: #666666">))</span>
+<span style="color: #bbbbbb">  </span><span style="color: #666666">/</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">sum</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">by</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #19177C">service</span><span style="color: #666666">)</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #008000; font-weight: bold">rate</span><span style="color: #666666">(</span><span style="color: #19177C">alertmanager_notifications_total</span>[<span style="color: #BA2121">5m</span>]<span style="color: #666666">))</span>
+<span style="color: #666666">)</span><span style="color: #bbbbbb"> </span><span style="color: #666666">&gt;</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0.10</span>
+<span style="color: #AA22FF; font-weight: bold">and</span>
+<span style="color: #008000; font-weight: bold">sum</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">by</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #19177C">service</span><span style="color: #666666">)</span><span style="color: #bbbbbb"> </span><span style="color: #666666">(</span><span style="color: #008000; font-weight: bold">rate</span><span style="color: #666666">(</span><span style="color: #19177C">alertmanager_notifications_total</span>[<span style="color: #BA2121">5m</span>]<span style="color: #666666">))</span><span style="color: #bbbbbb"> </span><span style="color: #666666">&gt;</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>
+<span style="color: #BA2121">```</span>
+
+<span style="color: #800080; font-weight: bold">## What the condition means</span>
+
+The 5 minute failure ratio of Alertmanager notifications has stayed above 0.10 for 15 minutes, and notifications are still being attempted.
+
+<span style="color: #800080; font-weight: bold">## What an on-call would check</span>
+
+<span style="color: #008000; font-weight: bold">1.</span> Read the expression above and the recording rules it uses.
+<span style="color: #008000; font-weight: bold">2.</span> Compare it with the promtool unit tests in <span style="color: #BA2121">`tests/rules/`</span>. Every alert except Watchdog has a firing case and a non-firing case.
+<span style="color: #008000; font-weight: bold">3.</span> The annotation <span style="color: #BA2121">`runbook_url`</span> is <span style="color: #BA2121">`https://runbooks.larkspur.example/AlertmanagerNotificationsFailing`</span>. That host is a placeholder. This file is the copy in the repo.
+<span style="color: #008000; font-weight: bold">4.</span> This stack does not page anyone. Receivers use <span style="color: #BA2121">`*_file`</span> credential paths and <span style="color: #BA2121">`example.invalid`</span>.
+
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

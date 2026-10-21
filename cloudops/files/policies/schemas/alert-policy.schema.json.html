@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>policies/schemas/alert-policy.schema.json</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>policies/schemas/alert-policy.schema.json</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>{
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;title&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;CloudMonitoringAlertPolicy&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;object&quot;</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;additionalProperties&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>,
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;required&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;displayName&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;combiner&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;severity&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;enabled&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;summary&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;documentation&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;conditions&quot;</span>,
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121">&quot;notificationChannels&quot;</span>
+<span style="color: #bbbbbb">  </span>],
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">&quot;properties&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;displayName&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;minLength&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;combiner&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;enum&quot;</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;OR&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;AND&quot;</span>]},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;severity&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;enum&quot;</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;CRITICAL&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;ERROR&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;WARNING&quot;</span>]},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;enabled&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;boolean&quot;</span>},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;summary&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;minLength&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">8</span>},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;host&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;minLength&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">3</span>},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;documentation&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;object&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;additionalProperties&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">false</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;required&quot;</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;content&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;mimeType&quot;</span>],
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;properties&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;content&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;minLength&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">20</span>},
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;mimeType&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;minLength&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">3</span>}
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;notificationChannels&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;array&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;minItems&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;items&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;pattern&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;^(projects/[a-z0-9-]+/notificationChannels/[A-Za-z0-9-]+|https://example\\.invalid/[A-Za-z0-9_./-]+)$&quot;</span>
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>},
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;conditions&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;array&quot;</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;minItems&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>,
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">&quot;items&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;object&quot;</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;additionalProperties&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">true</span>,
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;required&quot;</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #BA2121">&quot;displayName&quot;</span>],
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">&quot;properties&quot;</span>:<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">&quot;displayName&quot;</span>:<span style="color: #bbbbbb"> </span>{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;string&quot;</span>,<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">&quot;minLength&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #666666">3</span>}
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">      </span>}
+<span style="color: #bbbbbb">    </span>}
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+</main>
+</body>
+</html>

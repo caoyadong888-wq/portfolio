@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>account-baseline</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · Security · v1.0.0</p>
+<h1>account-baseline</h1>
+<p>Password policy, public access block, EBS encryption, Access Analyzer, and multi-region CloudTrail.</p>
+<p>Tests passed <span data-metric="modules.account-baseline.passed">6</span> of <span data-metric="modules.account-baseline.runs">6</span>. Failed <span data-metric="modules.account-baseline.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>enable_guardduty</td><td><code>bool</code></td><td>no</td><td>Create a GuardDuty detector. Default is false because GuardDuty is a billable service.</td></tr><tr><td>enable_security_hub</td><td><code>bool</code></td><td>no</td><td>Turn on Security Hub. Default is false because Security Hub is a billable service.</td></tr><tr><td>minimum_password_length</td><td><code>number</code></td><td>no</td><td>Minimum IAM user password length. The module default is 14.</td></tr><tr><td>name</td><td><code>string</code></td><td>yes</td><td>Name used for the CloudTrail, the trail bucket, and the account analyzer.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr><tr><td>trail_log_expiration_days</td><td><code>number</code></td><td>no</td><td>Days before CloudTrail objects in the trail bucket expire.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>access_analyzer_type</td><td>IAM Access Analyzer type. This module creates an account analyzer.</td></tr><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources.</td></tr><tr><td>cloudtrail_is_multi_region</td><td>Whether the trail records events in every region.</td></tr><tr><td>cloudtrail_log_file_validation</td><td>Whether CloudTrail log file validation is on.</td></tr><tr><td>ebs_encryption_enabled</td><td>Whether new EBS volumes are encrypted by default.</td></tr><tr><td>guardduty_detector_count</td><td>Number of GuardDuty detectors. Zero unless enable_guardduty is true.</td></tr><tr><td>password_policy_minimum_length</td><td>Minimum password length enforced by the account password policy.</td></tr><tr><td>s3_account_public_access_block</td><td>Account-level S3 public access block flags.</td></tr><tr><td>security_hub_count</td><td>Number of Security Hub account resources. Zero unless enable_security_hub is true.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr><tr><td>trail_bucket_name</td><td>Name of the encrypted CloudTrail bucket.</td></tr><tr><td>trail_bucket_sse_algorithm</td><td>Server-side encryption algorithm applied to the trail bucket.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;baseline&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">name</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;demo-baseline&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>defaults_locked passed</li><li>custom_password_length passed</li><li>billable_detectors_on passed</li><li>shorter_log_retention passed</li><li>reject_short_password passed</li><li>reject_bad_name passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\account-baseline.tftest.hcl... in progress
+  run &quot;defaults_locked&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_accessanalyzer_analyzer.this will be created
+  + resource &quot;aws_accessanalyzer_analyzer&quot; &quot;this&quot; {
+      + analyzer_name = &quot;demo-baseline-account&quot;
+      + arn           = (known after apply)
+      + id            = (known after apply)
+      + tags          = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;account-baseline&quot;
+          + &quot;Owner&quot;     = &quot;platform&quot;
+        }
+      + tags_all      = (known after apply)
+      + type          = &quot;ACCOUNT&quot;
+    }
+
+  # aws_cloudtrail.this will be created
+  + resource &quot;aws_cloudtrail&quot; &quot;this&quot; {
+      + arn                           = (known after apply)
+      + enable_log_file_validation    = true
+      + enable_logging                = true
+      + home_region                   = (known after apply)
+      + id                            = (known after apply)
+      + include_global_service_events = true
+      + is_multi_region_trail         = true
+      + kms_key_id                    = (known after apply)
+      + name                          = &quot;demo-baseline&quot;
+      + s3_bucket_name                = (known after apply)
+      + tags                          = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;account-baseline&quot;</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/account-baseline.svg" alt="Resource list for account-baseline">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Account password policy, public access block, EBS encryption, Access Analyzer, and a multi-region CloudTrail.</li><li>Optional GuardDuty and Security Hub switches, both off by default.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>AWS CloudTrail</li><li>Amazon S3</li><li>AWS Key Management Service</li><li>IAM Access Analyzer</li><li>Amazon GuardDuty</li><li>AWS Security Hub</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

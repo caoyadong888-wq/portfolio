@@ -1,0 +1,148 @@
+{
+  "modules": [
+    {
+      "name": "s3-static-site",
+      "version": "1.1.0",
+      "category": "Web",
+      "summary": "Private S3 origin, CloudFront origin access control, and optional access logs.",
+      "aws_services": [
+        "Amazon S3",
+        "Amazon CloudFront",
+        "Amazon Route 53",
+        "AWS Certificate Manager",
+        "AWS WAF",
+        "AWS Key Management Service"
+      ],
+      "billable_items": [
+        "Amazon S3",
+        "Amazon CloudFront",
+        "Amazon Route 53",
+        "AWS WAF",
+        "AWS Key Management Service"
+      ],
+      "min_terraform": "1.7.0"
+    },
+    {
+      "name": "github-oidc-role",
+      "version": "1.0.0",
+      "category": "CI/CD",
+      "summary": "GitHub Actions role whose trust policy allows one branch or one environment.",
+      "aws_services": [
+        "AWS Identity and Access Management"
+      ],
+      "billable_items": [],
+      "min_terraform": "1.7.0"
+    },
+    {
+      "name": "rds-postgres",
+      "version": "1.0.0",
+      "category": "Data",
+      "summary": "Encrypted Postgres with security-group ingress and a Secrets Manager master password.",
+      "aws_services": [
+        "Amazon RDS",
+        "Amazon CloudWatch",
+        "AWS Secrets Manager",
+        "AWS Key Management Service"
+      ],
+      "billable_items": [
+        "Amazon RDS",
+        "Amazon CloudWatch",
+        "AWS Secrets Manager",
+        "Performance Insights",
+        "RDS Enhanced Monitoring"
+      ],
+      "min_terraform": "1.7.0"
+    },
+    {
+      "name": "sqs-queue",
+      "version": "1.0.0",
+      "category": "Messaging",
+      "summary": "Queue, dead-letter queue, redrive policy, and server-side encryption.",
+      "aws_services": [
+        "Amazon SQS",
+        "AWS Key Management Service"
+      ],
+      "billable_items": [
+        "Amazon SQS",
+        "AWS Key Management Service"
+      ],
+      "min_terraform": "1.7.0"
+    },
+    {
+      "name": "lambda-function",
+      "version": "1.0.0",
+      "category": "Compute",
+      "summary": "Zip-packaged function, retained log group, and a least-privilege execution role.",
+      "aws_services": [
+        "AWS Lambda",
+        "Amazon CloudWatch Logs",
+        "AWS X-Ray",
+        "Amazon SQS"
+      ],
+      "billable_items": [
+        "AWS Lambda",
+        "Amazon CloudWatch Logs",
+        "AWS X-Ray"
+      ],
+      "min_terraform": "1.7.0"
+    },
+    {
+      "name": "cloudwatch-alarms",
+      "version": "1.0.0",
+      "category": "Observability",
+      "summary": "Map-driven alarms that publish to an encrypted SNS topic.",
+      "aws_services": [
+        "Amazon CloudWatch",
+        "Amazon SNS",
+        "AWS Key Management Service"
+      ],
+      "billable_items": [
+        "Amazon CloudWatch",
+        "Amazon SNS",
+        "AWS Key Management Service"
+      ],
+      "min_terraform": "1.7.0"
+    },
+    {
+      "name": "budget-guard",
+      "version": "1.0.0",
+      "category": "Cost",
+      "summary": "Monthly cost budget that notifies at 50, 80, and 100 percent.",
+      "aws_services": [
+        "AWS Budgets",
+        "Amazon SNS",
+        "AWS Key Management Service"
+      ],
+      "billable_items": [
+        "AWS Budgets",
+        "Amazon SNS",
+        "AWS Key Management Service"
+      ],
+      "min_terraform": "1.7.0"
+    },
+    {
+      "name": "account-baseline",
+      "version": "1.0.0",
+      "category": "Security",
+      "summary": "Password policy, public access block, EBS encryption, Access Analyzer, and multi-region CloudTrail.",
+      "aws_services": [
+        "AWS CloudTrail",
+        "Amazon S3",
+        "AWS Key Management Service",
+        "IAM Access Analyzer",
+        "Amazon GuardDuty",
+        "AWS Security Hub",
+        "Amazon EBS"
+      ],
+      "billable_items": [
+        "AWS CloudTrail",
+        "Amazon S3",
+        "AWS Key Management Service",
+        "IAM Access Analyzer",
+        "Amazon GuardDuty",
+        "AWS Security Hub"
+      ],
+      "min_terraform": "1.7.0"
+    }
+  ]
+}

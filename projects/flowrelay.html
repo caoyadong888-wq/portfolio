@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FlowRelay — case study</title>
+  <meta name="description" content="Webhook lead intake with idempotency, retries, scoring, and a step log.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/flowrelay/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. The demo uses fictional data.</p>
+    <article class="readme">
+      <h1>FlowRelay</h1>
+      <p>Webhook in, routed lead out, with a step log for every run. FlowRelay is a small code-first alternative to an n8n/Zapier/Make lead intake: the same stages, plus idempotency, bounded retries, retention, and a page you can demo without connecting real Slack or Google accounts.</p>
+      <p>Fictional companies only (Acme Logistics, Globex Analytics, Initech, and similar). Nothing in the sample data is a real person or a live integration.</p>
+      <h2>Overview</h2>
+      <p>A website form or CRM posts JSON to <code>POST /api/webhook/lead</code>. The handler checks size, rate limit, and an optional HMAC, stores a run, and returns <code>202</code> with a run id. A background worker validates the lead, drops same-day duplicates, looks the email domain up in a local company fixture, scores it from 0 to 100, and routes it to sales, nurture, or support. Notify appends a simulated Slack message, a sheet row, and a CRM upsert. The UI shows the pipeline, the run table, the outbox, the sheet (including CSV), and 24-hour stats.</p>
+      <h2>Problem</h2>
+      <ul><li>Form and CRM webhooks fail open: a blip in enrichment drops the lead, and nobody can see which step died.</li><li>The same person submits twice in a day and two sales tasks get created.</li><li>Routing lives in a spreadsheet of opinions, so a &quot;hot&quot; lead and a support complaint land in the same queue.</li></ul>
+      <h2>Solution</h2>
+      <ul><li>Accept the webhook onto a SQLite queue and return immediately. A worker records status, duration, attempts, logs, and JSON for each step.</li><li>Idempotency key is the email plus the UTC day the webhook was accepted. A repeat is stored as a skipped run instead of a second notification.</li><li>Score with explicit rules (company size, industry fit, message keywords) and route support keywords ahead of the hot-score threshold. Enrichment retries a simulated timeout with exponential backoff, up to three attempts.</li></ul>
+      <h2>Result</h2>
+      <ul><li>The webhook responds with a run id while the pipeline is still in flight. The runs table updates on its own.</li><li>A second submit of the same email on the same UTC day is visible as <code>skipped</code>, and the sheet does not gain another row.</li><li>Operators can open a run and read why it scored the way it did, including a failed validation or a retried enrich, and download the sheet as CSV. <code>/metrics</code> exposes the same counts as Prometheus text.</li></ul>
+      <h2>Features</h2>
+      <ul><li>Seven-step pipeline: receive, validate, dedupe, enrich, score, route, notify.</li><li>Optional HMAC-SHA256 (<code>X-FlowRelay-Signature: sha256=&lt;hex&gt;</code> of the raw body). Off when <code>FLOWRELAY_WEBHOOK_SECRET</code> is empty, which is the demo default.</li><li>Per-IP write limit of 10 requests per minute, honoring <code>X-Real-IP</code>. Request bodies over 8 KB are rejected.</li><li>Flaky enrich fixture: about 15% of first attempts time out, then retry. The attempt log records the backoff.</li><li>Rules score capped at 100. Hot (70+) goes to sales, support keywords go to support, everything else to nurture.</li><li>Simulated Slack outbox (one channel per route), sheet with <code>GET /api/sheet.csv</code>, and CRM upsert by email.</li><li>Retention caps (default 500 runs, outbox rows, and sheet rows) so the SQLite file cannot grow without bound.</li><li>Crash recovery: on startup, <code>running</code> rows are queued again. Notify will not double-write a run that already reached the outbox.</li><li>Self-contained UI. Relative URLs, no CDN, user-supplied text rendered with <code>textContent</code>.</li><li>About 40 historical runs are inserted the first time the database is empty.</li><li>An importable n8n workflow in <code>n8n/</code> for the same shape of graph.</li></ul>
+      <h2>Architecture</h2>
+      <pre><code class="language-text">POST /api/webhook/lead
+              |
+              | 202 {run_id}
+              v
+         SQLite run (queued) ---&gt; worker thread
+              |
+              v
+       receive -&gt; validate -&gt; dedupe -&gt; enrich -&gt; score -&gt; route -&gt; notify
+                                                          |              |
+                                                          v              v
+                                                    Slack outbox    sheet + CRM</code></pre>
+      <p>See <code>docs/architecture.md</code> for the sequence diagram, the idempotency rule, and the retry policy.</p>
+      <p>The worker is one thread. SQLite writes take a process lock. <code>GET /healthz</code> does not touch the database. The page polls <code>GET /api/runs</code> every 3 seconds. Open <code>/?run=&lt;id&gt;</code> to show that run&#x27;s timeline.</p>
+      <h2>Tech stack</h2>
+      <ul><li>Python 3.9+ (developed to run on 3.9 and 3.11+)</li><li>FastAPI 0.115 and Uvicorn 0.30</li><li>SQLite via the standard library</li><li>One static page: HTML, CSS, and vanilla JS. Charts are inline SVG</li><li>pytest for the pipeline and the HTTP API</li><li>Docker image runs as a non-root user. Compose file included</li><li>GitHub Actions workflow: ruff, pytest, and <code>docker build</code></li></ul>
+      <h2>Run locally</h2>
+      <pre><code class="language-bash">python3 -m venv .venv
+      source .venv/bin/activate
+      pip install -r requirements.txt -r requirements-dev.txt
+      pytest
+      ./run.sh</code></pre>
+      <p>Open <code>http://127.0.0.1:18802/</code>. The default port is 18802 (<code>PORT</code>). Use a trailing slash if you put the app behind a prefix, and keep links relative (<code>api/...</code>, <code>static/...</code>).</p>
+      <p><code>examples/curl.sh</code> posts a lead with and without a signature. Set <code>BASE</code> if the service is not on port 18802.</p>
+      <h3>Docker Compose</h3>
+      <p>Docker is optional. The image listens on <code>0.0.0.0:18802</code> inside the container and stores SQLite in a named volume.</p>
+      <pre><code class="language-bash">docker compose up --build</code></pre>
+      <p>The container healthcheck calls <code>GET /healthz</code>. The process user is <code>flowrelay</code>, not root.</p>
+      <h2>Configuration</h2>
+      <table><thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td>Bind address. Compose sets <code>0.0.0.0</code>.</td></tr><tr><td><code>PORT</code></td><td><code>18802</code></td><td>Bind port.</td></tr><tr><td><code>DATA_DIR</code></td><td><code>./data</code></td><td>Directory for <code>flowrelay.db</code>.</td></tr><tr><td><code>FLOWRELAY_WEBHOOK_SECRET</code></td><td>empty</td><td>HMAC secret. Empty disables the check.</td></tr><tr><td><code>FLOWRELAY_ENRICH_FAIL_RATE</code></td><td><code>0.15</code></td><td>Chance the first enrich attempt times out.</td></tr><tr><td><code>FLOWRELAY_ENRICH_FORCE_FAILURES</code></td><td>unset</td><td>If set, fail the first N enrich attempts on every run (tests and demos).</td></tr><tr><td><code>FLOWRELAY_BACKOFF_BASE</code></td><td><code>0.05</code></td><td>First retry delay in seconds. Each later retry doubles it.</td></tr><tr><td><code>FLOWRELAY_MAX_RUNS</code></td><td><code>500</code></td><td>How many runs to keep.</td></tr><tr><td><code>FLOWRELAY_MAX_OUTBOX</code></td><td><code>500</code></td><td>How many outbox rows to keep.</td></tr><tr><td><code>FLOWRELAY_MAX_SHEET</code></td><td><code>500</code></td><td>How many sheet rows to keep.</td></tr><tr><td><code>FLOWRELAY_SEED</code></td><td><code>1</code></td><td>Insert historical runs when the database has none.</td></tr><tr><td><code>LOG_LEVEL</code></td><td><code>info</code></td><td>Uvicorn log level.</td></tr></tbody></table>
+      <p>Scoring, short version: base 10, plus size (6 to 30), plus industry (0, 8, 14, or 25), plus at most one hit each for urgent (15), enterprise (15), budget (12), integration (8), pricing (6), and demo (6). Cap 100. Support keywords win over the score. Otherwise 70 or more is sales and the rest is nurture.</p>
+      <h2>API endpoints</h2>
+      <table><thead><tr><th>Method</th><th>Path</th><th>Notes</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/</code></td><td>Demo UI</td></tr><tr><td><code>GET</code></td><td><code>/healthz</code></td><td><code>{&quot;status&quot;:&quot;ok&quot;,...}</code></td></tr><tr><td><code>POST</code></td><td><code>/api/webhook/lead</code></td><td>JSON lead. <code>202 {&quot;run_id&quot;,&quot;status&quot;:&quot;queued&quot;}</code>. Rate limit 10/min/IP. Body ≤ 8 KB.</td></tr><tr><td><code>POST</code></td><td><code>/api/enrich</code></td><td><code>{email}</code> or <code>{domain}</code>. Local fixture only. No network fetch.</td></tr><tr><td><code>GET</code></td><td><code>/api/runs?limit=</code></td><td>Newest runs. <code>limit</code> is clamped to 1–200.</td></tr><tr><td><code>GET</code></td><td><code>/api/runs/{id}</code></td><td>Full step timeline.</td></tr><tr><td><code>GET</code></td><td><code>/api/outbox</code></td><td>Simulated Slack messages by channel.</td></tr><tr><td><code>GET</code></td><td><code>/api/sheet</code></td><td>Simulated sheet rows.</td></tr><tr><td><code>GET</code></td><td><code>/api/sheet.csv</code></td><td>Same rows as CSV. Formula-leading cells are prefixed.</td></tr><tr><td><code>GET</code></td><td><code>/api/stats</code></td><td>Last 24 hourly buckets, success rate, p50/p95, counts by route.</td></tr><tr><td><code>GET</code></td><td><code>/api/sample-lead</code></td><td>A random fictional lead plus a fixture score preview.</td></tr><tr><td><code>GET</code></td><td><code>/metrics</code></td><td>Prometheus text.</td></tr></tbody></table>
+      <p>Lead JSON fields: <code>name</code>, <code>email</code>, <code>company</code>, <code>message</code>, and optional <code>source</code> (default <code>webhook</code>). A well-formed JSON object with a bad email still returns <code>202</code>; the run then fails in the validate step. Malformed JSON is <code>400</code> and is not queued.</p>
+      <p>Signature header, when the secret is set:</p>
+      <pre><code class="language-text">X-FlowRelay-Signature: sha256=&lt;hex HMAC-SHA256 of the raw request body&gt;</code></pre>
+      <p>A missing or wrong signature is <code>401</code> and does not create a run.</p>
+      <h2>Tests</h2>
+      <pre><code class="language-bash">pytest</code></pre>
+      <p>Coverage includes validation, the UTC-day idempotency key, enrich retry and give-up, score and route boundaries, webhook <code>202</code> through to a finished run, XSS strings stored in the API but not echoed by the HTML shell (the page assigns <code>textContent</code>), the rate limit, retention caps, CSV export and formula neutralization, HMAC, and the n8n workflow shape.</p>
+      <h2>Deployment</h2>
+      <p>The live demo is a systemd service on a small VPS, behind nginx, with the URL prefix stripped:</p>
+      <pre><code class="language-nginx">location /portfolio/flowrelay/ {
+          proxy_pass http://127.0.0.1:18802/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-Proto $scheme;
+      }</code></pre>
+      <p><code>proxy_pass</code> has a trailing slash so the app sees <code>/</code> while the browser stays on <code>/portfolio/flowrelay/</code>. The UI uses relative URLs for that reason. Public entry for this demo: <code>https://3.1.79.63/portfolio/flowrelay/</code>.</p>
+      <p>Install sketch (not applied by this repository):</p>
+      <pre><code class="language-bash">sudo mkdir -p /opt/portfolio/flowrelay
+      sudo rsync -a --exclude .venv --exclude data ./ /opt/portfolio/flowrelay/
+      sudo chown -R ec2-user:ec2-user /opt/portfolio/flowrelay
+      sudo -u ec2-user python3 -m venv /opt/portfolio/flowrelay/.venv
+      sudo -u ec2-user /opt/portfolio/flowrelay/.venv/bin/pip install -r /opt/portfolio/flowrelay/requirements.txt
+      sudo cp deploy/flowrelay.service /etc/systemd/system/flowrelay.service
+      sudo systemctl daemon-reload
+      sudo systemctl enable --now flowrelay</code></pre>
+      <p>The unit runs as <code>ec2-user</code>, sets <code>PORT</code> and <code>DATA_DIR</code>, restarts always, sets <code>MemoryMax=150M</code>, and sets <code>NoNewPrivileges=yes</code>. Do not put a real webhook secret in git. If you want HMAC, add <code>Environment=FLOWRELAY_WEBHOOK_SECRET=...</code> in a root-owned drop-in.</p>
+      <p>This tree does not install the unit or edit nginx. Memory target for the process is under 80 MB RSS.</p>
+      <h2>Screenshots</h2>
+      <p><img alt="Desktop" src="../img/flowrelay-desktop.png"></p>
+      <p><img alt="Mobile" src="../img/flowrelay-mobile.png"></p>
+      <p><img alt="Run detail" src="../img/flowrelay-run-detail.png"></p>
+      <p>Screenshots are from headless Chrome against the local service (1440×1000, 390×844, and the run-detail dialog opened with <code>?run=</code>).</p>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/flowrelay/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

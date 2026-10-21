@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aws/codebuild/buildspec.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>aws/codebuild/buildspec.yml</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># SECONDARY — AWS parallel; GCP is the primary narrative of this demo.</span>
+<span style="color: #3D7B7B; font-style: italic"># 次要. The portfolio build does not start this CodeBuild project.</span>
+<span style="color: #008000; font-weight: bold">version</span>:<span style="color: #bbbbbb"> </span>0.2
+<span style="color: #008000; font-weight: bold">phases</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">install</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">runtime-versions</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">python</span>:<span style="color: #bbbbbb"> </span>3.12
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">commands</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>python -m pip install --upgrade pip
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>python -m pip install -e app
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">pre_build</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">commands</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>python -m ruff check app aws/lambda
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>python -m pytest -q app/tests
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">build</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">commands</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>python -m compileall aws/lambda
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">post_build</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">commands</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span>echo &quot;SECONDARY package ready. This buildspec does not call AWS during make check.&quot;
+<span style="color: #008000; font-weight: bold">artifacts</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">files</span>:
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span>aws/lambda/**/*
+<span style="color: #bbbbbb">    </span>-<span style="color: #bbbbbb"> </span>aws/template.yaml
+</code></pre></div>
+
+</main>
+</body>
+</html>

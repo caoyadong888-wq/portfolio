@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.github/workflows/gcp-deploy.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>.github/workflows/gcp-deploy.yml</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>gcp-deploy
+<span style="color: #008000; font-weight: bold">on</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">workflow_dispatch</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">push</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">branches</span>:<span style="color: #bbbbbb"> </span>[<span style="color: #19177C">main</span>]
+<span style="color: #008000; font-weight: bold">permissions</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">id-token</span>:<span style="color: #bbbbbb"> </span>write
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">contents</span>:<span style="color: #bbbbbb"> </span>read
+<span style="color: #008000; font-weight: bold">jobs</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">deploy</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">runs-on</span>:<span style="color: #bbbbbb"> </span>ubuntu-latest
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">timeout-minutes</span>:<span style="color: #bbbbbb"> </span>30
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">steps</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>checkout
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">uses</span>:<span style="color: #bbbbbb"> </span>actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic"># v4.2.2</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>Authenticate to Google Cloud
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">uses</span>:<span style="color: #bbbbbb"> </span>google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic"># v2.1.13</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">with</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">workload_identity_provider</span>:<span style="color: #bbbbbb"> </span>projects/000000000000/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">service_account</span>:<span style="color: #bbbbbb"> </span>github-deploy-sa@thistle-analytics-demo.iam.gserviceaccount.com
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>show the documented project
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">env</span>:
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">PROJECT_ID</span>:<span style="color: #bbbbbb"> </span>thistle-analytics-demo
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">REGION</span>:<span style="color: #bbbbbb"> </span>asia-east1
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">SERVICE</span>:<span style="color: #bbbbbb"> </span>insights-api
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">run</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">echo &quot;Offline demo. make check does not run this workflow.&quot;</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">echo &quot;project=${PROJECT_ID} region=${REGION} service=${SERVICE}&quot;</span>
+</code></pre></div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Senior Full-Stack &amp; DevOps Engineer</title>
+  <meta name="description" content="Independent contractor. Docker, Linux/VPS, CI/CD, APIs, automation, monitoring, and Terraform. Sixteen project pages, nine of them live processes, with fictional data.">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#work">Skip to projects</a>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Portfolio</p>
+      <h1>Senior Full-Stack &amp; DevOps Engineer</h1>
+      <p class="lead">Independent contractor — Docker, Linux/VPS, CI/CD, APIs, automation (n8n/Python), monitoring.</p>
+      <p class="value">I take a small service from a repository to a host you can reload: the process, the reverse proxy, the backup, and a page that measures the machine it is running on.</p>
+      <p class="cta">Hire me through the platform where you found my profile.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="work">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Selected work</h2>
+          <p>Sixteen project pages. Nine run as a real process, and the numbers on those pages come from that process. KubeHarbor, WorkflowKit, DataMill, TerraShelf, PipeForge, ObservaStack, and CloudOps are static pages recorded at build time. KubeHarbor is not deployed to a cluster. WorkflowKit does not run n8n. DataMill does not run the pipeline on the server. TerraShelf was not applied to an AWS account. PipeForge does not deploy from Actions to this host. ObservaStack does not run Prometheus or Grafana here. CloudOps was not applied to a cloud account. Every company name is fictional.</p>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/stackpilot/">
+              <img src="img/stackpilot-desktop.png" alt="StackPilot status page on a desktop layout" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>StackPilot</h3>
+              <p class="tagline">Reference production stack and a live status page for an inventory API.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A one-process API had no honest story for health, backups, or rollback.</div>
+                <div><strong>Solution</strong> A Compose file (nginx, API, Postgres, pg_dump) plus a native demo that snapshots SQLite and reads host metrics.</div>
+                <div><strong>Result</strong> The live page shows component health, an uptime bar, backup retention, and a read-only inventory explorer.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">Docker Compose</span>
+                <span class="tag">nginx</span>
+                <span class="tag">Postgres</span>
+                <span class="tag">SQLite</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/stackpilot/">Live demo</a>
+                <a class="btn ghost" href="projects/stackpilot.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/flowrelay/">
+              <img src="img/flowrelay-desktop.png" alt="FlowRelay pipeline and lead form" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>FlowRelay</h3>
+              <p class="tagline">Webhook in, routed lead out, with a step log for every run.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Lead webhooks fail open, duplicate the same person, and mix support complaints with hot sales leads.</div>
+                <div><strong>Solution</strong> A queue validates, dedupes on email plus UTC day, retries a flaky enrich step, scores, and routes to sales, nurture, or support.</div>
+                <div><strong>Result</strong> A test lead returns a run id immediately. The page shows each step and a simulated Slack, sheet, and CRM outbox. A same-day repeat is skipped.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">SQLite</span>
+                <span class="tag">Webhooks</span>
+                <span class="tag">n8n</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/flowrelay/">Live demo</a>
+                <a class="btn ghost" href="projects/flowrelay.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/pulseboard/">
+              <img src="img/pulseboard-desktop.png" alt="PulseBoard uptime and latency dashboard" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>PulseBoard</h3>
+              <p class="tagline">Uptime, latency, and error budget for a small platform team.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A handful of services had no single place for uptime, latency, and remaining error budget.</div>
+                <div><strong>Solution</strong> A fixed-target prober checks the sibling demos over HTTP and keeps a week of clearly labelled simulated history, with alerts and a notification log.</div>
+                <div><strong>Result</strong> The dashboard opens on a 7-day status view, a latency chart, a healthy error budget, and a short incident timeline. Nothing is sent to a real on-call channel.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">SQLite</span>
+                <span class="tag">Prometheus</span>
+                <span class="tag">Grafana</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/pulseboard/">Live demo</a>
+                <a class="btn ghost" href="projects/pulseboard.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/hardenkit/">
+              <img src="img/hardenkit-desktop.png" alt="HardenKit fleet scores for six fictional hosts" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>HardenKit</h3>
+              <p class="tagline">Ansible baseline and before/after audit reports for a Linux VPS.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A fresh VPS still has password SSH, no firewall, and a hardening checklist that lives in a ticket.</div>
+                <div><strong>Solution</strong> One playbook plus a read-only audit script. The page shows six fictional hosts before and after the same baseline, and how to run the audit on your own server.</div>
+                <div><strong>Result</strong> Each host has a score, the controls that moved, and the role that fixes the ones still open. The public demo does not publish this server's own audit.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Ansible</span>
+                <span class="tag">Linux</span>
+                <span class="tag">Bash</span>
+                <span class="tag">Python</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">nginx</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/hardenkit/">Live demo</a>
+                <a class="btn ghost" href="projects/hardenkit.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/shiplane/">
+              <img src="img/shiplane-desktop.png" alt="ShipLane release pipeline for a fictional checkout API" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>ShipLane</h3>
+              <p class="tagline">Release pipeline for a fictional checkout API, with blue/green and a job log.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A release story in a README does not show which job failed, which color is live, or how often a deploy rolls back.</div>
+                <div><strong>Solution</strong> A page simulates the Globex checkout-api pipeline and ships the workflow files plus a dry-run blue/green switch.</div>
+                <div><strong>Result</strong> Seeded history, DORA numbers from that log, and a live run you can watch job by job. Nothing is pushed to a real registry.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">Docker</span>
+                <span class="tag">nginx</span>
+                <span class="tag">Bash</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/shiplane/">Live demo</a>
+                <a class="btn ghost" href="projects/shiplane.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/siteatlas/">
+              <img src="img/siteatlas-desktop.png" alt="SiteAtlas SEO audit of the Books to Scrape practice site" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>SiteAtlas</h3>
+              <p class="tagline">Website SEO audit crawler, also packaged as an Apify Actor.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Checking titles, meta descriptions, headings, and response time by hand stops being useful after a few pages.</div>
+                <div><strong>Solution</strong> An async crawler (httpx, no browser) writes one row per page. The same package is the Apify Actor, with a charge per audited page.</div>
+                <div><strong>Result</strong> The live page audits the Books to Scrape practice site, filters issue codes, and downloads CSV or JSON. The Actor is packaged and not listed yet.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">httpx</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">Web scraping</span>
+                <span class="tag">Apify</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/siteatlas/">Live demo</a>
+                <a class="btn ghost" href="projects/siteatlas.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/skyforge/">
+              <img src="img/skyforge-desktop.png" alt="SkyForge Terraform routes for a single EC2 host and ECS Fargate" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>SkyForge</h3>
+              <p class="tagline">Terraform for AWS: single-EC2 Docker host or ECS Fargate, tested offline.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A small API needs either one Docker host or a Fargate service, and the Terraform has to be reviewable before anyone creates resources.</div>
+                <div><strong>Solution</strong> Two pinned routes share modules for the network, the load balancer, ECR, Fargate, the EC2 host, and remote state. Tests use a mock AWS provider.</div>
+                <div><strong>Result</strong> The page shows both diagrams, the parsed resource list, and the checks recorded at build time. Nothing is applied and no account is used.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Terraform</span>
+                <span class="tag">AWS</span>
+                <span class="tag">ECS Fargate</span>
+                <span class="tag">EC2</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GitHub Actions</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/skyforge/">Live demo</a>
+                <a class="btn ghost" href="projects/skyforge.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>CaseNote</h3>
+              <p class="tagline">Django 4.2 + DRF helpdesk/ticketing demo: roles, SLA tracking, dashboard, CSV export, OpenAPI docs; read-only demo/demo login.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A support desk needs roles, an SLA clock, and a ticket list a viewer can read without changing.</div>
+                <div><strong>Solution</strong> Django 4.2 and Django REST Framework: viewer, agent, and lead groups, SLA windows, a dashboard, CSV export, and OpenAPI docs served by the app.</div>
+                <div><strong>Result</strong> Sign in as demo/demo. That account is read-only, and a write returns 403. The login page also lists agent and lead. The tenant is the fictional retailer Northwind Outfitters.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">Django</span>
+                <span class="tag">DRF</span>
+                <span class="tag">SQLite</span>
+                <span class="tag">OpenAPI</span>
+                <span class="tag">gunicorn</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/casenote/">Live demo</a>
+                <a class="btn ghost" href="projects/casenote.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="workflowkit/">
+              <img src="img/workflowkit-lead-intake-canvas.png" alt="WorkflowKit lead intake workflow on the local n8n editor canvas" width="1680" height="1050">
+            </a>
+            <div class="card-body">
+              <h3>WorkflowKit — three tested n8n templates</h3>
+              <p class="tagline">Lead intake, uptime watcher, and a daily RSS job digest as importable n8n workflow JSON, run on a local n8n 2.41.6.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> The portfolio had Python automation demos and no importable n8n workflow.</div>
+                <div><strong>Solution</strong> Three templates built from official nodes: a validated, deduplicated, scored lead webhook into Google Sheets and Slack with a separate error branch; an uptime check that alerts after two consecutive failures and on recovery; and a keyword-filtered daily RSS digest email.</div>
+                <div><strong>Result</strong> Each workflow was imported and executed successfully on a local n8n instance. Google Sheets and Slack were mocked locally. The public page shows the canvases, node notes, and executions, and offers the JSON for download. It does not run n8n.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">n8n</span>
+                <span class="tag">Automation</span>
+                <span class="tag">Webhooks</span>
+                <span class="tag">Google Sheets</span>
+                <span class="tag">API Integration</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="workflowkit/">Live demo</a>
+                <a class="btn ghost" href="projects/workflowkit.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="https://52.76.87.179/portfolio/ledgerlite/">
+              <img src="img/ledgerlite-desktop.png" alt="LedgerLite demo page for the fictional Vandelay Industries invoicing API" width="1440" height="900">
+            </a>
+            <div class="card-body">
+              <h3>LedgerLite</h3>
+              <p class="tagline">FastAPI invoicing REST API with JWT scopes, rate limits, cursor pagination, and OpenAPI docs.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A public invoicing API demo has to show scopes, pagination, and idempotent writes without letting visitors change the shared book.</div>
+                <div><strong>Solution</strong> FastAPI with JWT scopes, cursor pagination, idempotency keys, and a sandbox tenant created on each sandbox login.</div>
+                <div><strong>Result</strong> The reader login and the public read-only API key get 403 on writes. Sandboxes are isolated and deleted after 60 minutes. Vandelay Industries and every row are fictional.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">FastAPI</span>
+                <span class="tag">SQLAlchemy</span>
+                <span class="tag">OpenAPI</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://52.76.87.179/portfolio/ledgerlite/">Live demo</a>
+                <a class="btn ghost" href="projects/ledgerlite.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="kubeharbor/">
+              <img src="img/kubeharbor-desktop.png" alt="KubeHarbor showcase: Helm and Kustomize renders for the fictional Vandelay Industries LedgerLite API" width="1440" height="1000">
+            </a>
+            <div class="card-body">
+              <h3>KubeHarbor</h3>
+              <p class="tagline">Helm chart, Kustomize overlays, and Argo CD apps for a FastAPI service, validated offline.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A FastAPI service needs a Helm chart and a Kustomize overlay for three environments, and the manifests have to be reviewable before anyone points them at a cluster.</div>
+                <div><strong>Solution</strong> One chart and three overlays render the API, the network policy, and either in-cluster Postgres or an external database. Argo CD application files sit next to them. helm lint, kubeconform, kube-linter, checkov, and pytest run offline.</div>
+                <div><strong>Result</strong> The page shows the rendered manifests, the dev-to-prod diff, and the checks recorded at build time. Nothing is deployed to a cluster. Vandelay Industries is fictional.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Kubernetes</span>
+                <span class="tag">Helm</span>
+                <span class="tag">Kustomize</span>
+                <span class="tag">Argo CD</span>
+                <span class="tag">GitOps</span>
+                <span class="tag">NetworkPolicy</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="kubeharbor/">Live demo</a>
+                <a class="btn ghost" href="projects/kubeharbor.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="datamill/">
+              <img src="img/datamill-desktop.png?v=20261005" alt="DataMill showcase for the fictional Contoso Coffee Co. ETL pipeline" width="1440" height="900">
+            </a>
+            <div class="card-body">
+              <h3>DataMill</h3>
+              <p class="tagline">Python ETL pipeline: messy CSV, Excel, and API data into a tested star schema with data-quality gates.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A month of POS files, an inventory workbook, and a paged CRM payload do not share a layout, a locale, or a clock.</div>
+                <div><strong>Solution</strong> An offline pipeline lands the bytes, quarantines bad rows, loads a star schema, and publishes three marts. SQLite is the warehouse used for the recorded run.</div>
+                <div><strong>Result</strong> The page shows the recorded September 2026 run: 30 daily runs, the 17 September file in WARN for schema drift, a same-day rerun that added 0 rows, and a full refresh that matched the incremental marts. Contoso Coffee Co. is fictional. The server does not run the pipeline.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">ETL</span>
+                <span class="tag">pandas</span>
+                <span class="tag">Data Quality</span>
+                <span class="tag">SQL</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="datamill/">Live demo</a>
+                <a class="btn ghost" href="projects/datamill.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="terrashelf/">
+              <img src="img/terrashelf-desktop.png?v=20261005" alt="TerraShelf catalog of eight offline AWS Terraform modules" width="1440" height="900">
+            </a>
+            <div class="card-body">
+              <h3>TerraShelf</h3>
+              <p class="tagline">Reusable, versioned AWS Terraform modules with offline tests and generated docs.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A module library has to show inputs, tests, and a plan without creating AWS resources or claiming a Registry release.</div>
+                <div><strong>Solution</strong> Eight modules, each with mocked-provider tests, terraform-docs, and a static module page. Checkov exemptions are written down with a reason.</div>
+                <div><strong>Result</strong> terraform test recorded 48 passed and 0 failed. The pages state that the library is not published to the Terraform Registry and was not deployed.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Terraform</span>
+                <span class="tag">AWS</span>
+                <span class="tag">IaC</span>
+                <span class="tag">DevOps</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="terrashelf/">Live demo</a>
+                <a class="btn ghost" href="projects/terrashelf.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="pipeforge/">
+              <img src="img/pipeforge-run-graph.png" alt="PipeForge Actions run graph for the public pipeforge-demo repository" width="960" height="420">
+            </a>
+            <div class="card-body">
+              <h3>PipeForge</h3>
+              <p class="tagline">Live GitHub Actions CI/CD for a public ratecard-api demo: lint, test matrix, build, SBOM, scan, and release to GHCR.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A portfolio needs proof that a multi-stage pipeline actually runs on GitHub Actions, not only a simulated release board.</div>
+                <div><strong>Solution</strong> A public repository with real workflows: lint, a Python test matrix, build, parallel SBOM and scan, summary, and a tag release to GHCR. The showcase records runs from the GitHub API and keeps live status badges.</div>
+                <div><strong>Result</strong> The page links to real Actions runs for <code>caoyadong888-wq/pipeforge-demo</code>. Kestrel Parcel Co. is fictional. The pipeline does not deploy to any server.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">CI/CD</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GHCR</span>
+                <span class="tag">SBOM</span>
+                <span class="tag">Python</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="pipeforge/">Live demo</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/pipeforge-demo">GitHub repo</a>
+                <a class="btn ghost" href="projects/pipeforge.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="observastack/">
+              <img src="img/observastack-desktop.png" alt="ObservaStack showcase for the fictional Larkspur Grocers monitoring stack" width="1440" height="900">
+            </a>
+            <div class="card-body">
+              <h3>ObservaStack</h3>
+              <p class="tagline">Prometheus, Alertmanager, and Grafana stack with promtool tests, SLO burn alerts, and importable dashboards.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A self-drawn uptime board is not the same as real Prometheus rules, Alertmanager routing, and Grafana dashboards that can be checked offline.</div>
+                <div><strong>Solution</strong> Rules with promtool unit tests, multi-window SLO burn alerts, an Alertmanager tree checked with amtool, pint offline lint, and five dashboard JSON files imported on the build machine.</div>
+                <div><strong>Result</strong> The static page shows recorded check results and screenshots. Larkspur Grocers is fictional. The public host does not run Prometheus or Grafana.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Prometheus</span>
+                <span class="tag">Alertmanager</span>
+                <span class="tag">Grafana</span>
+                <span class="tag">SLO</span>
+                <span class="tag">SRE</span>
+                <span class="tag">Monitoring</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="observastack/">Live demo</a>
+                <a class="btn ghost" href="projects/observastack.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="cloudops/">
+              <img src="img/cloudops-desktop.png" alt="CloudOps showcase for GCP-first Cloud Run DevOps for fictional Thistle Analytics" width="1440" height="900">
+            </a>
+            <div class="card-body">
+              <h3>CloudOps</h3>
+              <p class="tagline">GCP-first Cloud Run DevOps: Cloud Build, WIF, least-privilege IAM, Secret Manager, and monitoring as code; thin AWS secondary.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> Cloud DevOps work needs Cloud Run, IAM, secrets, and alert policies as reviewable files, without spending on a real project or repeating an ECS module library.</div>
+                <div><strong>Solution</strong> A GCP-first package for insights-api: Cloud Run and Cloud Build configs, Workload Identity Federation from GitHub, least-privilege IAM checked with Rego, Secret Manager wiring, and Cloud Monitoring policies with schema checks. AWS Lambda and CodeBuild stay a thin secondary path.</div>
+                <div><strong>Result</strong> Offline checks are recorded on the page. Thistle Analytics is fictional. Nothing was applied to a GCP or AWS account.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">GCP</span>
+                <span class="tag">Cloud Run</span>
+                <span class="tag">Cloud Build</span>
+                <span class="tag">IAM</span>
+                <span class="tag">AWS</span>
+                <span class="tag">DevOps</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="cloudops/">Live demo</a>
+                <a class="btn ghost" href="projects/cloudops.html">Case study &amp; README</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>n8n DevOps Automation Pack</h3>
+              <p class="tagline">A downloadable product, not a hosted demo: 3 ready-to-import n8n workflows — GitHub CI failure / release alerts to Telegram or Slack, an uptime + SSL-expiry monitor that warns 14 days ahead, and an RSS / job-feed keyword filter that writes to Google Sheets. Pay what you want, from $9.</p>
+              <div class="tags">
+                <span class="tag">n8n</span>
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">Telegram</span>
+                <span class="tag">Slack</span>
+                <span class="tag">Google Sheets</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/yvmcqj" target="_blank" rel="noopener">Get it on Gumroad</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>Linux/Server Ops n8n Starter Pack</h3>
+              <p class="tagline">3 import-ready n8n workflows: disk-usage alert, daily multi-domain SSL-expiry check, backup-failure alert, plus 6 prompt templates (EN/ZH). Pay what you want, from $1. Free lite preview (disk-usage alert) on GitHub.</p>
+              <div class="tags">
+                <span class="tag">n8n</span>
+                <span class="tag">Linux</span>
+                <span class="tag">SSL</span>
+                <span class="tag">Backups</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/fnxeb" target="_blank" rel="noopener">Get it on Gumroad</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/n8n-server-ops-starter-lite" target="_blank" rel="noopener">Free lite on GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>DC Inspection &amp; Asset Register Kit</h3>
+              <p class="tagline">Data-center daily inspection checklist plus asset-register templates for AOC cables, optical modules and switches, with an SN-mapping checker that flags missing, duplicate and mismatched serials. Pay what you want, from $1. Free lite on GitHub.</p>
+              <div class="tags">
+                <span class="tag">Data Center</span>
+                <span class="tag">Asset Register</span>
+                <span class="tag">Python</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/hxlops" target="_blank" rel="noopener">Get it on Gumroad</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/dc-asset-kit-lite" target="_blank" rel="noopener">Free lite on GitHub</a>
+                <a class="btn ghost" href="/portfolio/dc-asset-kit/">Case page</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>Linux Server Health Check Scripts</h3>
+              <p class="tagline">Read-only Bash health checks that write a text report with OK/WARN/CRIT status, evidence and a recommendation, plus a container demo. Pay what you want, from $1. Free lite on GitHub.</p>
+              <div class="tags">
+                <span class="tag">Linux</span>
+                <span class="tag">Bash</span>
+                <span class="tag">Monitoring</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/nqephae" target="_blank" rel="noopener">Get it on Gumroad</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/linux-server-check-lite" target="_blank" rel="noopener">Free lite on GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>Docker Compose Production Templates</h3>
+              <p class="tagline">Compose deployment templates with pinned images: nginx HTTPS reverse proxy with Certbot renewal, Postgres 16 with daily pg_dump backups and restore script, and a one-command demo. Pay what you want, from $1. Free lite on GitHub.</p>
+              <div class="tags">
+                <span class="tag">Docker</span>
+                <span class="tag">Compose</span>
+                <span class="tag">DevOps</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/umaus" target="_blank" rel="noopener">Get it on Gumroad</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/compose-templates-lite" target="_blank" rel="noopener">Free lite on GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>GitHub Actions CI/CD Templates</h3>
+              <p class="tagline">GitHub Actions workflows: Python CI (Ruff + pytest matrix) and Docker Buildx build-and-push to GHCR using only GITHUB_TOKEN, with an example app and install script. Pay what you want, from $1. Free lite on GitHub.</p>
+              <div class="tags">
+                <span class="tag">CI/CD</span>
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">DevOps</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/zbggp" target="_blank" rel="noopener">Get it on Gumroad</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/gha-cicd-templates-lite" target="_blank" rel="noopener">Free lite on GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>Prometheus + Grafana Alert Pack</h3>
+              <p class="tagline">Prometheus alert rules with promtool unit tests, Grafana dashboards and an alert runbook, plus a local Prometheus + node_exporter + Grafana demo. Pay what you want, from $1. Free lite on GitHub.</p>
+              <div class="tags">
+                <span class="tag">Prometheus</span>
+                <span class="tag">Grafana</span>
+                <span class="tag">Alerting</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/umolb" target="_blank" rel="noopener">Get it on Gumroad</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/prom-grafana-alerts-lite" target="_blank" rel="noopener">Free lite on GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>BMC/IPMI Fault Code Quick Reference &amp; Runbook</h3>
+              <p class="tagline">SEL/SDR log parser that groups events by host and category and flags critical rows, plus a fault-code table, triage flowchart and hardware runbooks for data-center ops. Pay what you want, from $1. Free lite on GitHub.</p>
+              <div class="tags">
+                <span class="tag">Data Center</span>
+                <span class="tag">BMC/IPMI</span>
+                <span class="tag">Python</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://caoyadong.gumroad.com/l/dzmww" target="_blank" rel="noopener">Get it on Gumroad</a>
+                <a class="btn ghost" href="https://github.com/caoyadong888-wq/bmc-ipmi-kit-lite" target="_blank" rel="noopener">Free lite on GitHub</a>
+                <a class="btn ghost" href="/portfolio/bmc-ipmi-kit/">Case page</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <h3>Linux Server Health Check — sample report</h3>
+              <p class="tagline">Read-only Linux checks, a written risk list, and an anonymized sample report in English and Chinese.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A server review needs evidence and a written boundary before anyone changes the host.</div>
+                <div><strong>Solution</strong> A bash script reads the OS, disk, memory, listeners, SSH policy, updates, time sync, kernel errors, and local certificates, then writes one JSON line per check.</div>
+                <div><strong>Result</strong> The sample report ranks each item and states what a read-only pass includes. Host names, addresses, and accounts are replaced.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">Linux</span>
+                <span class="tag">Bash</span>
+                <span class="tag">Read-only</span>
+                <span class="tag">PDF</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="./healthcheck-sample/">Sample report</a>
+                <a class="btn ghost" href="./healthcheck-sample/zh.html">中文</a>
+                <a class="btn ghost" href="./healthcheck-sample/report-en.pdf">PDF</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <a class="shot" href="./smb-automation-demo/">
+              <img src="./smb-automation-demo/img/01-workflow-editor.png" alt="n8n editor showing the inquiry router workflow" width="1280" height="800">
+            </a>
+            <div class="card-body">
+              <h3>Small-business automation demo (n8n)</h3>
+              <p class="tagline">A webhook classifies a customer inquiry and appends a row. The table on the page is demo data.</p>
+              <div class="psr">
+                <div><strong>Problem</strong> A small team sorts price requests, support mail, and junk by hand.</div>
+                <div><strong>Solution</strong> An n8n workflow accepts a POST, applies keyword rules, stores the row in a data table, and returns the category.</div>
+                <div><strong>Result</strong> Eight sample inquiries were posted against n8n 2.43. The page shows the editor, the runs, and the stored rows.</div>
+              </div>
+              <div class="tags">
+                <span class="tag">n8n</span>
+                <span class="tag">Webhook</span>
+                <span class="tag">Automation</span>
+              </div>
+              <div class="actions">
+                <a class="btn" href="./smb-automation-demo/">Write-up</a>
+                <a class="btn ghost" href="./smb-automation-demo/zh.html">中文</a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="studies">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Written case studies</h2>
+          <p>Fifty written references for a proposal. Each one is a fictional problem, solution, and result. They do not start a process, and they are separate from the project pages above.</p>
+        </div>
+        <p><a class="btn" href="catalog.html">Open the catalog</a></p>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>What I do</h2>
+          <p>Hands-on delivery for a single VPS or a small service, with the runbook included.</p>
+        </div>
+        <div class="grid services">
+          <article class="service">
+            <h3>Docker &amp; VPS deployment</h3>
+            <p>Compose stacks or a native systemd unit, sized for a small cloud host, with healthchecks and resource caps.</p>
+          </article>
+          <article class="service">
+            <h3>CI/CD pipelines</h3>
+            <p>Lint, test, and image build on pull requests, plus a short rollback path written down before the first release.</p>
+          </article>
+          <article class="service">
+            <h3>API &amp; backend development</h3>
+            <p>Small HTTP APIs with explicit limits, idempotency where a retry would double-write, and a status document that is not just <code>ok</code>.</p>
+          </article>
+          <article class="service">
+            <h3>Workflow automation</h3>
+            <p>n8n or Python workers for intake, enrichment, and routing, with a log of every step instead of a silent failure.</p>
+          </article>
+          <article class="service">
+            <h3>Monitoring &amp; alerting</h3>
+            <p>Uptime, latency, and error budget on one page, with Prometheus text and a Grafana dashboard when the team outgrows the built-in view.</p>
+          </article>
+          <article class="service">
+            <h3>Linux hardening/backups</h3>
+            <p>Key-only SSH, a firewall, unattended upgrades, and backups you can restore from a documented drill.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="process">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>How I work</h2>
+        </div>
+        <div class="grid steps">
+          <article class="step">
+            <div class="step-no">1</div>
+            <h3>Discovery</h3>
+            <p>What has to stay up, what “done” looks like, and which limits the host actually has.</p>
+          </article>
+          <article class="step">
+            <div class="step-no">2</div>
+            <h3>Plan</h3>
+            <p>A short written plan: services, data, rollback, and what will be measured.</p>
+          </article>
+          <article class="step">
+            <div class="step-no">3</div>
+            <h3>Build</h3>
+            <p>The service, the tests, and the deploy path. No hidden admin surface on a public demo.</p>
+          </article>
+          <article class="step">
+            <div class="step-no">4</div>
+            <h3>Handover</h3>
+            <p>Docs and runbooks: how to deploy, how to roll back, and how to restore a backup.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tools">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Tools</h2>
+        </div>
+        <div class="cloud">
+          <span>Docker</span>
+          <span>Docker Compose</span>
+          <span>Linux</span>
+          <span>nginx</span>
+          <span>systemd</span>
+          <span>GitHub Actions</span>
+          <span>Python</span>
+          <span>FastAPI</span>
+          <span>Postgres</span>
+          <span>SQLite</span>
+          <span>Prometheus</span>
+          <span>Grafana</span>
+          <span>n8n</span>
+          <span>rsync</span>
+          <span>ufw</span>
+          <span>fail2ban</span>
+          <span>Bash</span>
+          <span>Ansible</span>
+          <span>httpx</span>
+          <span>Apify</span>
+          <span>Terraform</span>
+          <span>AWS</span>
+          <span>ECS Fargate</span>
+          <span>EC2</span>
+          <span>Django</span>
+          <span>DRF</span>
+          <span>OpenAPI</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">Company names are fictional. SiteAtlas reads the public Books to Scrape practice site. SkyForge is a reference architecture and offline tests, not a client project.</div>
+  </footer>
+</body>
+</html>

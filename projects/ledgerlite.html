@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LedgerLite — case study</title>
+  <meta name="description" content="FastAPI invoicing REST API with JWT scopes, rate limits, cursor pagination, and OpenAPI docs.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/ledgerlite/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. The demo uses fictional data.</p>
+    <article class="readme">
+      <h1>LedgerLite</h1>
+      <p>Portfolio demo of an invoicing REST API. The company is Vandelay Industries. The company, the customers, and every amount are fictional. This is a demo. Sandbox tenants are deleted after 60 minutes.</p>
+      <h2>Overview</h2>
+      <p>LedgerLite is a small FastAPI service for accounts receivable: customers, invoices, payments, an event stream that is stored and never sent anywhere, and an aging report. Authentication is a password grant plus a hashed API key. Writes require a scope. The public reader login and the public read-only API key cannot write.</p>
+      <p>The live process listens on <code>127.0.0.1:18809</code> behind the portfolio nginx prefix <code>/portfolio/ledgerlite/</code>. SQLite is the database on that host. <code>DATABASE_URL=postgresql+asyncpg://...</code> is the switch for Postgres; the VPS image does not install that driver.</p>
+      <h2>Problem → Solution → Result</h2>
+      <h3>Problem</h3>
+      <ul><li>A read-only JSON feed does not show how an API product handles authentication, scopes, pagination, idempotent writes, or conflicting updates.</li><li>Public demos still have to be safe to leave on the internet: fixed credentials, a body cap, rate limits, and no path that renders one user&#x27;s data into another user&#x27;s HTML.</li></ul>
+      <h3>Solution</h3>
+      <ul><li>One FastAPI app with JWT access tokens, rotating refresh tokens, API keys, cursor pagination, <code>Idempotency-Key</code>, and <code>If-Match</code>.</li><li>A shared read-only tenant seeded from a fixed random stream, and a sandbox tenant created per login with quotas and a 60-minute lifetime.</li><li>OpenAPI served by vendored Swagger UI and ReDoc. Nothing is loaded from a CDN.</li></ul>
+      <h3>Result</h3>
+      <ul><li><code>GET /healthz</code> does not touch the database. <code>GET /readyz</code> runs <code>SELECT 1</code>. <code>GET /metrics</code> is Prometheus text.</li><li>Reader calls that write return <code>403</code> with <code>application/problem+json</code>. Sandbox calls that write return <code>201</code> until a quota is hit.</li><li><code>pytest</code> covers auth, tenancy, pagination, filters, idempotency, concurrency, invoices, aging, rate limits, problems, the OpenAPI document, an in-process schemathesis pass over GET, migrations, and the seed. The landing page shows the recorded summary from <code>results/test_report.json</code>.</li></ul>
+      <p>These are capabilities of this demo, not claims about a client engagement.</p>
+      <h2>Features</h2>
+      <ul><li>Password grant (<code>reader</code> / <code>reader-demo</code>, <code>sandbox</code> / <code>sandbox-demo</code>) and API key <code>ll_demo_read_0000000000000000</code>.</li><li>Scopes, including <code>*:read</code> for the reader. Missing scope is <code>403</code> <code>/problems/insufficient-scope</code>.</li><li>Cursor pagination (<code>limit</code> 1–100) and <code>Link</code> headers that include the root path.</li><li>Idempotency keys on invoice create and payment create, kept for 24 hours.</li><li><code>If-Match</code> on customer and draft-invoice updates (<code>428</code> / <code>412</code>).</li><li>Invoice states <code>draft → open → paid</code> and <code>draft|open → void</code>. Tax is <code>ROUND_HALF_UP</code> per line in minor units.</li><li>Aging buckets current, 1–30, 31–60, 61–90, and 90+, grouped by currency.</li><li>In-process token buckets: 120/min authenticated, 30/min anonymous, 10/min on <code>POST /v1/auth/token</code>. One uvicorn worker. More than one process should use Redis; this demo does not ship a Redis backend.</li><li>Body cap 32 KB (<code>413</code>). <code>X-Real-IP</code> is trusted only when the TCP peer is <code>127.0.0.1</code>.</li><li>Sandboxes: 25 customers, 50 invoices, 100 payments, 60 minutes, at most 200 alive, cleanup every 5 minutes.</li></ul>
+      <h2>Architecture</h2>
+      <pre><code>Browser
+         |
+         |  relative URLs on the landing page
+         v
+      edge nginx, prefix /portfolio/ledgerlite/ stripped
+         |
+         v
+      systemd: python -m app   127.0.0.1:18809
+         |
+         +--&gt; SQLite   DATA_DIR/ledgerlite.db
+         +--&gt; signing key  DATA_DIR/jwt.key   (mode 0600, created on first use)</code></pre>
+      <p><code>docker-compose.yml</code> is the shape for a local API plus an optional <code>postgres:16</code> profile. The public demo does not run Compose.</p>
+      <h2>API</h2>
+      <table><thead><tr><th>Method</th><th>Path</th><th>Scope</th></tr></thead><tbody><tr><td>POST</td><td><code>/v1/auth/token</code></td><td>public password grant</td></tr><tr><td>POST</td><td><code>/v1/auth/refresh</code></td><td>public, rotates the refresh token</td></tr><tr><td>GET</td><td><code>/v1/me</code></td><td>any authenticated caller</td></tr><tr><td>GET/POST</td><td><code>/v1/customers</code></td><td><code>customers:read</code> / <code>customers:write</code></td></tr><tr><td>GET/PATCH/DELETE</td><td><code>/v1/customers/{id}</code></td><td>read / write; PATCH needs <code>If-Match</code></td></tr><tr><td>GET</td><td><code>/v1/invoices</code> and <code>/v1/invoices.csv</code></td><td><code>invoices:read</code></td></tr><tr><td>POST</td><td><code>/v1/invoices</code></td><td><code>invoices:write</code> and <code>Idempotency-Key</code></td></tr><tr><td>POST</td><td><code>/v1/invoices/{id}/send</code> and <code>/void</code></td><td><code>invoices:write</code></td></tr><tr><td>POST</td><td><code>/v1/invoices/{id}/payments</code></td><td><code>payments:write</code> and <code>Idempotency-Key</code></td></tr><tr><td>GET</td><td><code>/v1/payments</code></td><td><code>invoices:read</code></td></tr><tr><td>GET</td><td><code>/v1/events</code></td><td><code>invoices:read</code></td></tr><tr><td>GET</td><td><code>/v1/reports/aging</code></td><td><code>reports:read</code></td></tr></tbody></table>
+      <p>Errors use RFC 9457 <code>application/problem+json</code>. Swagger UI is <code>/docs</code>. ReDoc is <code>/redoc</code>. Both load <code>/openapi.json</code> and the files under <code>/static/vendor/</code> with the <code>ROOT_PATH</code> prefix when it is set. The password flow token URL is the relative path <code>v1/auth/token</code>.</p>
+      <h2>Tests</h2>
+      <pre><code class="language-bash">cd ledgerlite
+      /home/box/.local/bin/python3.9 -m venv .venv
+      .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+      .venv/bin/python -m pytest -q --cov=app
+      .venv/bin/ruff check app tests
+      .venv/bin/python scripts/record_tests.py</code></pre>
+      <p>Python 3.9 is the version the VPS runs. Annotations use <code>Optional</code>, <code>List</code>, and <code>Dict</code> so Pydantic and FastAPI can evaluate them on 3.9.</p>
+      <h2>Deployment notes</h2>
+      <ul><li><code>deploy/ledgerlite.service</code> runs as <code>ec2-user</code>, binds <code>127.0.0.1:18809</code>, sets <code>ROOT_PATH=/portfolio/ledgerlite</code> and <code>DATA_DIR=/opt/portfolio/ledgerlite/data</code>.</li><li><code>ExecStartPre</code> migrates (<code>alembic upgrade head</code>) and seeds only when the tenant table is empty.</li><li><code>MemoryMax=150M</code>, <code>NoNewPrivileges</code>, <code>PrivateTmp</code>, <code>ProtectSystem=strict</code>, <code>ProtectHome</code>, <code>ReadWritePaths</code> limited to the data directory.</li><li>The unit file does not contain a signing key. Set <code>LEDGERLITE_JWT_KEY</code> or let the process create <code>DATA_DIR/jwt.key</code>.</li><li>Single worker. Rate limits live in process memory.</li><li>On this demo host the TLS front end does not pass the client address, so the proxy sees one address and the per-IP buckets (anonymous 30/min, token 10/min) act as shared limits for all visitors; per-principal buckets (120/min) are unaffected.</li><li><code>./run.sh</code> migrates, seeds if empty, and starts the same entrypoint.</li></ul>
+      <h2>Screenshots</h2>
+      <p><img alt="Desktop landing page" src="../img/ledgerlite-desktop.png"></p>
+      <p><img alt="Mobile landing page" src="../img/ledgerlite-mobile.png"></p>
+      <p><img alt="Swagger UI" src="../img/ledgerlite-swagger.png"></p>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/ledgerlite/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

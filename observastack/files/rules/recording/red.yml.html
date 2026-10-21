@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rules/recording/red.yml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>ObservaStack</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../alerts.html">告警</a>
+<a href="../../../slo.html">SLO</a>
+<a href="../../../routing.html">路由</a>
+<a href="../../index.html">文件</a>
+</nav>
+</div></header>
+<main class="wrap">
+<h1>rules/recording/red.yml</h1>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">groups</span>:
+<span style="color: #bbbbbb">  </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>red
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">rules</span>:
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>service:http_requests:rate5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>sum by (service) (rate(http_requests_total[5m]))
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>service:http_requests_errors:rate5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>sum by (service) (rate(http_requests_total{code=~&quot;5..&quot;}[5m]))
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>service_route:http_request_duration_seconds:p95_5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>histogram_quantile(0.95, sum by (service, route, le) (rate(http_request_duration_seconds_bucket[5m])))
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>service_route:http_request_duration_seconds:p99_5m
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>histogram_quantile(0.99, sum by (service, route, le) (rate(http_request_duration_seconds_bucket[5m])))
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># Per-service p95 ceilings live here so alerts do not repeat the numbers.</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># `or` keeps every label set. pint&#39;s promql/impossible check treats a</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># non-empty left side as dead code, which is wrong for this union.</span>
+<span style="color: #bbbbbb">      </span><span style="color: #3D7B7B; font-style: italic"># pint disable promql/impossible</span>
+<span style="color: #bbbbbb">      </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">record</span>:<span style="color: #bbbbbb"> </span>service:http_latency_p95_threshold_seconds:constant
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">expr</span>:<span style="color: #bbbbbb"> </span>|
+<span style="color: #bbbbbb">          </span><span style="color: #880000">label_replace(vector(0.40), &quot;service&quot;, &quot;storefront&quot;, &quot;__name__&quot;, &quot;.*&quot;)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">or label_replace(vector(0.30), &quot;service&quot;, &quot;orders-api&quot;, &quot;__name__&quot;, &quot;.*&quot;)</span>
+<span style="color: #bbbbbb">          </span><span style="color: #880000">or label_replace(vector(1.00), &quot;service&quot;, &quot;payments-worker&quot;, &quot;__name__&quot;, &quot;.*&quot;)</span>
+</code></pre></div>
+
+</main>
+<footer><div class="wrap">离线校验；公开页面不运行 Prometheus/Grafana；截图使用合成数据；Larkspur Grocers 为虚构</div></footer>
+</body>
+</html>

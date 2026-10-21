@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DC Inspection &amp; Asset Register Kit</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --paper: #fffcf6;
+      --ink: #1c2416;
+      --muted: #5c6556;
+      --line: #ddd6c8;
+      --accent: #0e6b45;
+      --accent-soft: #e5f3eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--accent); }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 64px; }
+    header {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    header .wrap { padding-top: 22px; padding-bottom: 22px; }
+    .back { margin: 0 0 12px; font-size: 14px; }
+    h1 { margin: 0 0 6px; font-size: 32px; letter-spacing: -0.02em; line-height: 1.2; }
+    .zh-title { margin: 0; color: var(--muted); font-size: 18px; }
+    h2 { margin: 0 0 10px; font-size: 22px; }
+    h2 span { color: var(--muted); font-weight: 600; }
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 18px 8px;
+      margin: 16px 0;
+    }
+    p, li { font-size: 16px; }
+    ul { margin-top: 0; padding-left: 1.2em; }
+    .note {
+      background: var(--accent-soft);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    pre {
+      overflow-x: auto;
+      background: #f7f4ec;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: "DejaVu Sans Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #1c2416;
+    }
+    .links a { display: inline-block; margin: 0 16px 8px 0; }
+    footer { color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="back"><a href="/portfolio/">Back to portfolio / 返回作品集</a></p>
+      <h1>DC Inspection &amp; Asset Register Kit</h1>
+      <p class="zh-title">数据中心巡检与资产台账</p>
+    </div>
+  </header>
+  <main class="wrap">
+    <section id="problem">
+      <h2>Problem / <span>问题</span></h2>
+      <p>Manual serial-number reconciliation of AOC cables, optics, and switches is error-prone. A daily sheet and three registers are compared by hand with <code>show inventory</code>, <code>ipmitool fru print</code>, and <code>lshw -json</code>. Missing serials, unknown serials, duplicates, a host or port that moved, and a part number that does not match are easy to skip.</p>
+      <p>手工核对 AOC、光模块和交换机的序列号很容易出错。巡检表和三本台账要靠人去对 <code>show inventory</code>、<code>ipmitool fru print</code> 和 <code>lshw -json</code>。漏登、多出来的序列号、重复序列号、位置变化和型号不一致，都容易被看漏。</p>
+    </section>
+    <section id="approach">
+      <h2>Approach / <span>做法</span></h2>
+      <p>A bilingual checklist covers the walk-through. CSV templates hold the AOC, optics, and switch register. A Python 3 checker parses the three dump formats, strips and uppercases each serial, and writes MISSING, UNKNOWN, DUPLICATE, MISMATCH_LOCATION, and MISMATCH_PN. A second tool diffs two register snapshots. The sample below is synthetic: 40 register rows and seven findings on purpose.</p>
+      <p>中英巡检表覆盖现场走动检查。CSV 模板分别登记 AOC、光模块和交换机。Python 3 脚本解析三种采集，序列号去空白并转大写，然后写出五类差异。另一支脚本比较两份台账快照。下面的示例是合成数据：40 行台账，故意留下 7 条发现。</p>
+    </section>
+    <section id="demo">
+      <h2>Demo output / <span>演示输出</span></h2>
+      <p>Stdout of <code>scripts/sn_mapping_check.py</code> on <code>samples/register</code> and <code>samples/dumps</code>. Exit code 2.</p>
+      <p><code>scripts/sn_mapping_check.py</code> 对 <code>samples/register</code> 和 <code>samples/dumps</code> 的标准输出。退出码 2。</p>
+      <pre>== SN mapping check ==
+register_rows: 40
+unique_register_sn: 39
+dump_records: 39
+unique_dump_sn: 39
+findings: 7
+exit: 2
+
+finding            count
+-----------------  -----
+MISSING            2
+UNKNOWN            2
+DUPLICATE          1
+MISMATCH_LOCATION  1
+MISMATCH_PN        1
+
+type               sn              asset_ids            detail
+-----------------  --------------  -------------------  ---------------------------------------------------------------------------------------------------------------------------------
+MISSING            SYNMISSAOC0002  AOC-MISS             in register, not in dumps; asset_ids=AOC-MISS; host=dc1-rack-a01-srv01 port=NIC4 pn=SMP-AOC-10G-5M
+MISSING            SYNMISSOPT0001  OPT-MISS             in register, not in dumps; asset_ids=OPT-MISS; host=dc1-rack-a01-sw01 port=Ethernet1/48 pn=SMP-SFP-10G-LR
+UNKNOWN            SYNUNKFRU9002                        seen in dumps, not in register; host=dc1-rack-a01-srv01 pn=SMP-PSU-800 source=dumps/srv01_ipmitool_fru.txt
+UNKNOWN            SYNUNKOPT9001                        seen in dumps, not in register; host=dc1-rack-a01-sw01 port=Ethernet1/40 pn=SMP-SFP28-25G-SR source=dumps/sw01_show_inventory.txt
+DUPLICATE          SYNDUPOPT0042   OPT-0042A|OPT-0042B  sn repeated in register; asset_ids=OPT-0042A|OPT-0042B
+MISMATCH_LOCATION  SYNLOCOPT0100   OPT-0100             host/port differ; register dc1-rack-a01-sw01 Ethernet1/20; dump dc1-rack-a01-sw01 Ethernet1/28
+MISMATCH_PN        SYNPNOPT0200    OPT-0200             pn/model differ; register SMP-QSFP28-100G-SR4; dump SMP-QSFP28-100G-CWDM4
+
+wrote out/sn_mapping/report.md
+wrote out/sn_mapping/report.csv
+wrote out/sn_mapping/report.json</pre>
+    </section>
+    <section id="deliverables">
+      <h2>Deliverables / <span>交付物</span></h2>
+      <ul>
+        <li>Bilingual daily inspection checklist, Markdown and CSV. 中英每日巡检表。</li>
+        <li>AOC, optics (SFP through QSFP-DD), and switch register templates, plus <code>asset_register.xlsx</code>. AOC、光模块、交换机台账模板和工作簿。</li>
+        <li>Inspection NG summary by area and severity. 按区域和严重级别汇总 NG。</li>
+        <li>Dump parsers and the SN mapping check. 采集解析和序列号比对。</li>
+        <li>Snapshot reconcile: added, removed, moved, status changed. 快照对账：新增、删除、移动、状态变化。</li>
+        <li>Synthetic 40-row sample, <code>demo.py</code>, unit tests, and an acceptance script. 40 行合成示例、演示、单元测试和验收脚本。</li>
+      </ul>
+      <p>The free lite repo keeps the checklist and the SN checker. 免费精简仓库保留巡检表和序列号比对。</p>
+    </section>
+    <section id="delivery">
+      <h2>Delivery time / <span>交付时间</span></h2>
+      <p class="note">Instant download. Setup about 10 minutes. Adapting the templates to your own register about 30 minutes.</p>
+      <p class="note">下载即得。安装并跑通大约 10 分钟。把模板改成自己的台账大约 30 分钟。</p>
+      <p>Pay what you want, $1 or more. Suggested price is $5. 愿付多少付多少，1 美元起，建议 5 美元。</p>
+    </section>
+    <section id="gumroad">
+      <h2>Links / <span>链接</span></h2>
+      <p class="links"><a href="https://github.com/caoyadong888-wq/dc-asset-kit-lite">GitHub: dc-asset-kit-lite</a> <a href="https://caoyadong.gumroad.com/l/hxlops" target="_blank" rel="noopener">Gumroad: full kit (from $1)</a></p>
+      <p>Full n8n DevOps pack, $9 / 完整 n8n DevOps 包 9 美元: <a href="https://caoyadong.gumroad.com/l/yvmcqj">https://caoyadong.gumroad.com/l/yvmcqj</a></p>
+    </section>
+    <footer>
+      <p><a href="/portfolio/">Back to portfolio / 返回作品集</a></p>
+    </footer>
+  </main>
+</body>
+</html>

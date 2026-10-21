@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PulseBoard — Uptime, Latency &amp; SLO Alerting Demo</title>
+<meta name="description" content="PulseBoard probes services every 30 seconds, stores 7 days of samples in SQLite, and reports latency p50/p95, uptime, error budget, and alert state.">
+<meta property="og:title" content="PulseBoard — Uptime, Latency &amp; SLO Alerting Demo">
+<meta property="og:description" content="Lightweight demo of 30-second probes, 7-day SQLite history, p50/p95 latency, SLO error budget, and alerts moving pending to firing to resolved.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://52.76.87.179/portfolio/pulseboard-lite/">
+<meta property="og:image" content="https://52.76.87.179/portfolio/pulseboard-lite/desktop.jpg">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#1a1d27;background:#f4f6fb}
+main{max-width:44rem;margin:0 auto;padding:2rem 1.25rem 3rem}
+h1{font-size:1.65rem;line-height:1.25;margin:0 0 .4rem}
+h2{font-size:1.15rem;margin:2rem 0 .55rem}
+h3{font-size:.95rem;margin:1.2rem 0 .4rem}
+p{margin:.4rem 0}
+.lede{color:#3c445c;margin:0}
+ul{margin:.35rem 0 0;padding-left:1.15rem}
+li{margin:.28rem 0}
+code,pre{font-family:ui-monospace,monospace}
+pre{background:#111217;color:#d7dde8;padding:.85rem 1rem;border-radius:8px;overflow:auto;font-size:.75rem;line-height:1.45}
+svg{width:100%;height:auto;display:block;border-radius:8px}
+figure{margin:1rem 0}
+img{max-width:100%;height:auto;border:1px solid #e3e7f0;border-radius:8px;background:#fff}
+figcaption{font-size:.85rem;color:#5c6578;margin-top:.35rem}
+.time{margin:1.4rem 0 0;padding:.7rem 1rem;background:#eef2ff;border-radius:8px;font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:.75rem 1rem;align-items:center;margin-top:1rem}
+a{color:#4338ca}
+a:focus-visible{outline:2px solid #4f46e5;outline-offset:2px}
+.btn{background:#4f46e5;color:#fff;text-decoration:none;padding:.55rem .9rem;border-radius:8px;font-weight:600}
+.btn:hover{background:#3730a3}
+</style>
+</head>
+<body>
+<main>
+<h1>PulseBoard — Uptime, Latency &amp; SLO Alerting Demo</h1>
+<p class="lede">A compact status page for uptime, latency percentiles, and error-budget alerts.</p>
+
+<section>
+<h2>What it does</h2>
+<p>PulseBoard probes services every 30s and stores 7 days of samples in SQLite. It reports latency p50/p95, uptime, and error budget against the SLO. An alert state machine moves pending→firing→resolved and appends each step to a notification log. The same signals are published on a Prometheus-style <code>/metrics</code> endpoint and drawn as a Grafana-style dashboard in inline SVG. The catalog has 4 simulated targets labelled DEMO DATA and 6 real health checks.</p>
+<h3>Prometheus-style /metrics</h3>
+<pre><code># HELP probe_success 1 if the last probe succeeded.
+# TYPE probe_success gauge
+probe_success{target="payments-api",label="DEMO DATA"} 1
+probe_success{target="stackpilot",label="real"} 1
+# TYPE probe_latency_seconds histogram
+probe_latency_seconds_bucket{target="payments-api",le="0.1"} 118
+probe_latency_seconds_sum{target="payments-api"} 9.41
+probe_latency_seconds_count{target="payments-api"} 120
+# TYPE alerts_firing gauge
+alerts_firing{state="pending"} 0
+alerts_firing{state="firing"} 0</code></pre>
+<h3>Grafana-style dashboard</h3>
+<svg viewBox="0 0 720 360" role="img" aria-label="Grafana-style dashboard: 99.970 percent uptime, 92.5 ms p95 latency, 70 percent error budget remaining, and a seven-day p50 and p95 latency chart with a scripted spike">
+<title>Grafana-style latency and SLO dashboard</title>
+<rect width="720" height="360" rx="8" fill="#111217"/>
+<rect x="12" y="12" width="168" height="78" rx="4" fill="#181b1f"/>
+<text x="24" y="34" fill="#c7d0d9" font-size="12" font-family="sans-serif">Uptime 7d</text>
+<text x="24" y="66" fill="#73bf69" font-size="26" font-family="sans-serif">99.970%</text>
+<rect x="192" y="12" width="168" height="78" rx="4" fill="#181b1f"/>
+<text x="204" y="34" fill="#c7d0d9" font-size="12" font-family="sans-serif">Latency p95</text>
+<text x="204" y="66" fill="#ff9830" font-size="26" font-family="sans-serif">92.5 ms</text>
+<rect x="372" y="12" width="336" height="78" rx="4" fill="#181b1f"/>
+<text x="384" y="34" fill="#c7d0d9" font-size="12" font-family="sans-serif">Error budget remaining</text>
+<text x="692" y="34" fill="#c7d0d9" font-size="12" font-family="sans-serif" text-anchor="end">70%</text>
+<rect x="384" y="50" width="308" height="8" rx="4" fill="#2c3238"/>
+<rect x="384" y="50" width="216" height="8" rx="4" fill="#5794f2"/>
+<text x="384" y="76" fill="#8e98a6" font-size="11" font-family="sans-serif">SLO target 99.900%</text>
+<rect x="12" y="102" width="696" height="246" rx="4" fill="#181b1f"/>
+<text x="24" y="126" fill="#c7d0d9" font-size="13" font-family="sans-serif">Latency · 7d · DEMO DATA</text>
+<text x="688" y="126" fill="#8e98a6" font-size="11" font-family="sans-serif" text-anchor="end">payments-api</text>
+<line x1="48" y1="140" x2="692" y2="140" stroke="#2c3238"/>
+<line x1="48" y1="225" x2="692" y2="225" stroke="#f2495c" stroke-dasharray="4 3"/>
+<line x1="48" y1="310" x2="692" y2="310" stroke="#2c3238"/>
+<text x="42" y="144" fill="#8e98a6" font-size="10" font-family="sans-serif" text-anchor="end">500</text>
+<text x="42" y="229" fill="#f2495c" font-size="10" font-family="sans-serif" text-anchor="end">250</text>
+<text x="42" y="314" fill="#8e98a6" font-size="10" font-family="sans-serif" text-anchor="end">0</text>
+<polyline fill="none" stroke="#5794f2" stroke-width="2" points="56,288.9 112,291.3 168,286.9 224,290.3 280,285.5 336,288.2 392,289.6 448,286.2 504,291.6 560,287.6 616,289.3 672,286.5"/>
+<polyline fill="none" stroke="#ff9830" stroke-width="2" points="56,281.4 112,284.2 168,278.7 224,282.8 280,276.7 336,280.8 392,282.1 448,278 504,284.8 560,280.1 616,281.8 672,279.1"/>
+<polyline fill="none" stroke="#f2495c" stroke-width="1.5" points="392,289.6 392,167.2"/>
+<text x="24" y="336" fill="#5794f2" font-size="11" font-family="sans-serif">p50</text>
+<text x="64" y="336" fill="#ff9830" font-size="11" font-family="sans-serif">p95</text>
+<text x="104" y="336" fill="#f2495c" font-size="11" font-family="sans-serif">warn 250 ms</text>
+</svg>
+</section>
+
+<section>
+<h2>Screenshots</h2>
+<figure>
+<img src="desktop.jpg" width="800" height="556" alt="PulseBoard desktop dashboard showing all systems operational, 7 of 7 targets up, 100 percent 24-hour uptime, 92.5 ms p95 latency, 99.970 percent availability with 70 percent error budget remaining, a latency chart, and the notification log.">
+<figcaption>Desktop dashboard: status, error budget, latency, alerts, and the notification log.</figcaption>
+</figure>
+<figure>
+<img src="mobile.jpg" width="320" height="693" alt="PulseBoard mobile dashboard with operational status, 7 of 7 targets up, 100 percent uptime, 92.5 ms p95 latency, and a seven-day latency chart for the simulated payments-api target." loading="lazy">
+<figcaption>Mobile dashboard: status cards and the seven-day latency chart.</figcaption>
+</figure>
+</section>
+
+<section>
+<h2>Deliverables</h2>
+<ul>
+<li>docker-compose deploy</li>
+<li>probe target config targets.yml</li>
+<li>alert rules + notification hook</li>
+<li>dashboard</li>
+<li>README/runbook</li>
+<li>tests</li>
+</ul>
+</section>
+
+<p class="time">Typical delivery time: 3–5 days</p>
+<p class="actions"><a class="btn" href="/portfolio/pulseboard/">Open full live demo</a> <a href="/portfolio/">Back to portfolio</a></p>
+</main>
+</body>
+</html>

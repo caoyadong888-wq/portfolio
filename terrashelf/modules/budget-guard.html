@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>budget-guard</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+<p class="brand"><a href="../index.html">TerraShelf</a></p>
+<nav>
+<a href="../index.html">Catalog</a>
+<a href="../standards.html">Standards</a>
+<a href="../../index.html">Portfolio</a>
+</nav>
+</header>
+<main>
+
+<p class="meta"><a href="../index.html">Catalog</a> · Cost · v1.0.0</p>
+<h1>budget-guard</h1>
+<p>Monthly cost budget that notifies at 50, 80, and 100 percent.</p>
+<p>Tests passed <span data-metric="modules.budget-guard.passed">5</span> of <span data-metric="modules.budget-guard.runs">5</span>. Failed <span data-metric="modules.budget-guard.failed">0</span>.</p>
+<h2>Inputs</h2>
+<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>email_addresses</td><td><code>list(string)</code></td><td>no</td><td>Email addresses notified with the SNS topic. Empty notifies only the topic.</td></tr><tr><td>limit_amount</td><td><code>number</code></td><td>yes</td><td>Monthly cost budget amount in USD. Required. Values in examples are placeholders, not recommendations.</td></tr><tr><td>name_prefix</td><td><code>string</code></td><td>yes</td><td>Prefix for the budget and the notification topic.</td></tr><tr><td>tags</td><td><code>map(string)</code></td><td>no</td><td>Extra tags merged onto every taggable resource. ManagedBy and Module are always set by the module.</td></tr></tbody></table>
+<h2>Outputs</h2>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>caller_context</td><td>Account, partition, and region resolved from data sources.</td></tr><tr><td>email_subscription_count</td><td>Email subscriptions on the budget topic. Zero when email_addresses is empty.</td></tr><tr><td>limit_amount</td><td>Budget limit as planned. Example values are placeholders, not recommendations.</td></tr><tr><td>notification_count</td><td>How many budget notifications are configured.</td></tr><tr><td>notification_thresholds</td><td>Percentage thresholds notified for the monthly budget. Fixed at 50, 80, and 100.</td></tr><tr><td>notification_types</td><td>Notification types sent at each threshold.</td></tr><tr><td>tag_audit</td><td>Tags on every taggable resource this module creates.</td></tr><tr><td>topic_name</td><td>SNS topic name that receives budget notifications.</td></tr></tbody></table>
+<h2>Example</h2>
+<p>The caller supplies the region. This example does not embed an account id.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">module</span><span style="color: #bbbbbb"> </span><span style="color: #19177C">&quot;budget&quot;</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #687822">source</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;../..&quot;</span>
+
+<span style="color: #bbbbbb">  </span><span style="color: #687822">name_prefix</span><span style="color: #bbbbbb">  </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;demo-cost&quot;</span>
+<span style="color: #bbbbbb">  </span><span style="color: #687822">limit_amount</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000">tags</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span><span style="color: #687822">Example</span><span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;basic&quot;</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
+
+<h2>Tests</h2>
+<ul><li>placeholder_amount passed</li><li>with_email passed</li><li>different_placeholder passed</li><li>reject_zero passed</li><li>reject_negative passed</li></ul>
+<h2>Mock plan excerpt</h2>
+<p>mocked provider: ARNs and IDs are simulated. This excerpt is from terraform test with a mocked provider, not a live plan.</p>
+<pre class="plan">mocked provider: ARNs and IDs are simulated. This is terraform test -verbose, not a live plan.
+
+tests\budget-guard.tftest.hcl... in progress
+  run &quot;placeholder_amount&quot;... pass
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_budgets_budget.monthly will be created
+  + resource &quot;aws_budgets_budget&quot; &quot;monthly&quot; {
+      + account_id        = (known after apply)
+      + arn               = (known after apply)
+      + budget_type       = &quot;COST&quot;
+      + id                = (known after apply)
+      + name              = &quot;demo-cost-monthly-cost&quot;
+      + name_prefix       = (known after apply)
+      + tags              = {
+          + &quot;ManagedBy&quot; = &quot;terraform&quot;
+          + &quot;Module&quot;    = &quot;budget-guard&quot;
+          + &quot;Owner&quot;     = &quot;platform&quot;
+        }
+      + tags_all          = (known after apply)
+      + time_period_start = (known after apply)
+      + time_unit         = &quot;MONTHLY&quot;
+
+      + notification {
+          + comparison_operator       = &quot;GREATER_THAN&quot;
+          + notification_type         = &quot;ACTUAL&quot;
+          + subscriber_sns_topic_arns = [
+              + (known after apply),
+            ]
+          + threshold                 = 100
+          + threshold_type            = &quot;PERCENTAGE&quot;
+        }
+      + notification {
+          + comparison_operator       = &quot;GREATER_THAN&quot;
+          + notification_type         = &quot;ACTUAL&quot;</pre>
+<h2>Resources</h2>
+<p>graphviz dot was not installed. The figure is a python-hcl2 resource list.</p>
+<img src="../graphs/budget-guard.svg" alt="Resource list for budget-guard">
+<h2>Changelog</h2>
+<h1>Changelog</h1>
+<p>All notable changes to this module are documented in this file.</p>
+<p>The format is based on Keep a Changelog, and this module uses Semantic Versioning.</p>
+<h2>[1.0.0] - 2026-10-03</h2>
+<h3>Added</h3>
+<ul><li>Monthly cost budget with notifications at 50, 80, and 100 percent.</li></ul>
+<h2>Billable item names</h2>
+<p>Names only. This page does not quote a price. Example amounts, including a budget limit, are placeholders and are not recommendations. GuardDuty and Security Hub stay off unless a module switch is set, because those services are billable.</p>
+<ul><li>AWS Budgets</li><li>Amazon SNS</li><li>AWS Key Management Service</li></ul>
+
+</main>
+<footer>
+<p>Offline module library. Not deployed. This library is not published to the Terraform Registry. OWNER is a placeholder.</p>
+</footer>
+</body>
+</html>

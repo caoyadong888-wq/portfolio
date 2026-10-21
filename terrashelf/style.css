@@ -1,0 +1,22 @@
+:root {
+  color: #1c1915;
+  background: #f4f0e6;
+  font-family: Georgia, "Iowan Old Style", Palatino, serif;
+}
+body { margin: 0 auto; max-width: 960px; padding: 1.5rem; }
+a { color: #6b3a1f; }
+header.top, footer { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+nav { display: flex; gap: 1rem; }
+h1, h2 { font-weight: normal; }
+.lede { font-size: 1.15rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.card { background: #fffdf8; border: 1px solid #1c1915; padding: 1rem; }
+.meta, .count { color: #5c564c; }
+label { display: block; margin-top: 0.5rem; }
+input, select { font: inherit; padding: 0.3rem 0.4rem; width: 100%; max-width: 28rem; }
+table { border-collapse: collapse; width: 100%; font-family: Consolas, monospace; font-size: 0.85rem; }
+th, td { border-bottom: 1px solid #d9d1c3; text-align: left; vertical-align: top; padding: 0.35rem; }
+pre, code { font-family: Consolas, monospace; }
+pre.plan, .highlight { overflow: auto; background: #fffdf8; border: 1px solid #1c1915; padding: 0.75rem; }
+img { max-width: 100%; height: auto; background: #fffdf8; }
+footer { margin-top: 2rem; border-top: 1px solid #1c1915; padding-top: 0.75rem; }

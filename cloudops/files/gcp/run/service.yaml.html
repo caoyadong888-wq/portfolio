@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gcp/run/service.yaml</title>
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../../index.html">概览</a>
+<a href="../../../aws/index.html">AWS 次要</a>
+<a href="../../index.html">文件</a>
+<a href="../../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>gcp/run/service.yaml</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">apiVersion</span>:<span style="color: #bbbbbb"> </span>serving.knative.dev/v1
+<span style="color: #008000; font-weight: bold">kind</span>:<span style="color: #bbbbbb"> </span>Service
+<span style="color: #008000; font-weight: bold">metadata</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>insights-api
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">labels</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">app</span>:<span style="color: #bbbbbb"> </span>insights-api
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">cloud.googleapis.com/location</span>:<span style="color: #bbbbbb"> </span>asia-east1
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">run.googleapis.com/ingress</span>:<span style="color: #bbbbbb"> </span>internal
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">run.googleapis.com/description</span>:<span style="color: #bbbbbb"> </span>Fictional Thistle Analytics insights API. Not deployed.
+<span style="color: #008000; font-weight: bold">spec</span>:
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">template</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">metadata</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">annotations</span>:
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">autoscaling.knative.dev/maxScale</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;10&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">autoscaling.knative.dev/minScale</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;0&quot;</span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">run.googleapis.com/execution-environment</span>:<span style="color: #bbbbbb"> </span>gen2
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">run.googleapis.com/cpu-throttling</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;true&quot;</span>
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">spec</span>:
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">serviceAccountName</span>:<span style="color: #bbbbbb"> </span>insights-api-sa@thistle-analytics-demo.iam.gserviceaccount.com
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">containerConcurrency</span>:<span style="color: #bbbbbb"> </span>80
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">timeoutSeconds</span>:<span style="color: #bbbbbb"> </span>60
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">containers</span>:
+<span style="color: #bbbbbb">        </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>insights-api
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">image</span>:<span style="color: #bbbbbb"> </span>asia-east1-docker.pkg.dev/thistle-analytics-demo/apps/insights-api:0.1.0
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">ports</span>:
+<span style="color: #bbbbbb">            </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>http1
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">containerPort</span>:<span style="color: #bbbbbb"> </span>8080
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">env</span>:
+<span style="color: #bbbbbb">            </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>INSIGHTS_ENV
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">value</span>:<span style="color: #bbbbbb"> </span>demo
+<span style="color: #bbbbbb">            </span>-<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>SIGNING_KEY
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">valueFrom</span>:
+<span style="color: #bbbbbb">                </span><span style="color: #008000; font-weight: bold">secretKeyRef</span>:
+<span style="color: #bbbbbb">                  </span><span style="color: #008000; font-weight: bold">name</span>:<span style="color: #bbbbbb"> </span>insights-api-signing-key
+<span style="color: #bbbbbb">                  </span><span style="color: #008000; font-weight: bold">key</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;1&quot;</span>
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">resources</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">limits</span>:
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">cpu</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;1&quot;</span>
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">memory</span>:<span style="color: #bbbbbb"> </span>512Mi
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">startupProbe</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">httpGet</span>:
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">path</span>:<span style="color: #bbbbbb"> </span>/healthz
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">port</span>:<span style="color: #bbbbbb"> </span>8080
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">periodSeconds</span>:<span style="color: #bbbbbb"> </span>10
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">failureThreshold</span>:<span style="color: #bbbbbb"> </span>6
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">timeoutSeconds</span>:<span style="color: #bbbbbb"> </span>2
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">livenessProbe</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">httpGet</span>:
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">path</span>:<span style="color: #bbbbbb"> </span>/readyz
+<span style="color: #bbbbbb">              </span><span style="color: #008000; font-weight: bold">port</span>:<span style="color: #bbbbbb"> </span>8080
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">periodSeconds</span>:<span style="color: #bbbbbb"> </span>15
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">failureThreshold</span>:<span style="color: #bbbbbb"> </span>3
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">timeoutSeconds</span>:<span style="color: #bbbbbb"> </span>2
+<span style="color: #bbbbbb">          </span><span style="color: #008000; font-weight: bold">securityContext</span>:
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">runAsNonRoot</span>:<span style="color: #bbbbbb"> </span>true
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">runAsUser</span>:<span style="color: #bbbbbb"> </span>10001
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">allowPrivilegeEscalation</span>:<span style="color: #bbbbbb"> </span>false
+</code></pre></div>
+
+</main>
+</body>
+</html>

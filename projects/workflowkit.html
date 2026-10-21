@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WorkflowKit — case study</title>
+  <meta name="description" content="Three tested n8n templates: lead intake, uptime watcher, and a daily RSS job digest.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="../workflowkit/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. The demo uses fictional data.</p>
+    <article class="readme">
+      <h1>WorkflowKit</h1>
+      <p>Three n8n workflow templates for a portfolio demo: lead intake, uptime checks, and a daily RSS job digest. Each template is a published <code>workflow.json</code> that n8n can import from a file. They use official nodes only. Credential fields are left empty so a person can attach their own Google Sheets, Slack, and SMTP credentials in the n8n editor.</p>
+      <p>The workflows were executed on a local n8n 2.41.6 process with Node v24.21.0. The static page in <code>dist/</code> does not start n8n. These templates were not submitted to the n8n Creator Hub.</p>
+      <h2>Problem → Solution → Result</h2>
+      <h3>Problem</h3>
+      <ul><li>The portfolio had Python automation demos and no importable n8n workflow.</li><li>A lead form, an uptime check, and a job digest are small enough to read and still show validation, dedupe, scoring, retries, and a separate error path.</li></ul>
+      <h3>Solution</h3>
+      <ul><li><code>templates/lead-intake</code> accepts a POST, validates it, drops the same address on the same UTC day, scores the message, appends a Google Sheets row, and posts to Slack. Sheet and Slack failures use the node error output and write a log entry in workflow static data.</li><li><code>templates/uptime-watcher</code> checks a list of URLs every 10 minutes. The first failure is quiet. The second consecutive failure sends one down email. Further failures stay quiet. The next success after a down status sends a recovery email. Counts live in workflow static data.</li><li><code>templates/rss-job-digest</code> reads the public Jobicy RSS feed once a day, keeps keyword matches, hides items already sent, and emails one summary. Each digest item links back to the original Jobicy listing. Ids are stored only after the email node finishes. Source: Jobicy (jobicy.com), used with attribution.</li></ul>
+      <h3>Result</h3>
+      <ul><li>Each published file imports as its own workflow. A local run produced one success execution per template. The redacted records are <code>templates/&lt;slug&gt;/execution.json</code>. Editor screenshots are in <code>docs/screenshots/</code>.</li><li>Local execution id for lead intake: 28. Uptime recovery execution: 32. RSS digest execution: 33.</li></ul>
+      <p>These are capabilities of this project, not claims about a client engagement. No customer counts or testimonials are included.</p>
+      <h2>What the local run actually called</h2>
+      <p>Google Sheets and Slack were not called. There is no account for either one on this machine.</p>
+      <ul><li><strong>Append Lead Row</strong> and <strong>Post Lead Notification</strong> stayed Google Sheets and Slack nodes in the downloadable JSON. The runner built a test copy in the local database and rewrote those two nodes to HTTP Request calls against <code>127.0.0.1</code>. A Python process recorded the calls and did not forward them.</li><li><strong>Send Email</strong> used the real n8n SMTP node with a credential that points at <code>127.0.0.1</code> port 2525. A local SMTP receiver wrote each message to disk. Nothing left the machine.</li><li><strong>Uptime URLs</strong> in the published file are <code>https://example.com/</code> and <code>https://example.org/</code>. The test copy replaced those two strings inside List Watched URLs with two local health URLs, one of which returns HTTP 500 until the runner flips it.</li><li><strong>Read Public Job Feed</strong> uses <code>https://jobicy.com/?feed=job_feed</code>. Source: Jobicy (jobicy.com), used with attribution. Each digest item links back to the original Jobicy listing. Remotive (<code>https://remotive.com/remote-jobs/feed</code>) is a documented alternative. The runner records in <code>docs/local-run.json</code> which source the local run actually read: Jobicy, Remotive when Jobicy is unreachable, or a local fixture when both are unreachable.</li><li>Manual runs of the schedule workflows do not persist workflow static data in n8n 2.41. The runner copied the state those Code nodes had already computed into the local sqlite file while n8n was stopped, then started n8n again for the next run. The lead webhook path is not manual, so n8n saved that static data itself.</li></ul>
+      <p>The owner account exists only in <code>.n8n-local/</code> and uses the reserved name <code>owner@example.invalid</code>. That directory is gitignored.</p>
+      <h2>Layout</h2>
+      <table><thead><tr><th>Path</th><th>Role</th></tr></thead><tbody><tr><td><code>templates/&lt;slug&gt;/workflow.json</code></td><td>Published workflow. Import this file.</td></tr><tr><td><code>templates/&lt;slug&gt;/README.md</code></td><td>Purpose, credentials, setup, and tunable parameters.</td></tr><tr><td><code>templates/&lt;slug&gt;/execution.json</code></td><td>One redacted local execution.</td></tr><tr><td><code>templates/&lt;slug&gt;/screenshots/</code></td><td>Editor canvas and that execution.</td></tr><tr><td><code>showcase/build.py</code></td><td>Builds the static page. <code>python3 showcase/build.py --out dist</code>.</td></tr><tr><td><code>dist/</code></td><td>Static page produced by the build.</td></tr><tr><td><code>scripts/local_n8n.sh</code></td><td><code>start</code>, <code>stop</code>, <code>import</code>, <code>run</code>, <code>status</code>.</td></tr><tr><td><code>scripts/verify_local_n8n.sh</code></td><td>Import, run, and assert success.</td></tr><tr><td><code>scripts/bootstrap_tools.sh</code></td><td>Download local Node 24 and n8n if they are missing.</td></tr><tr><td><code>docs/local-run.json</code></td><td>Execution ids, statuses, and the mock notes.</td></tr><tr><td><code>docs/screenshots/</code></td><td>Copies of the editor screenshots for the portfolio case study.</td></tr></tbody></table>
+      <p>Slugs are <code>lead-intake</code>, <code>uptime-watcher</code>, and <code>rss-job-digest</code>.</p>
+      <h2>Run it again</h2>
+      <p>Node on <code>PATH</code> for these scripts is <code>.tools/node-v24.21.0-linux-x64/bin/node</code>. The system Node at <code>/usr/bin/node</code> is not used. n8n listens on <code>127.0.0.1:5688</code> only. Telemetry and version notices are turned off.</p>
+      <pre><code class="language-sh">scripts/bootstrap_tools.sh
+      scripts/verify_local_n8n.sh
+      scripts/local_n8n.sh stop</code></pre>
+      <p><code>verify_local_n8n.sh</code> starts the mock HTTP/SMTP process and n8n, imports the three published workflows, screenshots the canvases, applies the test-copy patch inside n8n, runs each workflow, writes the redacted execution files, and screenshots the execution records. Stop releases port 5688.</p>
+      <h2>Tests</h2>
+      <pre><code class="language-sh">.venv/bin/pytest -q</code></pre>
+      <p>Pytest 8.3.5 is installed in <code>.venv</code>. The tests check workflow shape, official node types, sticky notes, names, secrets in the JSON and execution exports, the Code-node functions (via the local Node 24 binary), and a showcase build in a temporary directory.</p>
+      <h2>Static page</h2>
+      <pre><code class="language-sh">python3 showcase/build.py --out dist</code></pre>
+      <p>Open <code>dist/index.html</code>. Links are relative, so the same files work under <code>/portfolio/workflowkit/</code>. The page states that the workflows were run on local n8n and that the public page does not run n8n.</p>
+      <h2>Screenshots</h2>
+      <p><img alt="Lead intake canvas" src="../img/workflowkit-lead-intake-canvas.png"></p>
+      <p><img alt="Lead intake execution" src="../img/workflowkit-lead-intake-execution.png"></p>
+      <p><img alt="Uptime watcher canvas" src="../img/workflowkit-uptime-watcher-canvas.png"></p>
+      <p><img alt="Uptime watcher execution" src="../img/workflowkit-uptime-watcher-execution.png"></p>
+      <p><img alt="RSS job digest canvas" src="../img/workflowkit-rss-job-digest-canvas.png"></p>
+      <p><img alt="RSS job digest execution" src="../img/workflowkit-rss-job-digest-execution.png"></p>
+    </article>
+    <p class="case-cta"><a class="btn" href="../workflowkit/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

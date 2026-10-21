@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShipLane — case study</title>
+  <meta name="description" content="Release-pipeline visualizer with blue/green deploy scripts and DORA metrics.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#readme">Skip to case study</a>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="../">Portfolio</a>
+      <nav class="topnav">
+        <a href="https://52.76.87.179/portfolio/shiplane/">Live demo</a>
+        <a href="../">All projects</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap case" id="readme">
+    <p class="eyebrow">Case study</p>
+    <p class="note">Rendered from the project README. The demo uses fictional data.</p>
+    <article class="readme">
+      <h1>ShipLane</h1>
+      <p>Release-pipeline visualizer for a fictional Globex service, <code>checkout-api</code>. The page you can click is a running simulator: seeded history, a live GitHub Actions–style graph, job logs, blue/green environment state, and DORA metrics computed from that history. The workflows and the blue/green scripts in this directory are real files you can read and lint. They are not executed by this demo process.</p>
+      <h2>Overview</h2>
+      <p>ShipLane shows how a release is designed when the target is one VPS: build, a Python test matrix, an SBOM and a vulnerability scan, a staging deploy, a manual production approval, a blue/green switch, a health check, and an automatic rollback if that check fails. Visitors watch a simulated run advance job by job. The same repository holds the workflow YAML and the bash that would perform the switch.</p>
+      <h2>Problem → Solution → Result</h2>
+      <h3>Problem</h3>
+      <ul><li>A release story told only in a README is hard to review. Reviewers cannot see which job failed, which color is live, or how often a deploy rolls back.</li><li>Blue/green on a single host is easy to describe and easy to get wrong: a health gate that is skipped, an nginx reload of a broken upstream, or a rollback that has already deleted the previous color.</li><li>DORA numbers pasted into a slide are not the same thing as numbers computed from the release log.</li></ul>
+      <h3>Solution</h3>
+      <ul><li>A FastAPI page renders the pipeline as a graph (build, test matrix, scan, staging, approval, production blue/green, verify, conditional rollback) and streams the current job log.</li><li><code>deploy/bluegreen.sh</code> keeps two Compose stacks, writes an nginx upstream, runs <code>nginx -t</code> before reload, and leaves the previous color in place. <code>deploy/rollback.sh</code> points traffic back at that color. <code>--dry-run</code> exercises the state machine without Docker or nginx.</li><li><code>.github/workflows/release.yml</code> is a real workflow: multi-arch GHCR push, SBOM, Trivy failing on HIGH and CRITICAL, keyless cosign, a production environment approval, SSH to the blue/green script, and a rollback job that runs only when verify failed.</li></ul>
+      <h3>Result</h3>
+      <ul><li>About 30 fictional releases over 45 days are present on first start, including a test failure, a scan block, and post-deploy health failures that auto-rolled back.</li><li><code>GET /api/metrics/dora</code> returns deployment frequency, lead time, change failure rate, and MTTR from that history. The page draws the weekly frequency as an inline SVG.</li><li><code>POST /api/runs</code> starts one simulated pipeline (one per minute per address, one in flight globally). Jobs advance in real time. The process keeps the newest 300 runs.</li></ul>
+      <p>These are capabilities of this demo, not claims about a client engagement.</p>
+      <h2>Features</h2>
+      <ul><li>Pipeline graph with status, duration, and edges. Stages: build, test (Python 3.10 / 3.11 / 3.12), scan, deploy-staging, approval, deploy-prod (blue/green), verify, and a rollback node that runs only after a failed verify.</li><li>Live run: a background tick starts a new pipeline about every 10 minutes. Each job lasts 5–30 seconds. Logs grow line by line. Roughly one run in ten takes a failure path (seeded randomness).</li><li>Job log viewer: monospace, ANSI stripped, HTML-escaped, auto-scroll. Click a node or a history row to pin it.</li><li>Release history: version, commit, author, status, duration, active color, deployed at.</li><li>Environment panel: which color is live in staging and production, idle color, and traffic percent.</li><li>DORA panel computed from the trailing 45 days: deployment frequency, median lead time, change failure rate, mean time to restore.</li><li>Workflow YAML tab: only <code>ci.yml</code> and <code>release.yml</code>, escaped, with a small client-side highlight. No other path is readable.</li><li>Fictional seed only (Globex, <code>checkout-api</code>, authors such as <code>jane.doe</code>). No shell and no outbound fetch from request handlers.</li></ul>
+      <h2>Architecture</h2>
+      <p>Live demo (what the public page is):</p>
+      <pre><code>Browser
+         |
+         |  relative URLs (api/..., static/..., ../)
+         v
+      edge nginx, prefix stripped
+         |
+         v
+      systemd: python -m app  127.0.0.1:18805
+         |
+         +--&gt; SQLite   DATA_DIR/shiplane.db   (runs, jobs, environments)
+         +--&gt; in-process simulator (tick, retain 300)
+         +--&gt; reads .github/workflows/{ci,release}.yml   (whitelist)</code></pre>
+      <p>Release path the workflow describes (not executed by the visualizer):</p>
+      <pre><code>tag v* or workflow_dispatch
+         |
+         v
+      test matrix --&gt; build/push GHCR (buildx, multi-arch)
+         |                 |
+         |                 +--&gt; SBOM (anchore) + Trivy (fail HIGH/CRITICAL) + cosign keyless
+         v
+      deploy-staging (blue/green, separate state dir)
+         |
+         v
+      environment: production   (manual approval)
+         |
+         v
+      SSH deploy/bluegreen.sh --&gt; nginx upstream swap --&gt; health check
+         |
+         +--&gt; ok: previous color stays up, idle
+         +--&gt; verify failed: deploy/rollback.sh restores the previous color</code></pre>
+      <pre><code class="language-mermaid">flowchart LR
+        browser[Browser] --&gt; nginx[edge nginx]
+        nginx --&gt; app[FastAPI visualizer]
+        app --&gt; db[(SQLite)]
+        app --&gt; yaml[workflow files]
+        release[release.yml] --&gt; ghcr[GHCR image]
+        release --&gt; vps[VPS blue/green]
+        vps --&gt; colorBlue[blue stack]
+        vps --&gt; colorGreen[green stack]</code></pre>
+      <p>Notes:</p>
+      <ul><li>The visualizer never runs <code>bluegreen.sh</code> and never opens a shell for a request. The script is for the VPS release path and for local <code>--dry-run</code>.</li><li><code>/healthz</code> does not touch SQLite.</li><li>Two Compose files: the root <code>docker-compose.yml</code> runs this visualizer. <code>deploy/checkout-compose.yml</code> is the color stack <code>bluegreen.sh</code> would start for <code>checkout-api</code>.</li><li>Job-level <code>permissions:</code> in the release workflow replace the workflow default. The production environment gate is the approval job. Rollback uses repository secrets so a failed verify is not stuck waiting on reviewers.</li></ul>
+      <h2>Tech stack</h2>
+      <ul><li>Python 3.9+ (style aimed at 3.9 and 3.11+), FastAPI 0.115, uvicorn 0.30, stdlib <code>sqlite3</code>.</li><li>Vanilla HTML, CSS, and JS. No CDN, no web font, no tracker. The frequency chart is an inline SVG built in the page.</li><li>GitHub Actions for CI and for the release workflow. Bash for blue/green. Prometheus text on <code>/metrics</code>.</li><li>pytest and ruff. <code>actionlint</code> and <code>shellcheck</code> are the intended checks for the workflow and the scripts when those binaries are installed.</li></ul>
+      <h2>Run locally</h2>
+      <h3>venv</h3>
+      <pre><code class="language-sh">python3 -m venv .venv
+      .venv/bin/pip install -r requirements-dev.txt
+      .venv/bin/python -m app</code></pre>
+      <p>Or <code>./run.sh</code>, which creates <code>.venv</code> if needed and listens on <code>127.0.0.1:18805</code>. Open <code>http://127.0.0.1:18805/</code>.</p>
+      <p>The first start seeds history and, with the default interval, begins a live run. <code>AUTO_INTERVAL_SECONDS=0</code> disables the automatic start. <code>TICK_SECONDS=0</code> disables the background clock (tests use both).</p>
+      <p>Dry-run the switch without Docker:</p>
+      <pre><code class="language-sh">bash deploy/bluegreen.sh --dry-run --image ghcr.io/globex/checkout-api:v2.9.5
+      bash deploy/bluegreen.sh --dry-run --status
+      bash deploy/rollback.sh --dry-run</code></pre>
+      <h3>Docker Compose</h3>
+      <p>Docker runs the visualizer. It is not required to view the demo, and this box does not need Docker to review the file.</p>
+      <pre><code class="language-sh">docker compose up -d --build
+      curl -fsS http://127.0.0.1:18805/healthz</code></pre>
+      <p>The image listens on <code>0.0.0.0:18805</code> as uid 10001, stores SQLite in the <code>shiplane_data</code> volume, and healthchecks <code>/healthz</code>. Memory cap in Compose is 150M.</p>
+      <h2>Configuration</h2>
+      <table><thead><tr><th>Variable</th><th>Default</th><th>Role</th></tr></thead><tbody><tr><td><code>PORT</code></td><td><code>18805</code></td><td>Listen port</td></tr><tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td>Bind address. The image sets <code>0.0.0.0</code></td></tr><tr><td><code>DATA_DIR</code></td><td><code>./data</code></td><td>SQLite directory (<code>shiplane.db</code>)</td></tr><tr><td><code>AUTO_INTERVAL_SECONDS</code></td><td><code>600</code></td><td>How often a new simulated run may start. <code>0</code> disables it</td></tr><tr><td><code>TICK_SECONDS</code></td><td><code>1</code></td><td>Simulator clock. <code>0</code> disables the background loop</td></tr><tr><td><code>SEED</code></td><td><code>1</code></td><td><code>0</code>, <code>false</code>, or <code>no</code> skips historical seed</td></tr><tr><td><code>SIM_SEED</code></td><td><code>18805</code></td><td>RNG seed for failure selection and durations</td></tr><tr><td><code>RETAIN_RUNS</code></td><td><code>300</code></td><td>Newest runs kept. Older runs and their jobs are deleted</td></tr><tr><td><code>RATE_LIMIT_SECONDS</code></td><td><code>60</code></td><td>Minimum gap between <code>POST /api/runs</code> from one address</td></tr><tr><td><code>DORA_WINDOW_DAYS</code></td><td><code>45</code></td><td>Trailing window for the four DORA figures</td></tr></tbody></table>
+      <p><code>POST /api/runs</code> also allows only one in-progress run for the whole process. A second start returns 409 and does not consume the per-address limit. The body is ignored and capped at 8 KB.</p>
+      <h2>API endpoints</h2>
+      <table><thead><tr><th>Method</th><th>Path</th><th>Notes</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/</code></td><td>Pipeline page</td></tr><tr><td><code>GET</code></td><td><code>/healthz</code></td><td><code>{&quot;status&quot;:&quot;ok&quot;,...}</code>. No database work</td></tr><tr><td><code>GET</code></td><td><code>/api/runs?limit=</code></td><td>Newest runs. <code>limit</code> is clamped</td></tr><tr><td><code>GET</code></td><td><code>/api/runs/{id}</code></td><td>One run and its jobs</td></tr><tr><td><code>GET</code></td><td><code>/api/runs/{id}/jobs/{job}/log</code></td><td>Visible log text for a known job key</td></tr><tr><td><code>POST</code></td><td><code>/api/runs</code></td><td>Start one simulated run. 201, 409 if one is active, 429 if the address is limited, 413 above 8 KB</td></tr><tr><td><code>GET</code></td><td><code>/api/environments</code></td><td>Staging and production color, traffic, version</td></tr><tr><td><code>GET</code></td><td><code>/api/metrics/dora</code></td><td>Frequency, lead time, change failure rate, MTTR, weekly buckets</td></tr><tr><td><code>GET</code></td><td><code>/api/workflows</code></td><td>Whitelist names, or <code>?name=ci.yml</code> / <code>?name=release.yml</code></td></tr><tr><td><code>GET</code></td><td><code>/metrics</code></td><td>Prometheus text</td></tr></tbody></table>
+      <p>Paths in the browser are relative (<code>api/runs</code>, not <code>/api/runs</code>) so the page works both at the bare port and behind a stripped prefix.</p>
+      <p>DORA definitions used by the page (trailing window, by pipeline start):</p>
+      <ul><li>Deployment frequency: successful production deploys per day.</li><li>Lead time: median of <code>deployed_at - committed_at</code> for those successes.</li><li>Change failure rate: rolled-back deploys divided by production deploys (successes plus rollbacks). A failed test or scan is not a production deploy.</li><li>MTTR: mean of <code>recovered_at - incident_started_at</code> for rollbacks.</li></ul>
+      <h2>Tests</h2>
+      <pre><code class="language-sh">.venv/bin/python -m pytest
+      .venv/bin/ruff check app tests
+      bash -n deploy/bluegreen.sh deploy/rollback.sh</code></pre>
+      <p>The suite checks the run state machine (success, test failure, scan block, verify failure with rollback and color restore), live job duration bounds, retention, DORA math, the seed counts, per-address rate limit and the global single-run lock, the 8 KB body cap, workflow path whitelist, relative URLs, HTML escaping, Prometheus text, Compose and systemd and Dockerfile tokens, <code>bash -n</code>, and a <code>--dry-run</code> that must not invoke docker, nginx, or curl.</p>
+      <p>CI (<code>.github/workflows/ci.yml</code>) runs ruff, <code>bash -n</code>, pytest with coverage on Python 3.10, 3.11, and 3.12, then a local <code>docker build</code> (<code>push: false</code>). The workflow lives with this project. If the git root is the parent monorepo, each job still finds <code>shiplane/requirements-dev.txt</code>.</p>
+      <h2>Deployment notes</h2>
+      <p>The live demo is a systemd service behind nginx on a small VPS, not a container. The unit is <code>deploy/shiplane.service</code> (<code>User=ec2-user</code>, <code>WorkingDirectory=/opt/portfolio/shiplane</code>, <code>PORT=18805</code>, <code>DATA_DIR=/opt/portfolio/shiplane/data</code>, <code>Restart=always</code>, <code>MemoryMax=150M</code>, <code>NoNewPrivileges=yes</code>).</p>
+      <p>The public URL is <code>https://3.1.79.63/portfolio/shiplane/</code> with the prefix stripped by nginx (<code>proxy_pass http://127.0.0.1:18805/;</code>). The page links back to the portfolio with <code>../</code>. <code>deploy/deploy.sh</code> in the portfolio repo installs this unit.</p>
+      <p><code>deploy/bluegreen.sh</code> is the production switch for <code>checkout-api</code> on that same class of host: two Compose projects, an atomic symlink for the live color, an upstream file swapped into place, <code>nginx -t</code> before reload, previous color left running. Defaults assume state under <code>/var/lib/shiplane</code> and an upstream at <code>/etc/nginx/conf.d/shiplane-checkout.conf</code>. Staging in <code>release.yml</code> uses a separate state directory and ports. The visualizer&#x27;s own systemd unit does not call this script.</p>
+      <h2>Screenshots</h2>
+      <p>Desktop, 1440×1000:</p>
+      <p><img alt="Desktop pipeline" src="../img/shiplane-desktop.png"></p>
+      <p>Mobile, 390×844:</p>
+      <p><img alt="Mobile pipeline" src="../img/shiplane-mobile.png"></p>
+      <p>A run in progress, with the job log open:</p>
+      <p><img alt="Live run" src="../img/shiplane-live-run.png"></p>
+    </article>
+    <p class="case-cta"><a class="btn" href="https://52.76.87.179/portfolio/shiplane/">Open the live demo</a></p>
+  </main>
+  <footer class="foot">
+    <div class="wrap">All demos use fictional data.</div>
+  </footer>
+</body>
+</html>

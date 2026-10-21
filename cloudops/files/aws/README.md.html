@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aws/README.md</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<strong>CloudOps</strong>
+<nav>
+<a href="../../index.html">概览</a>
+<a href="../../aws/index.html">AWS 次要</a>
+<a href="../index.html">文件</a>
+<a href="../../downloads/cloudops-config-0.1.0.tar.gz">配置包</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">源文件</p><h1>aws/README.md</h1><p class="note">离线配置。未部署到任何云账号。</p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold"># AWS parallel (secondary)</span>
+
+<span style="font-weight: bold">**SECONDARY — AWS parallel; GCP is the primary narrative of this demo.**</span>
+
+次要. This directory is a thin Lambda + API Gateway HTTP API + CodeBuild + GitHub OIDC fragment for the same fictional insights-api. GCP Cloud Run is the main story. Nothing here is deployed to an AWS account. There is no VPC, no load balancer, and no NAT gateway.
+
+Thistle Analytics is fictional. Account <span style="color: #BA2121">`000000000000`</span> is a placeholder. Configs are real files and are offline-validated. They are not deployed to any cloud account.
+
+<span style="color: #800080; font-weight: bold">## What is here</span>
+
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">`lambda/handler.py`</span> — a small adapter that answers <span style="color: #BA2121">`/healthz`</span>, <span style="color: #BA2121">`/readyz`</span>, and <span style="color: #BA2121">`/metrics`</span>. It is not the Cloud Run process.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">`template.yaml`</span> — SAM: HTTP API to that function, an execution role, and a deploy role that can update only that function.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">`codebuild/buildspec.yml`</span> — install, pre_build, build, post_build.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">`.github/workflows/aws-deploy.yml.fragment`</span> — OIDC via <span style="color: #BA2121">`aws-actions/configure-aws-credentials`</span>, pinned to a full commit SHA.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">`iam/`</span> — the same two roles in a form conftest can read.
+<span style="color: #008000; font-weight: bold">-</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">`monitoring/alarms.json`</span> — three CloudWatch alarms: errors, latency, throttles.
+
+<span style="color: #BA2121">`make check`</span> does not call the AWS API.
+</code></pre></div>
+
+</main>
+</body>
+</html>
